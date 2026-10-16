@@ -143,9 +143,24 @@ describe('handlers', () => {
     expect(r.crawlDate).toBe('9 October 2026');
   });
 
+  it('reports how fresh each source is', async () => {
+    const r = (await createHandlers(deps({ sources: fakeSources({ tpac: [] }), now: () => Date.parse('2026-10-27T10:00:00Z') })).handle({ type: 'get-freshness' }, sender(1))) as { sources: { name: string; origin: string }[] };
+    expect(r.sources.map((s) => s.name)).toEqual(['specs', 'groups', 'repos', 'tpac']);
+    expect(r.sources.every((s) => s.origin === 'bundled')).toBe(true);
+  });
+
   it('tells open panels when page facts change a tab\'s context', async () => {
     const notify = vi.fn();
     await createHandlers(deps({ notify })).handle({ type: 'page-facts', facts: { kind: 'spec', url: 'https://w3c.github.io/webappsec-fetch-metadata/' } }, sender(7));
     expect(notify).toHaveBeenCalledWith(7);
+  });
+
+  it('leaves the TPAC calendar alone outside the TPAC window', async () => {
+    const load = vi.fn(async (name: string) => ({ data: ({ specs, groups, repos } as Record<string, unknown>)[name] ?? [], fetchedAt: 1, origin: 'live' }));
+    const h = createHandlers(deps({ sources: { load } as unknown as Sources, now: () => Date.parse('2026-11-05T10:00:00Z') }));
+    expect(await h.handle({ type: 'get-tpac', groupNames: ['x'] }, sender(1))).toMatchObject({ visible: false, now: [], next: [] });
+    const f = (await h.handle({ type: 'get-freshness' }, sender(1))) as { sources: { name: string }[] };
+    expect(f.sources.map((s) => s.name)).toEqual(['specs', 'groups', 'repos']);
+    expect(load).not.toHaveBeenCalledWith('tpac');
   });
 });

@@ -143,9 +143,18 @@ export function createHandlers(deps: HandlerDeps) {
       const result = await checkLinks(msg.links, msg.shortname, specs, loadTarget);
       return { ...result, crawlDate: index.date };
     },
+    'get-freshness': async () => {
+      const names = tpacVisible(deps.now()) ? (['specs', 'groups', 'repos', 'tpac'] as const) : (['specs', 'groups', 'repos'] as const);
+      const loaded = await Promise.all(names.map((n) => deps.sources.load(n).catch(() => undefined)));
+      return {
+        sources: loaded.flatMap((l, i) => (l ? [{ name: names[i], fetchedAt: l.fetchedAt, origin: l.origin }] : [])),
+      };
+    },
     'get-tpac': async (msg) => {
-      const t = await deps.sources.load('tpac');
       const now = deps.now();
+      // Outside the TPAC window, the section is hidden, so don't fetch the calendar at all.
+      if (!tpacVisible(now)) return { visible: false, now: [], next: [], slots: {}, fetchedAt: 0, origin: 'bundled' };
+      const t = await deps.sources.load('tpac');
       const { now: inSession, next } = nowAndNext(t.data, now);
       const slots: Record<string, typeof t.data> = {};
       for (const name of msg.groupNames ?? []) slots[name] = eventsForGroup(t.data, name);

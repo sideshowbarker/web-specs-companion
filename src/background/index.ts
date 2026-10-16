@@ -9,6 +9,7 @@ import { badgeColor, maturityFor } from '../logic/maturity.ts';
 import type { Context } from '../shared/types.ts';
 import { createHandlers } from './handlers.ts';
 import { omniboxTarget, suggestionFor } from './omnibox.ts';
+import { ensureAlarms, runAlarm } from './refresh.ts';
 import type { SearchItem } from '../logic/search.ts';
 import { TabStore } from './tabs.ts';
 
@@ -78,5 +79,16 @@ if (browser.omnibox) {
     });
   });
 }
+
+// Alarms schedule the data refreshes. The WebExtensions WG is specifying this API: w3c/webextensions PR #1110.
+browser.runtime.onInstalled.addListener(() => {
+  ensureAlarms(browser.alarms).catch(() => {});
+});
+browser.runtime.onStartup.addListener(() => {
+  ensureAlarms(browser.alarms).catch(() => {});
+});
+browser.alarms.onAlarm.addListener((alarm) => {
+  runAlarm(alarm.name, sources, Date.now()).catch(() => {});
+});
 
 export { handlers, http, sources };

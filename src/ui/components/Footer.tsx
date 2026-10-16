@@ -1,3 +1,5 @@
+import { Freshness } from './Freshness.tsx';
+
 export function Footer({ surface, windowId }: { surface: 'popup' | 'sidepanel'; windowId?: number }) {
   const side = (browser as unknown as { sidePanel?: { open?: (o: { windowId: number }) => Promise<void> } }).sidePanel;
   const bar = (browser as unknown as { sidebarAction?: { open?: () => Promise<void> } }).sidebarAction;
@@ -14,6 +16,7 @@ export function Footer({ surface, windowId }: { surface: 'popup' | 'sidepanel'; 
           Keep this open beside the page
         </button>
       )}
+      <Freshness />
     </footer>
   );
 }
