@@ -1,0 +1,31 @@
+:root {
+  --blue: #005a9c;
+  --dark-blue: #002a56;
+  --focus: #f9dc4a;
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #555b61;
+  --line: #d6dbe0;
+  --warn-bg: #fff4ce;
+  --warn-fg: #5c4400;
+  --link: #005a9c;
+  font: 14px/1.45 "Noto Sans", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #11161c;
+    --fg: #e8ecf0;
+    --muted: #a9b3bd;
+    --line: #2c3540;
+    --warn-bg: #3d3200;
+    --warn-fg: #ffe9a3;
+    --link: #8cc4ff;
+  }
+}
+html, body { margin: 0; background: var(--bg); color: var(--fg); }
+/* Chrome injects body { font-family: system-ui, sans-serif; font-size: 75% } into every extension page, so the body
+   takes the root font back explicitly. */
+body { font: inherit; }
+html[data-surface="popup"] body { width: 380px; max-height: 580px; }
+a { color: var(--link); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }

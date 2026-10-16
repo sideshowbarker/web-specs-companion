@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "W3C Companion"
+  },
+  "extShortName": {
+    "message": "W3C"
+  },
+  "extDescription": {
+    "message": "A companion for reading W3C specifications and finding the groups and people behind them."
+  },
+  "actionTitle": {
+    "message": "W3C Companion"
+  }
+}

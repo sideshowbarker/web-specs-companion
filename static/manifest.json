@@ -1,0 +1,156 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "short_name": "__MSG_extShortName__",
+  "description": "__MSG_extDescription__",
+  "version": "0.0.0",
+  "default_locale": "en",
+  "minimum_chrome_version": "148",
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "__MSG_actionTitle__",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "activeTab",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://www.w3.org/*",
+    "https://api.w3.org/*",
+    "https://github.com/*",
+    "https://w3c.github.io/*",
+    "https://wicg.github.io/*",
+    "https://drafts.csswg.org/*",
+    "https://drafts.css-houdini.org/*",
+    "https://drafts.fxtf.org/*",
+    "https://*.spec.whatwg.org/*",
+    "https://webassembly.github.io/*",
+    "https://immersive-web.github.io/*",
+    "https://privacycg.github.io/*",
+    "https://webmachinelearning.github.io/*",
+    "https://webaudio.github.io/*",
+    "https://screen-share.github.io/*",
+    "https://w3c-fedid.github.io/*",
+    "https://w3ctag.github.io/*",
+    "https://gpuweb.github.io/*",
+    "https://patcg-individual-drafts.github.io/*",
+    "https://w3c-cg.github.io/*",
+    "https://svgwg.org/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.w3.org/TR/*",
+        "https://w3c.github.io/*",
+        "https://wicg.github.io/*",
+        "https://drafts.csswg.org/*",
+        "https://drafts.css-houdini.org/*",
+        "https://drafts.fxtf.org/*",
+        "https://*.spec.whatwg.org/*",
+        "https://webassembly.github.io/*",
+        "https://immersive-web.github.io/*",
+        "https://privacycg.github.io/*",
+        "https://webmachinelearning.github.io/*",
+        "https://webaudio.github.io/*",
+        "https://screen-share.github.io/*",
+        "https://w3c-fedid.github.io/*",
+        "https://w3ctag.github.io/*",
+        "https://gpuweb.github.io/*",
+        "https://patcg-individual-drafts.github.io/*",
+        "https://w3c-cg.github.io/*",
+        "https://svgwg.org/*"
+      ],
+      "js": [
+        "respec-main.js"
+      ],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://www.w3.org/TR/*",
+        "https://w3c.github.io/*",
+        "https://wicg.github.io/*",
+        "https://drafts.csswg.org/*",
+        "https://drafts.css-houdini.org/*",
+        "https://drafts.fxtf.org/*",
+        "https://*.spec.whatwg.org/*",
+        "https://webassembly.github.io/*",
+        "https://immersive-web.github.io/*",
+        "https://privacycg.github.io/*",
+        "https://webmachinelearning.github.io/*",
+        "https://webaudio.github.io/*",
+        "https://screen-share.github.io/*",
+        "https://w3c-fedid.github.io/*",
+        "https://w3ctag.github.io/*",
+        "https://gpuweb.github.io/*",
+        "https://patcg-individual-drafts.github.io/*",
+        "https://w3c-cg.github.io/*",
+        "https://svgwg.org/*"
+      ],
+      "js": [
+        "spec.js"
+      ],
+      "run_at": "document_idle",
+      "world": "ISOLATED"
+    },
+    {
+      "matches": [
+        "https://github.com/*"
+      ],
+      "include_globs": [],
+      "js": [
+        "github.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "sidebar_action": {
+    "default_panel": "sidepanel.html",
+    "default_title": "__MSG_extName__",
+    "default_icon": "icons/32.png",
+    "open_at_install": false
+  },
+  "omnibox": {
+    "keyword": "w3c"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+W"
+      }
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "w3c-companion@w3.org",
+      "strict_min_version": "128.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  }
+}
