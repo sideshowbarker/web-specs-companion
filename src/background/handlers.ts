@@ -4,6 +4,7 @@ import type { Sources } from '../data/sources.ts';
 import { getGroupDetails, getSpecDetails } from '../data/w3capi.ts';
 import { computeRadar } from '../logic/radar.ts';
 import { SpecIndex } from '../data/specs.ts';
+import { eventsForGroup, nowAndNext, tpacVisible } from '../data/tpac.ts';
 import { resolveContext } from '../logic/context.ts';
 import type { Api, Message, MessageType } from '../shared/messages.ts';
 import type { Context } from '../shared/types.ts';
@@ -65,6 +66,22 @@ export function createHandlers(deps: HandlerDeps) {
         : undefined;
       const { specs } = await indexes();
       return { radar: computeRadar(ctx, specs, details) ?? null };
+    },
+    'get-tpac': async (msg) => {
+      const t = await deps.sources.load('tpac');
+      const now = deps.now();
+      const { now: inSession, next } = nowAndNext(t.data, now);
+      const slots: Record<string, typeof t.data> = {};
+      for (const name of msg.groupNames ?? []) slots[name] = eventsForGroup(t.data, name);
+      return {
+        visible: tpacVisible(now),
+        firstStart: t.data.find((e) => e.kind === 'group')?.start,
+        now: inSession,
+        next,
+        slots,
+        fetchedAt: t.fetchedAt,
+        origin: t.origin,
+      };
     },
   };
 

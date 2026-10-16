@@ -4,6 +4,8 @@ import { TabStore, type SessionArea } from '../src/background/tabs.ts';
 import { createHttp, MemoryStore } from '../src/data/http.ts';
 import type { Sources } from '../src/data/sources.ts';
 import { specs, groups, repos } from './fixtures/catalog.ts';
+import { parseIcs } from '../src/data/tpac.ts';
+import { readFileSync } from 'node:fs';
 
 export function fakeSession(): SessionArea {
   const m = new Map<string, unknown>();
@@ -73,5 +75,16 @@ describe('handlers', () => {
     const http = createHttp(new MemoryStore(), vi.fn(async () => { throw new TypeError('offline'); }), () => 0);
     const r = await createHandlers(deps({ http })).handle({ type: 'get-group-details', identifier: 'wg/css' }, sender(1));
     expect(r).toEqual({ details: null });
+  });
+
+  it("answers get-tpac with the group's slots", async () => {
+    const tpac = parseIcs(readFileSync(new URL('./fixtures/tpac.ics', import.meta.url), 'utf8'));
+    const h = createHandlers(deps({ sources: fakeSources({ tpac }), now: () => Date.parse('2026-10-26T10:00:00Z') }));
+    const r = (await h.handle({ type: 'get-tpac', groupNames: ['Web Application Security Working Group'] }, sender(1))) as {
+      visible: boolean; now: { uid: string }[]; slots: Record<string, { room?: string }[]>;
+    };
+    expect(r.visible).toBe(true);
+    expect(r.now.map((e) => e.uid)).toContain('group-1');
+    expect(r.slots['Web Application Security Working Group'][0].room).toBe('Ground Floor - Munster Suite');
   });
 });

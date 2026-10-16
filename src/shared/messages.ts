@@ -1,3 +1,4 @@
+import type { TpacView } from '../data/tpac.ts';
 import type { GroupDetails, SpecDetails } from '../data/w3capi.ts';
 import type { Radar } from '../logic/radar.ts';
 import type { Context, PageFacts } from './types.ts';
@@ -8,6 +9,7 @@ export interface Api {
   'get-spec-details': { req: { shortname: string }; res: { details: SpecDetails | null } };
   'get-group-details': { req: { identifier: string }; res: { details: GroupDetails | null } };
   'get-radar': { req: { tabId: number; url?: string }; res: { radar: Radar | null } };
+  'get-tpac': { req: { groupNames?: string[] }; res: TpacView };
 }
 
 export type MessageType = keyof Api;
