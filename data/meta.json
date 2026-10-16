@@ -1,0 +1,9 @@
+{
+  "generatedAt": "2026-10-16T07:30:41.226Z",
+  "sources": {
+    "specs": "https://w3c.github.io/browser-specs/index.json",
+    "groups": "https://w3c.github.io/groups/w3c-groups.json",
+    "repos": "https://w3c.github.io/groups/repositories.json",
+    "idlnames": "https://w3c.github.io/webref/ed/idlnames.json"
+  }
+}
