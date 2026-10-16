@@ -20,7 +20,15 @@ export function historyShortname(url: string): string | undefined {
   return /^https?:\/\/www\.w3\.org\/standards\/history\/([^/?#]+)/.exec(url)?.[1];
 }
 
-export function parseGitHubUrl(url: string) {
+export interface GitHubPage {
+  owner: string;
+  repo: string;
+  nwo: string;
+  kind: 'repo' | 'issue' | 'pr';
+  number?: number;
+}
+
+export function parseGitHubUrl(url: string): GitHubPage | undefined {
   const u = new URL(url);
   if (u.hostname !== 'github.com') return undefined;
   const [owner, repo, section, num] = u.pathname.split('/').filter(Boolean);
