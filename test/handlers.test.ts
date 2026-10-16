@@ -122,4 +122,24 @@ describe('handlers', () => {
     expect(f.footprint.normativeRefs).toHaveLength(1);
     expect(f.footprint.crawlDate).toBe('9 October 2026');
   });
+
+  it('checks links against the target spec ids from webref', async () => {
+    const files: Record<string, unknown> = {
+      'https://w3c.github.io/webref/ed/index.json': { date: '9 October 2026', results: [{ shortname: 'fetch-metadata', ids: 'ids/fetch-metadata.json', dfns: 'dfns/fetch-metadata.json' }] },
+      'https://w3c.github.io/webref/ed/ids/fetch-metadata.json': { ids: ['https://w3c.github.io/webappsec-fetch-metadata/#sec-fetch-dest-header'] },
+      'https://w3c.github.io/webref/ed/dfns/fetch-metadata.json': { dfns: [] },
+    };
+    const http = createHttp(new MemoryStore(), vi.fn(async (u: RequestInfo | URL) => (String(u) in files ? new Response(JSON.stringify(files[String(u)])) : new Response('', { status: 404 }))), () => 0);
+    const r = (await createHandlers(deps({ http, now: () => Date.UTC(2026, 9, 17) })).handle({
+      type: 'check-links',
+      shortname: 'fetch',
+      links: [
+        { i: 0, href: 'https://w3c.github.io/webappsec-fetch-metadata/#sec-fetch-dest-header', text: 'Sec-Fetch-Dest' },
+        { i: 1, href: 'https://w3c.github.io/webappsec-fetch-metadata/#gone', text: 'gone' },
+      ],
+    }, sender(1))) as { problems: { i: number }[]; checked: number; crawlDate: string };
+    expect(r.problems.map((p) => p.i)).toEqual([1]);
+    expect(r.checked).toBe(2);
+    expect(r.crawlDate).toBe('9 October 2026');
+  });
 });

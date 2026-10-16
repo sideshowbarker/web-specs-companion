@@ -1,6 +1,8 @@
 import type { TpacView } from '../data/tpac.ts';
 import type { GroupDetails, SpecDetails } from '../data/w3capi.ts';
+import type { OutLink } from '../content/links.ts';
 import type { Footprint, UsedByEntry } from '../logic/footprint.ts';
+import type { LinkCheckResult } from '../logic/linkcheck.ts';
 import type { Radar } from '../logic/radar.ts';
 import type { SearchItem } from '../logic/search.ts';
 import type { Context, PageFacts } from './types.ts';
@@ -16,6 +18,7 @@ export interface Api {
   'resolve-idl': { req: { name: string }; res: { url: string } };
   'get-footprint': { req: { shortname: string }; res: { footprint: Footprint | null } };
   'get-used-by': { req: { shortname: string }; res: { map: Record<string, UsedByEntry> | null; specdex: string } };
+  'check-links': { req: { shortname: string; links: OutLink[] }; res: LinkCheckResult };
 }
 
 export type MessageType = keyof Api;
@@ -30,8 +33,11 @@ export async function send<K extends MessageType>(type: K, req: Api[K]['req']): 
   return unwrap(await browser.runtime.sendMessage({ type, ...req }));
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface TabApi {}
+export interface TabApi {
+  'run-link-check': { req: Record<string, never>; res: LinkCheckResult };
+  'reveal-link': { req: { i: number }; res: { ok: boolean } };
+  'clear-link-check': { req: Record<string, never>; res: { ok: boolean } };
+}
 export type TabMessage = { [K in keyof TabApi]: { type: K } & TabApi[K]['req'] }[keyof TabApi];
 
 export async function sendToTab<K extends keyof TabApi>(

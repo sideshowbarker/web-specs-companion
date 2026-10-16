@@ -4,7 +4,9 @@ import type { Sources } from '../data/sources.ts';
 import { getGroupDetails, getSpecDetails } from '../data/w3capi.ts';
 import { getExtract, getWebrefIndex, type WebrefEntry } from '../data/webref.ts';
 import { buildUsedByMap, computeFootprint, specdexUrl } from '../logic/footprint.ts';
+import { checkLinks, type TargetData } from '../logic/linkcheck.ts';
 import { computeRadar } from '../logic/radar.ts';
+import { fragmentOf } from '../shared/url.ts';
 import { buildSearchItems, IDL_TYPES, parseQuery, search, termSearch, webidlpediaUrl, type SearchItem } from '../logic/search.ts';
 import { SpecIndex } from '../data/specs.ts';
 import { eventsForGroup, nowAndNext, tpacVisible } from '../data/tpac.ts';
@@ -120,6 +122,23 @@ export function createHandlers(deps: HandlerDeps) {
       const { specs } = await indexes();
       const series = specs.get(msg.shortname)?.series.shortname ?? msg.shortname;
       return { map: buildUsedByMap(file.backrefs, msg.shortname, series), specdex };
+    },
+    'check-links': async (msg) => {
+      const index = await getWebrefIndex(deps.http, deps.now);
+      const { specs } = await indexes();
+      const loadTarget = async (shortname: string): Promise<TargetData | undefined> => {
+        const entry = index.entries.get(shortname);
+        const [ids, dfns] = await Promise.all([getExtract(deps.http, entry, 'ids'), getExtract(deps.http, entry, 'dfns')]);
+        if (!ids) return undefined;
+        const fragments = new Map<string, string>();
+        for (const url of ids.ids) {
+          const f = fragmentOf(url);
+          if (f) fragments.set(f, url);
+        }
+        return { fragments, dfns: dfns?.dfns ?? [] };
+      };
+      const result = await checkLinks(msg.links, msg.shortname, specs, loadTarget);
+      return { ...result, crawlDate: index.date };
     },
     'get-tpac': async (msg) => {
       const t = await deps.sources.load('tpac');
