@@ -38,7 +38,11 @@ function setBadge(tabId: number, ctx: Context) {
   browser.action.setBadgeTextColor?.({ tabId, color: '#ffffff' })?.catch(() => {});
 }
 
-const handlers = createHandlers({ sources, http, tabs, now: Date.now, setBadge });
+const notify = (tabId: number) => {
+  browser.runtime.sendMessage({ type: 'context-changed', tabId }).catch(() => {});
+};
+
+const handlers = createHandlers({ sources, http, tabs, now: Date.now, setBadge, notify });
 
 // Answer through sendResponse, and keep the channel open, which every engine supports.
 browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {

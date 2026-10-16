@@ -29,3 +29,33 @@ body { font: inherit; }
 html[data-surface="popup"] body { width: 380px; max-height: 580px; }
 a { color: var(--link); }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+main { padding: 12px 14px 16px; display: grid; gap: 14px; }
+h1 { font-size: 1.15rem; margin: 0; line-height: 1.3; }
+h2 { font-size: 0.95rem; margin: 0 0 4px; }
+h3 { font-size: 0.85rem; margin: 8px 0 2px; }
+p { margin: 0 0 4px; }
+ul { margin: 0; padding-inline-start: 18px; }
+.muted { color: var(--muted); }
+.note, .warn { padding: 4px 8px; border-radius: 4px; }
+.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.note { border-inline-start: 3px solid var(--blue); }
+.card { display: grid; gap: 10px; }
+.card-head { display: grid; gap: 2px; }
+.chip { justify-self: start; color: #fff; font: 700 11px/1 system-ui, sans-serif; padding: 3px 6px; border-radius: 3px; }
+.links { display: flex; flex-wrap: wrap; gap: 4px 12px; list-style: none; padding: 0; }
+.group, .footprint, .tools, .tpac, .specs { border-top: 1px solid var(--line); padding-top: 8px; }
+.radar-label { font-weight: 600; }
+.search { display: grid; gap: 4px; }
+.search label { font-weight: 600; }
+.search input { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--fg); }
+.results { list-style: none; padding: 0; display: grid; gap: 4px; }
+details summary { cursor: pointer; }
+button { font: inherit; padding: 4px 10px; border: 1px solid var(--blue); border-radius: 4px; background: var(--bg); color: var(--link); cursor: pointer; }
+button:disabled { opacity: 0.6; cursor: default; }
+button.linkish { border: 0; padding: 0; text-decoration: underline; }
+.toggle { display: block; margin-bottom: 8px; }
+.filter { border: 0; padding: 0; margin: 0 0 6px; display: flex; gap: 10px; }
+.filter legend { font-weight: 600; float: left; margin-inline-end: 8px; }
+.events { list-style: none; padding: 0; display: grid; gap: 4px; }
+.empty { color: var(--muted); }
+footer { border-top: 1px solid var(--line); padding-top: 8px; display: grid; gap: 6px; }

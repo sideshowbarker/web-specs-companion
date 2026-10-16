@@ -142,4 +142,10 @@ describe('handlers', () => {
     expect(r.checked).toBe(2);
     expect(r.crawlDate).toBe('9 October 2026');
   });
+
+  it('tells open panels when page facts change a tab\'s context', async () => {
+    const notify = vi.fn();
+    await createHandlers(deps({ notify })).handle({ type: 'page-facts', facts: { kind: 'spec', url: 'https://w3c.github.io/webappsec-fetch-metadata/' } }, sender(7));
+    expect(notify).toHaveBeenCalledWith(7);
+  });
 });

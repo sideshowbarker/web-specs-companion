@@ -26,6 +26,8 @@ export interface HandlerDeps {
   tabs: TabStore;
   now: () => number;
   setBadge: (tabId: number, ctx: Context) => void | Promise<void>;
+  /** Tells open panels that a tab's context changed after its URL did (page facts arrive later). */
+  notify?: (tabId: number) => void;
 }
 
 export type HandlerTable = {
@@ -66,6 +68,7 @@ export function createHandlers(deps: HandlerDeps) {
       await deps.tabs.setFacts(tabId, msg.facts);
       const ctx = await contextFor(tabId, msg.facts.url);
       if (ctx) await deps.setBadge(tabId, ctx);
+      deps.notify?.(tabId);
       return { shortname: ctx?.spec?.shortname };
     },
     'get-context': async (msg) => ({ context: await contextFor(msg.tabId, msg.url) }),
