@@ -87,4 +87,15 @@ describe('handlers', () => {
     expect(r.now.map((e) => e.uid)).toContain('group-1');
     expect(r.slots['Web Application Security Working Group'][0].room).toBe('Ground Floor - Munster Suite');
   });
+
+  it('searches the indexes, and falls back to webidlpedia when the xref service is down', async () => {
+    const http = createHttp(new MemoryStore(), vi.fn(async () => { throw new TypeError('offline'); }), () => 0);
+    const h = createHandlers(deps({ http, sources: fakeSources({ idlnames: { Request: { type: 'interface' } } }) }));
+    const r = (await h.handle({ type: 'search', query: 'fetch' }, sender(1))) as { items: { url: string }[] };
+    expect(r.items[0].url).toBe('https://fetch.spec.whatwg.org/');
+    const t = (await h.handle({ type: 'search', query: 'dfn navigate' }, sender(1))) as { items: unknown[] };
+    expect(t.items).toEqual([]);
+    const idl = (await h.handle({ type: 'resolve-idl', name: 'Request' }, sender(1))) as { url: string };
+    expect(idl.url).toBe('https://dontcallmedom.github.io/webidlpedia/names/Request.html');
+  });
 });

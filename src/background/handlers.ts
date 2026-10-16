@@ -3,6 +3,7 @@ import type { Http } from '../data/http.ts';
 import type { Sources } from '../data/sources.ts';
 import { getGroupDetails, getSpecDetails } from '../data/w3capi.ts';
 import { computeRadar } from '../logic/radar.ts';
+import { buildSearchItems, IDL_TYPES, parseQuery, search, termSearch, webidlpediaUrl, type SearchItem } from '../logic/search.ts';
 import { SpecIndex } from '../data/specs.ts';
 import { eventsForGroup, nowAndNext, tpacVisible } from '../data/tpac.ts';
 import { resolveContext } from '../logic/context.ts';
@@ -29,6 +30,14 @@ export type HandlerTable = {
 
 export function createHandlers(deps: HandlerDeps) {
   let built: { key: string; idx: Indexes } | undefined;
+  let searchItems: { key: string; items: SearchItem[] } | undefined;
+
+  async function items(): Promise<SearchItem[]> {
+    const [s, g, i] = await Promise.all([deps.sources.load('specs'), deps.sources.load('groups'), deps.sources.load('idlnames')]);
+    const key = [s, g, i].map((x) => `${x.origin}:${x.fetchedAt}`).join('|');
+    if (searchItems?.key !== key) searchItems = { key, items: buildSearchItems(s.data, g.data, i.data) };
+    return searchItems.items;
+  }
 
   async function indexes(): Promise<Indexes> {
     const [s, g, r] = await Promise.all([deps.sources.load('specs'), deps.sources.load('groups'), deps.sources.load('repos')]);
@@ -66,6 +75,21 @@ export function createHandlers(deps: HandlerDeps) {
         : undefined;
       const { specs } = await indexes();
       return { radar: computeRadar(ctx, specs, details) ?? null };
+    },
+    'search': async (msg) => {
+      const { scope, text } = parseQuery(msg.query);
+      const found = search(await items(), msg.query);
+      if (scope === 'term' || (scope === 'all' && found.length === 0 && text.length > 1)) {
+        const { specs } = await indexes();
+        const terms = await termSearch(deps.http, specs, text).catch(() => []);
+        return { items: [...found, ...terms].slice(0, 8) };
+      }
+      return { items: found };
+    },
+    'resolve-idl': async (msg) => {
+      const { specs } = await indexes();
+      const hits = await termSearch(deps.http, specs, msg.name, IDL_TYPES).catch(() => []);
+      return { url: hits[0]?.url ?? webidlpediaUrl(msg.name) };
     },
     'get-tpac': async (msg) => {
       const t = await deps.sources.load('tpac');

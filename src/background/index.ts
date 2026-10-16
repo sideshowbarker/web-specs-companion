@@ -8,6 +8,8 @@ import { createSources } from '../data/sources.ts';
 import { badgeColor, maturityFor } from '../logic/maturity.ts';
 import type { Context } from '../shared/types.ts';
 import { createHandlers } from './handlers.ts';
+import { omniboxTarget, suggestionFor } from './omnibox.ts';
+import type { SearchItem } from '../logic/search.ts';
 import { TabStore } from './tabs.ts';
 
 const store = new CacheApiStore();
@@ -54,5 +56,23 @@ browser.tabs.onUpdated.addListener((tabId, info, tab) => {
 browser.tabs.onRemoved.addListener((tabId) => {
   tabs.remove(tabId).catch(() => {});
 });
+
+const markup = typeof browser.runtime.getBrowserInfo !== 'function';
+const find = async (q: string) => ((await handlers.handle({ type: 'search', query: q }, {})) as { items: SearchItem[] }).items;
+const resolveIdl = async (name: string) => ((await handlers.handle({ type: 'resolve-idl', name }, {})) as { url: string }).url;
+
+if (browser.omnibox) {
+  browser.omnibox.setDefaultSuggestion({ description: 'Search W3C specs, groups, Web IDL, and terms' });
+  browser.omnibox.onInputChanged.addListener((text, suggest) => {
+    find(text).then((items) => suggest(items.map((i) => suggestionFor(i, markup))), () => suggest([]));
+  });
+  browser.omnibox.onInputEntered.addListener((text, disposition) => {
+    omniboxTarget(text, find, resolveIdl).then((url) => {
+      if (disposition === 'newForegroundTab') return browser.tabs.create({ url });
+      if (disposition === 'newBackgroundTab') return browser.tabs.create({ url, active: false });
+      return browser.tabs.update({ url });
+    });
+  });
+}
 
 export { handlers, http, sources };
