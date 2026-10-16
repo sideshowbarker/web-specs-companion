@@ -96,4 +96,8 @@ describe('resolveContext', () => {
   it('returns kind none for anything else', () => {
     expect(resolve('https://example.org/').kind).toBe('none');
   });
+
+  it('lists the repositories of a group page', () => {
+    expect(resolve('https://www.w3.org/groups/wg/css/').groupRepos).toEqual(['w3c/csswg-drafts']);
+  });
 });

@@ -13,6 +13,16 @@ export function RepoCard({ ctx, slots }: { ctx: Context; slots: Record<string, T
       </header>
       {repo && ctx.groups.length === 0 && <p class="muted">No W3C group is recorded for this repository.</p>}
       {ctx.groups.map((g) => <GroupBlock key={g.identifier} group={g} slots={slots[g.name]} />)}
+      {!repo && ctx.groupRepos && ctx.groupRepos.length > 0 && (
+        <div class="specs">
+          <h2>Repositories</h2>
+          <ul>
+            {ctx.groupRepos.map((nwo) => (
+              <li key={nwo}><A href={`https://github.com/${nwo}`}>{nwo}</A></li>
+            ))}
+          </ul>
+        </div>
+      )}
       {ctx.repoSpecs && ctx.repoSpecs.length > 0 && (
         <div class="specs">
           <h2>{repo ? 'Specs in this repository' : 'Specs from this group'}</h2>

@@ -41,6 +41,16 @@ export class GroupIndex {
       .filter((g): g is SlimGroup => !!g);
   }
 
+  reposFor(identifier: string): string[] {
+    return Object.entries(this.repos.repos)
+      .filter(([, ids]) => ids.includes(identifier))
+      .map(([nwo]) => {
+        const [owner, name] = nwo.split('/');
+        return `${this.repos.owners[owner] ?? owner}/${name}`;
+      })
+      .sort();
+  }
+
   forSpec(spec: SlimSpec): SlimGroup[] {
     const out: SlimGroup[] = [];
     for (const g of spec.groups) {

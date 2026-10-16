@@ -80,6 +80,7 @@ export interface Context {
   groups: SlimGroup[];
   repo?: { nwo: string; url: string; number?: number };
   repoSpecs?: SlimSpec[];
+  groupRepos?: string[];
   facts?: PageFacts;
 }
 

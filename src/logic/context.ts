@@ -36,6 +36,7 @@ export function resolveContext(url: string, facts: PageFacts | undefined, specs:
       url,
       groups: g ? [g] : [],
       repoSpecs: g ? specs.specs.filter((s) => groups.forSpec(s).includes(g)) : [],
+      groupRepos: g ? groups.reposFor(g.identifier) : [],
       facts,
     };
   }
