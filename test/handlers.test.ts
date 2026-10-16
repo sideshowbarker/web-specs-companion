@@ -68,4 +68,10 @@ describe('handlers', () => {
   it('rejects unknown messages', async () => {
     await expect(createHandlers(deps()).handle({ type: 'nope' }, sender(1))).rejects.toThrow(/unknown message/);
   });
+
+  it('answers get-group-details with null when the API is unreachable', async () => {
+    const http = createHttp(new MemoryStore(), vi.fn(async () => { throw new TypeError('offline'); }), () => 0);
+    const r = await createHandlers(deps({ http })).handle({ type: 'get-group-details', identifier: 'wg/css' }, sender(1));
+    expect(r).toEqual({ details: null });
+  });
 });

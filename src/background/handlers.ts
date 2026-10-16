@@ -1,6 +1,8 @@
 import { GroupIndex } from '../data/groups.ts';
 import type { Http } from '../data/http.ts';
 import type { Sources } from '../data/sources.ts';
+import { getGroupDetails, getSpecDetails } from '../data/w3capi.ts';
+import { computeRadar } from '../logic/radar.ts';
 import { SpecIndex } from '../data/specs.ts';
 import { resolveContext } from '../logic/context.ts';
 import type { Api, Message, MessageType } from '../shared/messages.ts';
@@ -53,6 +55,17 @@ export function createHandlers(deps: HandlerDeps) {
       return { shortname: ctx?.spec?.shortname };
     },
     'get-context': async (msg) => ({ context: await contextFor(msg.tabId, msg.url) }),
+    'get-spec-details': async (msg) => ({ details: (await getSpecDetails(deps.http, msg.shortname).catch(() => undefined)) ?? null }),
+    'get-group-details': async (msg) => ({ details: (await getGroupDetails(deps.http, msg.identifier).catch(() => undefined)) ?? null }),
+    'get-radar': async (msg) => {
+      const ctx = await contextFor(msg.tabId, msg.url);
+      if (!ctx?.spec) return { radar: null };
+      const details = ctx.spec.organization.startsWith('W3C')
+        ? await getSpecDetails(deps.http, ctx.spec.shortname).catch(() => undefined)
+        : undefined;
+      const { specs } = await indexes();
+      return { radar: computeRadar(ctx, specs, details) ?? null };
+    },
   };
 
   return {

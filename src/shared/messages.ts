@@ -1,8 +1,13 @@
+import type { GroupDetails, SpecDetails } from '../data/w3capi.ts';
+import type { Radar } from '../logic/radar.ts';
 import type { Context, PageFacts } from './types.ts';
 
 export interface Api {
   'page-facts': { req: { facts: PageFacts }; res: { shortname?: string } };
   'get-context': { req: { tabId: number; url?: string }; res: { context: Context | null } };
+  'get-spec-details': { req: { shortname: string }; res: { details: SpecDetails | null } };
+  'get-group-details': { req: { identifier: string }; res: { details: GroupDetails | null } };
+  'get-radar': { req: { tabId: number; url?: string }; res: { radar: Radar | null } };
 }
 
 export type MessageType = keyof Api;
