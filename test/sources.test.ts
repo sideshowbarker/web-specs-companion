@@ -1,0 +1,82 @@
+import { describe, it, expect, vi } from 'vitest';
+import { createSources, type SourceDeps } from '../src/data/sources.ts';
+import { MemoryStore } from '../src/data/http.ts';
+
+const liveSpecs = JSON.stringify([{ shortname: 'live-spec', url: 'https://x.test/live/', title: 'Live' }]);
+const bundledSpecs = JSON.stringify([{ shortname: 'bundled-spec', url: 'https://x.test/b/', title: 'Bundled', series: { shortname: 'bundled-spec', currentSpecification: 'bundled-spec' }, groups: [], organization: 'W3C', standing: 'good' }]);
+
+function deps(over: Partial<SourceDeps> = {}): SourceDeps {
+  return {
+    store: new MemoryStore(),
+    fetchImpl: vi.fn(async () => new Response(liveSpecs)),
+    now: () => 1_000,
+    readBundled: vi.fn(async () => bundledSpecs),
+    bundledAt: async () => 500,
+    ...over,
+  };
+}
+
+describe('createSources', () => {
+  it('loads live data, slims it, and reports the origin', async () => {
+    const s = createSources(deps());
+    const r = await s.load('specs');
+    expect(r.origin).toBe('live');
+    expect(r.data[0].shortname).toBe('live-spec');
+    expect(r.data[0].series.currentSpecification).toBe('live-spec');
+  });
+
+  it('serves a fresh stored slim copy without fetching (a restarted worker)', async () => {
+    const store = new MemoryStore();
+    await createSources(deps({ store })).load('specs');
+    const fetchImpl = vi.fn();
+    const r = await createSources(deps({ store, fetchImpl })).load('specs');
+    expect(r.origin).toBe('cache');
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the stale stored copy when the live fetch fails', async () => {
+    const store = new MemoryStore();
+    await createSources(deps({ store })).load('specs');
+    const r = await createSources(deps({
+      store,
+      now: () => 1_000 + 2 * 86_400_000,
+      fetchImpl: vi.fn(async () => { throw new TypeError('offline'); }),
+    })).load('specs');
+    expect(r.origin).toBe('stale');
+    expect(r.data[0].shortname).toBe('live-spec');
+  });
+
+  it('falls back to the bundled snapshot when nothing is stored and the network is down', async () => {
+    const r = await createSources(deps({ fetchImpl: vi.fn(async () => new Response('', { status: 503 })) })).load('specs');
+    expect(r.origin).toBe('bundled');
+    expect(r.fetchedAt).toBe(500);
+    expect(r.data[0].shortname).toBe('bundled-spec');
+  });
+
+  it('refetches when forced', async () => {
+    const fetchImpl = vi.fn(async () => new Response(liveSpecs));
+    const s = createSources(deps({ fetchImpl }));
+    await s.load('specs');
+    await s.load('specs', { force: true });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('still loads live data when the cache store fails', async () => {
+    const store = { get: async () => { throw new Error('quota'); }, put: async () => { throw new Error('quota'); } };
+    const r = await createSources(deps({ store })).load('specs');
+    expect(r.origin).toBe('live');
+  });
+
+  it('waits two minutes before retrying a source whose live fetch failed', async () => {
+    let t = 1_000;
+    const fetchImpl = vi.fn(async () => { throw new TypeError('offline'); });
+    const s = createSources(deps({ fetchImpl, now: () => t }));
+    expect((await s.load('specs')).origin).toBe('bundled');
+    t += 60_000;
+    expect((await s.load('specs')).origin).toBe('bundled');
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+    t += 61_000;
+    await s.load('specs');
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+});
