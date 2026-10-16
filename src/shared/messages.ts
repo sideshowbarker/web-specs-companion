@@ -1,5 +1,6 @@
 import type { TpacView } from '../data/tpac.ts';
 import type { GroupDetails, SpecDetails } from '../data/w3capi.ts';
+import type { Footprint, UsedByEntry } from '../logic/footprint.ts';
 import type { Radar } from '../logic/radar.ts';
 import type { SearchItem } from '../logic/search.ts';
 import type { Context, PageFacts } from './types.ts';
@@ -13,6 +14,8 @@ export interface Api {
   'get-tpac': { req: { groupNames?: string[] }; res: TpacView };
   'search': { req: { query: string }; res: { items: SearchItem[] } };
   'resolve-idl': { req: { name: string }; res: { url: string } };
+  'get-footprint': { req: { shortname: string }; res: { footprint: Footprint | null } };
+  'get-used-by': { req: { shortname: string }; res: { map: Record<string, UsedByEntry> | null; specdex: string } };
 }
 
 export type MessageType = keyof Api;

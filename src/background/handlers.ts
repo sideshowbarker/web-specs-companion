@@ -2,6 +2,8 @@ import { GroupIndex } from '../data/groups.ts';
 import type { Http } from '../data/http.ts';
 import type { Sources } from '../data/sources.ts';
 import { getGroupDetails, getSpecDetails } from '../data/w3capi.ts';
+import { getExtract, getWebrefIndex, type WebrefEntry } from '../data/webref.ts';
+import { buildUsedByMap, computeFootprint, specdexUrl } from '../logic/footprint.ts';
 import { computeRadar } from '../logic/radar.ts';
 import { buildSearchItems, IDL_TYPES, parseQuery, search, termSearch, webidlpediaUrl, type SearchItem } from '../logic/search.ts';
 import { SpecIndex } from '../data/specs.ts';
@@ -90,6 +92,34 @@ export function createHandlers(deps: HandlerDeps) {
       const { specs } = await indexes();
       const hits = await termSearch(deps.http, specs, msg.name, IDL_TYPES).catch(() => []);
       return { url: hits[0]?.url ?? webidlpediaUrl(msg.name) };
+    },
+    'get-footprint': async (msg) => {
+      const { entries } = await getWebrefIndex(deps.http, deps.now).catch(() => ({ entries: new Map<string, WebrefEntry>() }));
+      const entry = entries.get(msg.shortname);
+      if (!entry) return { footprint: null };
+      const safe = <T>(p: Promise<T>) => p.catch(() => undefined);
+      const [backrefs, links, refs, idlparsed] = await Promise.all([
+        safe(getExtract(deps.http, entry, 'backrefs')),
+        safe(getExtract(deps.http, entry, 'links')),
+        safe(getExtract(deps.http, entry, 'refs')),
+        safe(getExtract(deps.http, entry, 'idlparsed')),
+      ]);
+      const { specs } = await indexes();
+      return {
+        footprint: computeFootprint(
+          { backrefs: backrefs?.backrefs, links: links?.links, refs: refs?.refs, idlparsed: idlparsed?.idlparsed },
+          msg.shortname, specs, entry,
+        ),
+      };
+    },
+    'get-used-by': async (msg) => {
+      const specdex = specdexUrl(msg.shortname);
+      const { entries } = await getWebrefIndex(deps.http, deps.now).catch(() => ({ entries: new Map<string, WebrefEntry>() }));
+      const file = await getExtract(deps.http, entries.get(msg.shortname), 'backrefs').catch(() => undefined);
+      if (!file) return { map: null, specdex };
+      const { specs } = await indexes();
+      const series = specs.get(msg.shortname)?.series.shortname ?? msg.shortname;
+      return { map: buildUsedByMap(file.backrefs, msg.shortname, series), specdex };
     },
     'get-tpac': async (msg) => {
       const t = await deps.sources.load('tpac');
