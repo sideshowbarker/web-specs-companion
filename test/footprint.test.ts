@@ -71,3 +71,23 @@ describe('webdexUrl', () => {
     expect(specdexUrl('CSS2')).toBe('https://dontcallmedom.github.io/specdex/CSS2.html');
   });
 });
+
+import { mostUsed, webrefBehind } from '../src/logic/footprint.ts';
+
+describe('mostUsed', () => {
+  it('lists the definitions other specs use most, with their anchors', () => {
+    const top = mostUsed(buildUsedByMap(backrefs, 'fetch', 'fetch'), 2);
+    expect(top.map((d) => [d.term, d.count, d.href])).toEqual([
+      ['fetch', 2, 'https://fetch.spec.whatwg.org/#concept-fetch'],
+      ['destination', 1, 'https://fetch.spec.whatwg.org/#concept-request-destination'],
+    ]);
+  });
+});
+
+describe('webrefBehind', () => {
+  it('is true only when both revisions are known and differ', () => {
+    expect(webrefBehind('abc', 'abc')).toBe(false);
+    expect(webrefBehind('abc', 'def')).toBe(true);
+    expect(webrefBehind(undefined, 'def')).toBe(false);
+  });
+});

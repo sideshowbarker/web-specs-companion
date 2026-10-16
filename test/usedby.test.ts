@@ -4,7 +4,7 @@ import { UsedByLayer } from '../src/content/usedby.ts';
 import type { UsedByEntry } from '../src/logic/footprint.ts';
 
 const entry = (count: number, access = 'public'): UsedByEntry => ({
-  count, access, term: 'fetch', type: 'dfn',
+  count, access, term: 'fetch', type: 'dfn', href: 'https://fetch.spec.whatwg.org/#a',
   specs: Array.from({ length: count }, (_, i) => ({ shortname: `s${i}`, title: `Spec ${i}`, url: `https://example.org/s${i}/` })),
   webdex: access === 'public' ? 'https://dontcallmedom.github.io/webdex/f.html#x' : undefined,
 });

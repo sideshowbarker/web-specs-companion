@@ -14,6 +14,7 @@ export interface Footprint {
 
 export interface UsedByEntry {
   count: number;
+  href: string;
   access: string;
   term: string;
   type: string;
@@ -82,7 +83,19 @@ export function buildUsedByMap(backrefs: Backref[], self: string, series: string
   for (const b of backrefs) {
     const others = b.referencedBy.filter((r) => r.shortname !== self).sort(byTitle);
     if (!others.length) continue;
-    out[b.id] = { count: others.length, access: b.access, term: b.linkingText[0] ?? b.id, type: b.type, specs: others, webdex: webdexUrl(b, series) };
+    out[b.id] = { count: others.length, href: b.href, access: b.access, term: b.linkingText[0] ?? b.id, type: b.type, specs: others, webdex: webdexUrl(b, series) };
   }
   return out;
+}
+
+export function mostUsed(map: Record<string, UsedByEntry>, n = 5): (UsedByEntry & { id: string })[] {
+  return Object.entries(map)
+    .map(([id, e]) => ({ ...e, id }))
+    .sort((a, b) => b.count - a.count || a.term.localeCompare(b.term))
+    .slice(0, n);
+}
+
+/** True when the page's source revision is known and isn't the one webref crawled. */
+export function webrefBehind(pageRevision: string | undefined, webrefRevision: string | undefined): boolean {
+  return !!pageRevision && !!webrefRevision && pageRevision !== webrefRevision;
 }
