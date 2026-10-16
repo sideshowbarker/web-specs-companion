@@ -4,12 +4,14 @@
   "private": true,
   "type": "module",
   "license": "Apache-2.0",
+  "repository": "github:w3c-oss/w3c-companion",
   "engines": { "node": ">=24" },
   "scripts": {
     "build": "node scripts/build.ts",
     "snapshot": "node scripts/snapshot.ts",
     "icons": "node scripts/make-icons.ts",
     "package": "node scripts/package.ts",
+    "screenshots": "npm run build && node scripts/screenshots.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint:firefox": "web-ext lint --source-dir dist"

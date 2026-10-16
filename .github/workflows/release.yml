@@ -1,0 +1,112 @@
+name: Release
+
+# Pushing a tag like v1.0.1 (matching the version in package.json) publishes that version: a GitHub release with the zip
+# for Chromium-based browsers and Safari, and the source zip; a submission to Firefox Add-ons (AMO); and an upload to
+# the Chrome Web Store. AMO signs the version when it approves it, so the Firefox job waits up to an hour for that, and
+# attaches the signed .xpi to the release; if AMO takes longer, the "Attach Firefox build" workflow does it later.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Check the tag against package.json
+        id: version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::The tag $GITHUB_REF_NAME doesn't match version $version in package.json"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - run: npm run package
+      - uses: actions/upload-artifact@v7
+        with:
+          name: packages
+          path: |
+            dist
+            artifacts
+
+  github:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ needs.build.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: packages
+      - name: Publish the GitHub release
+        run: |
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "W3C Companion $VERSION" --generate-notes \
+            "artifacts/w3c-companion-$VERSION.zip#W3C Companion $VERSION for Chrome, Edge, other Chromium-based browsers, and Safari" \
+            "artifacts/w3c-companion-$VERSION-source.zip#W3C Companion $VERSION source code"
+
+  firefox:
+    needs: [build, github]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ needs.build.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: packages
+      - name: Submit to Firefox Add-ons
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+        run: |
+          if [ -z "$WEB_EXT_API_KEY" ] || [ -z "$WEB_EXT_API_SECRET" ]; then
+            echo "::error::Set the WEB_EXT_API_KEY and WEB_EXT_API_SECRET secrets to an AMO API key"
+            exit 1
+          fi
+          npx --yes web-ext@10.8.0 sign --source-dir dist --channel listed --amo-metadata store/amo-metadata.json \
+            --upload-source-code "artifacts/w3c-companion-$VERSION-source.zip" --approval-timeout 0 --artifacts-dir signed
+      - name: Attach the signed .xpi once AMO approves it
+        run: .github/scripts/attach-amo-xpi.sh "$GITHUB_REF_NAME" 60
+
+  chrome:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.build.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: packages
+      - name: Upload to the Chrome Web Store and submit it for review
+        env:
+          EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+          PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
+          CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+        run: |
+          if [ -z "$EXTENSION_ID" ]; then
+            echo "::notice::The Chrome Web Store secrets aren't set, so upload $VERSION in the developer dashboard"
+            exit 0
+          fi
+          npx --yes chrome-webstore-upload-cli@4.0.2 --source "artifacts/w3c-companion-$VERSION.zip"

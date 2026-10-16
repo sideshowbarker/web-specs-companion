@@ -1,0 +1,24 @@
+name: Attach Firefox build
+
+# Attaches the .xpi that Firefox Add-ons (AMO) signed for a release, for when AMO approved the version after the
+# Release workflow stopped waiting.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The release tag, like v1.0.1
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  attach:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+      - run: .github/scripts/attach-amo-xpi.sh "$TAG" 0
