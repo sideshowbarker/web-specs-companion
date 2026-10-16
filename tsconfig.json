@@ -11,8 +11,21 @@
     "skipLibCheck": true,
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "types": ["chrome", "node"]
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "chrome",
+      "node"
+    ]
   },
-  "include": ["src", "test", "scripts", "vitest.config.ts"]
+  "include": [
+    "src",
+    "test",
+    "scripts",
+    "vitest.config.ts",
+    "e2e"
+  ]
 }

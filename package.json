@@ -5,7 +5,9 @@
   "type": "module",
   "license": "Apache-2.0",
   "repository": "github:w3c-oss/w3c-companion",
-  "engines": { "node": ">=24" },
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "build": "node scripts/build.ts",
     "snapshot": "node scripts/snapshot.ts",
@@ -14,7 +16,8 @@
     "screenshots": "npm run build && node scripts/screenshots.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint:firefox": "web-ext lint --source-dir dist"
+    "lint:firefox": "web-ext lint --source-dir dist",
+    "e2e:firefox": "node e2e/firefox-bidi.ts"
   },
   "dependencies": {
     "preact": "10.29.8"
