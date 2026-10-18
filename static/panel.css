@@ -9,6 +9,9 @@
   --warn-bg: #fff4ce;
   --warn-fg: #5c4400;
   --link: #005a9c;
+  --impl-all: #1a7f37;
+  --impl-two: #9aa3ab;
+  --impl-off: 0.35;
   font: 14px/1.45 "Noto Sans", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -20,6 +23,9 @@
     --warn-bg: #3d3200;
     --warn-fg: #ffe9a3;
     --link: #8cc4ff;
+    --impl-all: #3fb950;
+    --impl-two: #6e7781;
+    --impl-off: 0.5;
   }
 }
 html, body { margin: 0; background: var(--bg); color: var(--fg); }
@@ -45,6 +51,17 @@ ul { margin: 0; padding-inline-start: 18px; }
 .links { display: flex; flex-wrap: wrap; gap: 4px 12px; list-style: none; padding: 0; }
 .group, .footprint, .tools, .tpac, .specs { border-top: 1px solid var(--line); padding-top: 8px; }
 .radar-label { font-weight: 600; }
+.impl-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.impl { display: flex; align-items: center; gap: 6px; }
+.impl img { display: block; width: 20px; height: 20px; }
+.impl img.no { filter: grayscale(1); opacity: var(--impl-off); }
+.impl .check { width: 18px; font-size: 17px; line-height: 1; text-align: center; }
+.impl .check.all { color: var(--impl-all); }
+.impl .check.two { color: var(--impl-two); }
+.impl .why { font-size: 12.5px; margin-inline-start: 4px; }
+.impl-why { font-size: 12.5px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; }
+.impl-why ul { margin: 2px 0 6px; }
+.impl-why code { font: 11.5px ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
 .search { display: grid; gap: 4px; }
 .search label { font-weight: 600; }
 .search input { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--fg); }

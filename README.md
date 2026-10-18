@@ -111,4 +111,4 @@ Contributions are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the contrib
 
 ## License
 
-[Apache-2.0](LICENSE) © 2026 [World Wide Web Consortium](https://www.w3.org/). The W3C symbol in `assets/` and the icons made from it in `static/icons/` are W3C trademarks, which the license doesn’t cover; see the [W3C logo policy](https://www.w3.org/policies/logos/). `npm run icons` renders the icons from the symbol, and needs [ImageMagick](https://imagemagick.org/).
+[Apache-2.0](LICENSE) © 2026 [World Wide Web Consortium](https://www.w3.org/). The W3C symbol in `assets/` and the icons made from it in `static/icons/` are W3C trademarks, which the license doesn’t cover; see the [W3C logo policy](https://www.w3.org/policies/logos/). `npm run icons` renders the icons from the symbol, and needs [ImageMagick](https://imagemagick.org/). The browser logos in `static/icons/browsers/` are from [alrra/browser-logos](https://github.com/alrra/browser-logos/tree/58881b84c4d73adc03c06fa2c275a7abee02d935/src), under the MIT license in `LICENSE.txt` beside them. The logos themselves are trademarks of Mozilla, Apple, and Google.

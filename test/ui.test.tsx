@@ -39,6 +39,14 @@ describe('SpecCard', () => {
     render(<SpecCard ctx={{ kind: 'spec', url: 'x', pageKind: 'ed', spec: specs[0], groups: [] }} tabId={1} slots={{}} />);
     expect(screen.queryByText('On this page')).toBeNull();
   });
+
+  it('puts the browser-support row right after the header', async () => {
+    const impl = { engines: ['gecko', 'webkit', 'blink'], basis: 'shared', core: 1, ships: { gecko: 1, webkit: 1, blink: 1 }, lacks: {}, bcd: { version: '8.1.6', timestamp: '2026-10-15T10:11:12.000Z' } };
+    sendMock.mockImplementation(async (type: string) => (type === 'get-implementations' ? { impl } : { footprint: null }));
+    const { container } = render(<SpecCard ctx={{ kind: 'spec', url: 'x', pageKind: 'ed', spec: specs[0], groups: [] }} tabId={1} slots={{}} />);
+    await screen.findByAltText('Firefox: implements it');
+    expect(container.querySelector('header')!.nextElementSibling!.className).toBe('impl-row');
+  });
 });
 
 describe('GroupBlock', () => {
@@ -93,5 +101,140 @@ describe('Freshness', () => {
     sendMock.mockImplementation(async () => ({ sources: [{ name: 'specs', fetchedAt: 0, origin: 'live' }, { name: 'implementations', fetchedAt: 0, origin: 'live' }] }));
     render(<Freshness now={3 * 3_600_000} />);
     expect(await screen.findByText(/Browser support 3 hours ago/)).toBeTruthy();
+  });
+});
+
+import { Implementations } from '../src/ui/components/Implementations.tsx';
+import type { ImplView } from '../src/logic/implementations.ts';
+
+describe('Implementations', () => {
+  const bcd = { version: '8.1.6', timestamp: '2026-10-15T10:11:12.000Z' };
+  const view = (over: Partial<ImplView> = {}): ImplView => ({
+    engines: ['gecko', 'webkit', 'blink'], basis: 'shared', core: 4, ships: { gecko: 4, webkit: 4, blink: 4 }, lacks: {}, bcd, ...over,
+  });
+  const answer = (impl: ImplView | null) => sendMock.mockImplementation(async (type: string) => (type === 'get-implementations' ? { impl } : {}));
+  const referrerPolicy = view({
+    engines: ['webkit', 'blink'],
+    core: 21,
+    ships: { gecko: 3, webkit: 21, blink: 21 },
+    lacks: {
+      gecko: {
+        features: [
+          { key: 'api.HTMLAnchorElement.referrerPolicy.unsafe-url', mdn: 'https://developer.mozilla.org/docs/Web/API/HTMLAnchorElement/referrerPolicy' },
+          { key: 'api.HTMLAreaElement.referrerPolicy.unsafe-url' },
+        ],
+        more: 16,
+      },
+    },
+  });
+  const bcdLine = (_: string, el: Element | null) => el?.tagName === 'P' && el.textContent === 'From BCD 8.1.6, 15 October 2026.';
+
+  it('shows all three logos in color, and a green check mark, when all three engines implement the spec', async () => {
+    answer(view());
+    render(<Implementations shortname="fetch" />);
+    const firefox = await screen.findByAltText('Firefox: implements it');
+    expect(firefox.getAttribute('title')).toBe('Firefox: ships 4 of the 4 features at least two engines ship');
+    expect(firefox.classList.contains('no')).toBe(false);
+    expect(screen.getByAltText('Safari: implements it')).toBeTruthy();
+    expect(screen.getByAltText('Chrome: implements it')).toBeTruthy();
+    expect(screen.getByRole('img', { name: 'Implemented in all three engines' }).className).toBe('check all');
+    expect(screen.queryByRole('button', { name: 'What\u2019s missing?' })).toBeNull();
+  });
+
+  it('grays out the engine that lacks the core, and lists what it lacks on request', async () => {
+    answer(referrerPolicy);
+    render(<Implementations shortname="referrer-policy" />);
+    const firefox = await screen.findByAltText('Firefox: doesn\u2019t implement it');
+    expect(firefox.classList.contains('no')).toBe(true);
+    expect(firefox.getAttribute('title')).toBe('Firefox: ships 3 of the 21 features at least two engines ship');
+    expect(screen.getByRole('img', { name: 'Implemented in two of the three engines' }).className).toBe('check two');
+    const why = screen.getByRole('button', { name: 'What\u2019s missing?' });
+    expect(why.getAttribute('aria-expanded')).toBe('false');
+    expect(document.getElementById('impl-why')!.hidden).toBe(true);
+    fireEvent.click(why);
+    expect(why.getAttribute('aria-expanded')).toBe('true');
+    expect(document.getElementById('impl-why')!.hidden).toBe(false);
+    expect(screen.getByText('Firefox ships 3 of the 21 features at least two engines ship. It lacks:')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'api.HTMLAnchorElement.referrerPolicy.unsafe-url' }).getAttribute('href'))
+      .toBe('https://developer.mozilla.org/docs/Web/API/HTMLAnchorElement/referrerPolicy');
+    expect(screen.queryByRole('link', { name: 'api.HTMLAreaElement.referrerPolicy.unsafe-url' })).toBeNull();
+    expect(screen.getByText('api.HTMLAreaElement.referrerPolicy.unsafe-url')).toBeTruthy();
+    expect(screen.getByText('and 16 more')).toBeTruthy();
+    expect(screen.getByText(bcdLine)).toBeTruthy();
+  });
+
+  it('leaves the check-mark slot empty when only one engine implements the spec', async () => {
+    const lacking = { features: [{ key: 'api.A' }, { key: 'api.B' }], more: 0 };
+    answer(view({ engines: ['blink'], basis: 'any', core: 2, ships: { gecko: 0, webkit: 0, blink: 2 }, lacks: { gecko: lacking, webkit: lacking } }));
+    const { container } = render(<Implementations shortname="usb" />);
+    expect((await screen.findByAltText('Chrome: implements it')).getAttribute('title')).toBe('Chrome: ships 2 of the 2 features any engine ships');
+    const slot = container.querySelector('.check')!;
+    expect(slot.getAttribute('aria-hidden')).toBe('true');
+    expect(slot.textContent).toBe('');
+    fireEvent.click(screen.getByRole('button', { name: 'What\u2019s missing?' }));
+    expect(screen.getByText('Firefox ships 0 of the 2 features any engine ships. It lacks:')).toBeTruthy();
+    expect(screen.getByText('Safari ships 0 of the 2 features any engine ships. It lacks:')).toBeTruthy();
+  });
+
+  it('grays out all three logos, and lists the features once, when no engine ships any', async () => {
+    const lacking = { features: [{ key: 'api.A' }, { key: 'api.B' }, { key: 'api.C' }], more: 0 };
+    answer(view({ engines: [], basis: 'none', core: 3, ships: { gecko: 0, webkit: 0, blink: 0 }, lacks: { gecko: lacking, webkit: lacking, blink: lacking } }));
+    render(<Implementations shortname="x" />);
+    const chrome = await screen.findByAltText('Chrome: doesn\u2019t implement it');
+    expect(chrome.getAttribute('title')).toBe('No engine ships any of the 3 features BCD lists for this spec');
+    fireEvent.click(screen.getByRole('button', { name: 'What\u2019s missing?' }));
+    expect(screen.getByText('No engine ships any of the 3 features BCD lists for this spec:')).toBeTruthy();
+    expect(screen.getAllByText('api.A')).toHaveLength(1);
+  });
+
+  it('words the counts for a core of one feature', async () => {
+    answer(view({ engines: ['webkit', 'blink'], core: 1, ships: { gecko: 0, webkit: 1, blink: 1 }, lacks: { gecko: { features: [{ key: 'api.A' }], more: 0 } } }));
+    render(<Implementations shortname="x" />);
+    expect((await screen.findByAltText('Firefox: doesn\u2019t implement it')).getAttribute('title'))
+      .toBe('Firefox: doesn\u2019t ship the one feature at least two engines ship');
+    expect(screen.getByAltText('Safari: implements it').getAttribute('title')).toBe('Safari: ships the one feature at least two engines ship');
+  });
+
+  it("says when the data is the series' current level's", async () => {
+    answer({ ...referrerPolicy, fromSeries: { shortname: 'css-grid-2', title: 'CSS Grid Layout Module Level 2' } });
+    render(<Implementations shortname="css-grid-1" />);
+    expect((await screen.findByAltText('Safari: implements it')).getAttribute('title'))
+      .toBe('Safari: ships 21 of the 21 features at least two engines ship (from the data for CSS Grid Layout Module Level 2)');
+    fireEvent.click(screen.getByRole('button', { name: 'What\u2019s missing?' }));
+    expect(screen.getByText('This spec has no data of its own, so this is from the data for CSS Grid Layout Module Level 2.')).toBeTruthy();
+  });
+
+  it('shows the sentence without a list for a gray engine the record lists nothing for', async () => {
+    answer({ ...referrerPolicy, lacks: {} });
+    render(<Implementations shortname="x" />);
+    fireEvent.click(await screen.findByRole('button', { name: 'What\u2019s missing?' }));
+    expect(screen.getByText('Firefox ships 3 of the 21 features at least two engines ship. It lacks:')).toBeTruthy();
+    expect(document.querySelector('#impl-why ul')).toBeNull();
+  });
+
+  it('drops the old verdict, and closes "What\u2019s missing?", when the card changes to another spec', async () => {
+    let answerSecond: ((v: unknown) => void) | undefined;
+    sendMock.mockImplementation(async (type: string, req: { shortname?: string }) => {
+      if (type !== 'get-implementations') return { footprint: null };
+      if (req.shortname === specs[0].shortname) return { impl: referrerPolicy };
+      return new Promise((resolve) => { answerSecond = resolve; });
+    });
+    const ctx = (i: number) => ({ kind: 'spec' as const, url: 'x', pageKind: 'ed' as const, spec: specs[i], groups: [] });
+    const { rerender } = render(<SpecCard ctx={ctx(0)} tabId={1} slots={{}} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'What\u2019s missing?' }));
+    expect(screen.getByRole('button', { name: 'What\u2019s missing?' }).getAttribute('aria-expanded')).toBe('true');
+    rerender(<SpecCard ctx={ctx(1)} tabId={1} slots={{}} />);
+    expect(screen.queryByAltText('Safari: implements it')).toBeNull();
+    await waitFor(() => expect(answerSecond).toBeDefined());
+    answerSecond!({ impl: referrerPolicy });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'What\u2019s missing?' }).getAttribute('aria-expanded')).toBe('false'));
+  });
+
+  it('shows no row when there is no data', async () => {
+    answer(null);
+    const { container } = render(<Implementations shortname="x" />);
+    await waitFor(() => expect(sendMock).toHaveBeenCalledWith('get-implementations', { shortname: 'x' }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(container.innerHTML).toBe('');
   });
 });

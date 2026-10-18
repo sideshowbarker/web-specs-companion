@@ -1,6 +1,6 @@
 # Manual checklist before each submission
 
-Run steps 1–13 in Chrome (latest stable) and Firefox (latest release) with a fresh profile, and step 14 in Safari.
+Run steps 1–14 in Chrome (latest stable) and Firefox (latest release) with a fresh profile, and step 15 in Safari.
 
 1. Install `artifacts/w3c-companion-<version>.zip` (Chrome: drag onto chrome://extensions; Firefox: about:debugging → Load Temporary Add-on). No errors, and warnings only for the other browser’s keys: Firefox shows exactly two, for the Chrome-only sidePanel permission and side_panel key; Chrome warns only about Firefox keys, such as sidebar_action.
 2. https://w3c.github.io/webappsec-fetch-metadata/ — badge “ED”; popup card with group, chairs, footprint; definition counts in the page; the link check runs and reports a result.
@@ -15,4 +15,5 @@ Run steps 1–13 in Chrome (latest stable) and Firefox (latest release) with a f
 11. Keyboard only: every control reachable, visible focus ring; Escape closes the definition popover.
 12. Offline (network off, extension reloaded): the card still resolves; the footer warns about live data.
 13. `npm run lint:firefox` reports no errors.
-14. Safari (latest release): Settings → Developer → Add Temporary Extension…, and select the zip. It installs with no errors; once allowed on the site, steps 2, 3, 7, and 8 work as in Chrome; the panel has no “Keep this open beside the page” button, and the address bar has no `w3c` keyword. Removing the extension and adding it again works.
+14. https://fetch.spec.whatwg.org/ — the card shows all three browser logos in color, and a green check mark. https://wicg.github.io/webusb/ — only the Chrome logo is in color, there’s no check mark, and “What’s missing?” opens a list of what Firefox and Safari lack. The footer lists “Browser support”. With the network off, as in step 12, the logos still show. And the row reads well in both light and dark mode.
+15. Safari (latest release): Settings → Developer → Add Temporary Extension…, and select the zip. It installs with no errors; once allowed on the site, steps 2, 3, 7, 8, and 14 work as in Chrome; the panel has no “Keep this open beside the page” button, and the address bar has no `w3c` keyword. Removing the extension and adding it again works.

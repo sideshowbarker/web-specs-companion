@@ -4,6 +4,7 @@ import { specLinks } from '../format.ts';
 import { A } from './A.tsx';
 import { Footprint } from './Footprint.tsx';
 import { GroupBlock } from './GroupBlock.tsx';
+import { Implementations } from './Implementations.tsx';
 import { Radar } from './Radar.tsx';
 import { SpecTools } from './SpecTools.tsx';
 
@@ -17,6 +18,7 @@ export function SpecCard({ ctx, tabId, slots }: { ctx: Context; tabId: number; s
         <h1 id="card-title"><A href={ctx.spec?.url ?? ctx.url}>{title}</A></h1>
         {ctx.spec && <p class="muted">{ctx.spec.shortname}</p>}
       </header>
+      {ctx.spec && <Implementations key={ctx.spec.shortname} shortname={ctx.spec.shortname} />}
       <Radar tabId={tabId} url={ctx.url} />
       {ctx.otherLevels && ctx.otherLevels.length > 0 && (
         <p class="note">The same draft also serves {ctx.otherLevels.map((s) => s.title).join(', ')}.</p>
