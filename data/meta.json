@@ -1,10 +1,11 @@
 {
-  "generatedAt": "2026-10-16T07:49:05.471Z",
+  "generatedAt": "2026-10-18T22:46:32.340Z",
   "sources": {
     "specs": "https://w3c.github.io/browser-specs/index.json",
     "groups": "https://w3c.github.io/groups/w3c-groups.json",
     "repos": "https://w3c.github.io/groups/repositories.json",
     "idlnames": "https://w3c.github.io/webref/ed/idlnames.json",
+    "implementations": "https://cdn.jsdelivr.net/npm/@mdn/browser-compat-data@8.1.6/data.json",
     "tpac": "https://www.w3.org/calendar/tpac2026/export/"
   }
 }
