@@ -24,7 +24,7 @@ describe('runAlarm', () => {
       if (name === 'groups') throw new Error('offline');
       return { data: [], fetchedAt: 0, origin: 'live' };
     });
-    expect(await runAlarm('refresh-data', s, 0)).toEqual(['specs', 'repos', 'idlnames']);
+    expect(await runAlarm('refresh-data', s, 0)).toEqual(['specs', 'repos', 'idlnames', 'implementations']);
     expect(s.load).toHaveBeenCalledWith('specs', { force: true });
   });
 

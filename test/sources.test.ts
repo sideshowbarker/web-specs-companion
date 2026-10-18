@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createSources, type SourceDeps } from '../src/data/sources.ts';
+import { readFileSync } from 'node:fs';
+import { createSources, SOURCES, type SourceDeps } from '../src/data/sources.ts';
 import { MemoryStore } from '../src/data/http.ts';
 
 const liveSpecs = JSON.stringify([{ shortname: 'live-spec', url: 'https://x.test/live/', title: 'Live' }]);
@@ -78,5 +79,24 @@ describe('createSources', () => {
     t += 61_000;
     await s.load('specs');
     expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  it('has a bundled snapshot of every source', () => {
+    for (const src of Object.values(SOURCES)) {
+      expect(() => JSON.parse(readFileSync(new URL('../' + src.bundled, import.meta.url), 'utf8')), src.bundled).not.toThrow();
+    }
+  });
+
+  it('loads the browser-support file, and falls back to the bundled copy when the live one is malformed', async () => {
+    const good = JSON.stringify({ bcd: { version: '8.1.6', timestamp: '2026-10-15T10:11:12.000Z' }, specs: { fetch: { engines: ['gecko', 'webkit', 'blink'] } } });
+    const live = await createSources(deps({ fetchImpl: vi.fn(async () => new Response(good)) })).load('implementations');
+    expect(live.origin).toBe('live');
+    expect(live.data.bcd.version).toBe('8.1.6');
+    const bundled = await createSources(deps({
+      fetchImpl: vi.fn(async () => new Response(JSON.stringify({ specs: {} }))),
+      readBundled: vi.fn(async () => good),
+    })).load('implementations');
+    expect(bundled.origin).toBe('bundled');
+    expect(Object.keys(bundled.data.specs)).toEqual(['fetch']);
   });
 });

@@ -1,4 +1,5 @@
 import type { IdlNames, RepoMap, SlimGroup, SlimSpec } from '../shared/types.ts';
+import { isImplRecord, type ImplFile, type ImplRecord } from '../logic/implementations.ts';
 
 // Upstream records are untyped JSON; each slimmer reads only the fields it keeps.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,4 +85,15 @@ export function slimIdlNames(raw: unknown): IdlNames {
     if (typeof v?.type === 'string') out[name] = { type: v.type };
   }
   return out;
+}
+
+// Drops each record whose shape doesn't fit, so the card shows no row for that spec, rather than failing to render.
+export function slimImplementations(raw: unknown): ImplFile {
+  const r = raw as Raw;
+  const specs = r?.specs;
+  if (typeof r?.bcd?.version !== 'string' || typeof r.bcd.timestamp !== 'string' || !specs || typeof specs !== 'object' || Array.isArray(specs)) {
+    throw new Error('implementations: expected bcd.version, bcd.timestamp, and specs');
+  }
+  const valid = Object.entries(specs as Record<string, unknown>).filter((entry): entry is [string, ImplRecord] => isImplRecord(entry[1]));
+  return { bcd: { version: r.bcd.version, timestamp: r.bcd.timestamp }, specs: Object.fromEntries(valid) };
 }

@@ -96,8 +96,10 @@ The extension showcases the use of particular features from the [WebExtensions s
 
 [browser-specs](https://github.com/w3c/browser-specs), [w3c/groups](https://github.com/w3c/groups),
 [webref](https://github.com/w3c/webref), the [W3C API](https://api.w3.org/doc), the
-[TPAC 2026 calendar](https://www.w3.org/calendar/tpac2026/), and [ReSpec’s xref service](https://respec.org/xref/).
-Snapshots of the spec, group, repository, IDL-name, and TPAC data ship in `data/`, so the extension works offline.
+[TPAC 2026 calendar](https://www.w3.org/calendar/tpac2026/), [ReSpec’s xref service](https://respec.org/xref/), and
+MDN’s [browser-compat-data](https://github.com/mdn/browser-compat-data), by way of the website’s
+`data/implementations.json`. Snapshots of the spec, group, repository, IDL-name, browser-support, and TPAC data ship in
+`data/`, so the extension works offline.
 
 ## Privacy
 

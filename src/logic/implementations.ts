@@ -101,6 +101,21 @@ export interface ImplView extends ImplRecord {
   fromSeries?: { shortname: string; title: string };
 }
 
+const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+
+// Checks a record's shape, down to each lacking feature's key, so a file from another build of this generator, or a
+// copy stored by another version of the extension, can't hand the card a record it can't render.
+export function isImplRecord(value: unknown): value is ImplRecord {
+  if (!isObject(value)) return false;
+  const { engines, basis, core, ships, lacks } = value;
+  return Array.isArray(engines) && engines.every((e) => ENGINES.includes(e))
+    && (basis === 'shared' || basis === 'any' || basis === 'none')
+    && typeof core === 'number'
+    && isObject(ships) && ENGINES.every((e) => typeof ships[e] === 'number')
+    && isObject(lacks) && Object.values(lacks).every((l) => isObject(l) && typeof l.more === 'number' && Array.isArray(l.features)
+      && l.features.every((f) => isObject(f) && typeof f.key === 'string' && (f.mdn === undefined || typeof f.mdn === 'string')));
+}
+
 interface Feature {
   key: string;
   mdn?: string;

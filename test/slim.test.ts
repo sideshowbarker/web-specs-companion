@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { slimSpecs, slimGroups, slimRepos, slimIdlNames } from '../src/data/slim.ts';
+import { readFileSync } from 'node:fs';
+import { slimSpecs, slimGroups, slimRepos, slimIdlNames, slimImplementations } from '../src/data/slim.ts';
 
 const rawSpec = {
   url: 'https://www.w3.org/TR/css-grid-3/',
@@ -96,5 +97,45 @@ describe('slimIdlNames', () => {
   it('keeps each name with its type', () => {
     expect(slimIdlNames({ Request: { fragment: 'idlnames/Request.idl', parsed: 'idlnamesparsed/Request.json', type: 'interface' } }))
       .toEqual({ Request: { type: 'interface' } });
+  });
+});
+
+describe('slimImplementations', () => {
+  const good = { bcd: { version: '8.1.6', timestamp: '2026-10-15T10:11:12.000Z' }, specs: {} };
+
+  it('accepts the bundled browser-support file', () => {
+    const file = slimImplementations(JSON.parse(readFileSync(new URL('../data/implementations.json', import.meta.url), 'utf8')));
+    expect(file.bcd.version).toMatch(/^[0-9]+[.][0-9]+[.][0-9]+$/);
+    expect(Object.keys(file.specs).length).toBeGreaterThan(300);
+  });
+
+  it('rejects a file without a BCD version, a timestamp, or specs', () => {
+    expect(slimImplementations(good)).toEqual(good);
+    expect(() => slimImplementations({ ...good, bcd: { timestamp: good.bcd.timestamp } })).toThrow(/implementations/);
+    expect(() => slimImplementations({ ...good, bcd: { version: '8.1.6' } })).toThrow(/implementations/);
+    expect(() => slimImplementations({ bcd: good.bcd })).toThrow(/implementations/);
+    expect(() => slimImplementations({ ...good, specs: [] })).toThrow(/implementations/);
+    expect(() => slimImplementations(null)).toThrow(/implementations/);
+  });
+
+  it('drops each record that another build of the generator shaped differently, and keeps every bundled one', () => {
+    const rec = { engines: ['webkit', 'blink'], basis: 'shared', core: 2, ships: { gecko: 0, webkit: 2, blink: 2 }, lacks: { gecko: { features: [{ key: 'api.A' }], more: 0 } } };
+    const file = slimImplementations({
+      ...good,
+      specs: {
+        fine: rec,
+        number: 5,
+        noEngines: { ...rec, engines: undefined },
+        oddEngine: { ...rec, engines: ['presto'] },
+        oddBasis: { ...rec, basis: 'most' },
+        noShips: { ...rec, ships: undefined },
+        noLacks: { ...rec, lacks: undefined },
+        oddLacks: { ...rec, lacks: { gecko: {} } },
+        oddFeature: { ...rec, lacks: { gecko: { features: [{}], more: 0 } } },
+      },
+    });
+    expect(Object.keys(file.specs)).toEqual(['fine']);
+    const raw = JSON.parse(readFileSync(new URL('../data/implementations.json', import.meta.url), 'utf8'));
+    expect(Object.keys(slimImplementations(raw).specs)).toHaveLength(Object.keys(raw.specs).length);
   });
 });
