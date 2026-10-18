@@ -163,4 +163,32 @@ describe('handlers', () => {
     expect(f.sources.map((s) => s.name)).toEqual(['specs', 'groups', 'repos', 'implementations']);
     expect(load).not.toHaveBeenCalledWith('tpac');
   });
+
+  it("answers get-implementations with the spec's record, its series' current level's, or null", async () => {
+    const bcd = { version: '8.1.6', timestamp: '2026-10-15T10:11:12.000Z' };
+    const rec = { engines: ['gecko', 'webkit', 'blink'], basis: 'shared', core: 2, ships: { gecko: 2, webkit: 2, blink: 2 }, lacks: {} };
+    const implementations = { bcd, specs: { 'fetch-metadata': rec, 'wai-aria-1.2': { ...rec, core: 5 } } };
+    const h = createHandlers(deps({ sources: fakeSources({ implementations }) }));
+    expect(await h.handle({ type: 'get-implementations', shortname: 'fetch-metadata' }, sender(1))).toEqual({ impl: { ...rec, bcd } });
+    expect(await h.handle({ type: 'get-implementations', shortname: 'wai-aria-1.3' }, sender(1))).toEqual({
+      impl: { ...rec, core: 5, bcd, fromSeries: { shortname: 'wai-aria-1.2', title: 'WAI-ARIA 1.2' } },
+    });
+    expect(await h.handle({ type: 'get-implementations', shortname: 'css-grid-3' }, sender(1))).toEqual({ impl: null });
+    expect(await h.handle({ type: 'get-implementations', shortname: 'constructor' }, sender(1))).toEqual({ impl: null });
+  });
+
+  it('answers get-implementations with null when the browser-support file fails to load', async () => {
+    const load = vi.fn(async (name: string) => {
+      if (name === 'implementations') throw new Error('offline');
+      return { data: ({ specs, groups, repos } as Record<string, unknown>)[name], fetchedAt: 1, origin: 'bundled' };
+    });
+    const h = createHandlers(deps({ sources: { load } as unknown as Sources }));
+    expect(await h.handle({ type: 'get-implementations', shortname: 'fetch-metadata' }, sender(1))).toEqual({ impl: null });
+  });
+
+  it('answers get-implementations with null for a record shaped by another build', async () => {
+    const bcd = { version: '8.1.6', timestamp: '2026-10-15T10:11:12.000Z' };
+    const h = createHandlers(deps({ sources: fakeSources({ implementations: { bcd, specs: { 'fetch-metadata': { implemented: ['gecko'] } } } }) }));
+    expect(await h.handle({ type: 'get-implementations', shortname: 'fetch-metadata' }, sender(1))).toEqual({ impl: null });
+  });
 });

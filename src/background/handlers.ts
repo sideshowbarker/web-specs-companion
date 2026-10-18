@@ -4,6 +4,7 @@ import type { Sources } from '../data/sources.ts';
 import { getGroupDetails, getSpecDetails } from '../data/w3capi.ts';
 import { getExtract, getWebrefIndex, type WebrefEntry } from '../data/webref.ts';
 import { buildUsedByMap, computeFootprint, specdexUrl } from '../logic/footprint.ts';
+import { isImplRecord } from '../logic/implementations.ts';
 import { checkLinks, type TargetData } from '../logic/linkcheck.ts';
 import { computeRadar } from '../logic/radar.ts';
 import { fragmentOf } from '../shared/url.ts';
@@ -125,6 +126,23 @@ export function createHandlers(deps: HandlerDeps) {
       const { specs } = await indexes();
       const series = specs.get(msg.shortname)?.series.shortname ?? msg.shortname;
       return { map: buildUsedByMap(file.backrefs, msg.shortname, series), specdex };
+    },
+    'get-implementations': async (msg) => {
+      const file = await deps.sources.load('implementations').then((l) => l.data, () => undefined);
+      if (!file) return { impl: null };
+      // A copy stored by another version of the extension isn't slimmed again, so check each record here too.
+      const record = (shortname: string) => {
+        const r = Object.hasOwn(file.specs, shortname) ? file.specs[shortname] : undefined;
+        return isImplRecord(r) ? r : undefined;
+      };
+      const own = record(msg.shortname);
+      if (own) return { impl: { ...own, bcd: file.bcd } };
+      // BCD files an older level's features under the current level, since their spec URLs don't name a level.
+      const { specs } = await indexes();
+      const current = specs.get(msg.shortname)?.series.currentSpecification;
+      const series = current && current !== msg.shortname ? record(current) : undefined;
+      if (!current || !series) return { impl: null };
+      return { impl: { ...series, bcd: file.bcd, fromSeries: { shortname: current, title: specs.get(current)?.title ?? current } } };
     },
     'check-links': async (msg) => {
       const index = await getWebrefIndex(deps.http, deps.now);
