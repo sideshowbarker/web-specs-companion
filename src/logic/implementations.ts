@@ -72,3 +72,123 @@ export function ships(support: Record<string, unknown> | undefined, engine: Engi
     }),
   );
 }
+
+// How many lacking features a record lists for each engine that doesn't implement the spec.
+export const LACKS_CAP = 40;
+
+export interface ImplFeature {
+  key: string; // BCD's dotted path, e.g. 'api.HTMLAnchorElement.referrerPolicy.unsafe-url'
+  mdn?: string; // the feature's mdn_url, when it has one
+}
+
+export interface ImplRecord {
+  engines: Engine[]; // the engines that implement the spec, in gecko, webkit, blink order
+  basis: 'shared' | 'any' | 'none'; // which features make up the core
+  core: number; // the number of features in the core
+  ships: Record<Engine, number>; // the number of core features each engine ships
+  // For each engine not in engines: the first LACKS_CAP core features it lacks, in BCD's order, and how many more.
+  lacks: Partial<Record<Engine, { features: ImplFeature[]; more: number }>>;
+}
+
+export interface ImplFile {
+  bcd: { version: string; timestamp: string }; // from BCD's __meta
+  specs: Record<string, ImplRecord>; // by browser-specs shortname
+}
+
+// What the card gets for a spec: its own record, or its series' current level's (fromSeries), with BCD's version.
+export interface ImplView extends ImplRecord {
+  bcd: ImplFile['bcd'];
+  fromSeries?: { shortname: string; title: string };
+}
+
+interface Feature {
+  key: string;
+  mdn?: string;
+  engines: Engine[];
+}
+
+interface Compat {
+  spec_url?: unknown;
+  mdn_url?: unknown;
+  support?: Record<string, unknown>;
+  status?: { deprecated?: unknown };
+}
+
+// Collects, for each spec, the BCD features whose spec URLs match it, from every tree but BCD's list of browsers. A
+// feature with spec URLs in several specs counts once for each of them, and deprecated features don't count.
+function featuresBySpec(bcd: Record<string, unknown>, index: Map<string, string>): Map<string, Feature[]> {
+  const bySpec = new Map<string, Feature[]>();
+  const walk = (node: Record<string, unknown>, path: string[]) => {
+    for (const [name, child] of Object.entries(node)) {
+      if (!child || typeof child !== 'object') continue;
+      if (name !== '__compat') {
+        if (!name.startsWith('__')) walk(child as Record<string, unknown>, [...path, name]);
+        continue;
+      }
+      const compat = child as Compat;
+      if (compat.status?.deprecated) continue;
+      const urls = ([] as unknown[]).concat(compat.spec_url ?? []).filter((u): u is string => typeof u === 'string');
+      const shortnames = new Set(urls.map((u) => matchSpecUrl(index, u)).filter((s): s is string => s !== undefined));
+      if (shortnames.size === 0) continue;
+      const feature: Feature = { key: path.join('.'), engines: ENGINES.filter((e) => ships(compat.support, e)) };
+      if (typeof compat.mdn_url === 'string') feature.mdn = compat.mdn_url;
+      for (const s of shortnames) {
+        const list = bySpec.get(s);
+        if (list) list.push(feature);
+        else bySpec.set(s, [feature]);
+      }
+    }
+  };
+  for (const [tree, node] of Object.entries(bcd)) {
+    if (tree !== 'browsers' && !tree.startsWith('__') && node && typeof node === 'object') walk(node as Record<string, unknown>, [tree]);
+  }
+  return bySpec;
+}
+
+// Drops each feature that has an ancestor among the same spec's features, so a spec counts its interfaces, properties,
+// and elements, rather than all their members and values.
+function topLevel(features: Feature[]): Feature[] {
+  const keys = new Set(features.map((f) => f.key));
+  return features.filter((f) => {
+    const parts = f.key.split('.');
+    for (let i = 1; i < parts.length; i++) if (keys.has(parts.slice(0, i).join('.'))) return false;
+    return true;
+  });
+}
+
+// The core is the features at least two engines ship, or failing that, the features any engine ships, or failing that,
+// all of them. An engine implements the spec if it ships at least half the core, so no engine is marked down for
+// features just one other engine ships.
+function verdict(features: Feature[]): ImplRecord {
+  const shared = features.filter((f) => f.engines.length >= 2);
+  const any = features.filter((f) => f.engines.length >= 1);
+  const [basis, core]: [ImplRecord['basis'], Feature[]] =
+    shared.length > 0 ? ['shared', shared] : any.length > 0 ? ['any', any] : ['none', features];
+  const count = (e: Engine) => core.filter((f) => f.engines.includes(e)).length;
+  const shipped: Record<Engine, number> = { gecko: count('gecko'), webkit: count('webkit'), blink: count('blink') };
+  const engines = basis === 'none' ? [] : ENGINES.filter((e) => shipped[e] >= core.length / 2);
+  const lacks: ImplRecord['lacks'] = {};
+  for (const e of ENGINES) {
+    if (engines.includes(e)) continue;
+    const missing = core.filter((f) => !f.engines.includes(e));
+    lacks[e] = {
+      features: missing.slice(0, LACKS_CAP).map(({ key, mdn }) => (mdn ? { key, mdn } : { key })),
+      more: Math.max(0, missing.length - LACKS_CAP),
+    };
+  }
+  return { engines, basis, core: core.length, ships: shipped, lacks };
+}
+
+// Builds the browser-support file from BCD's data.json and browser-specs. Its specs keys are sorted, so the same data
+// always gives the same bytes.
+export function buildImplementations(bcd: unknown, specs: SlimSpec[]): ImplFile {
+  const root = (bcd ?? {}) as Record<string, unknown> & { __meta?: { version?: unknown; timestamp?: unknown } };
+  const { version, timestamp } = root.__meta ?? {};
+  if (typeof version !== 'string' || typeof timestamp !== 'string') {
+    throw new Error('BCD: expected __meta.version and __meta.timestamp');
+  }
+  const bySpec = featuresBySpec(root, specUrlIndex(specs));
+  const records: Record<string, ImplRecord> = {};
+  for (const shortname of [...bySpec.keys()].sort()) records[shortname] = verdict(topLevel(bySpec.get(shortname)!));
+  return { bcd: { version, timestamp }, specs: records };
+}
