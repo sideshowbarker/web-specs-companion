@@ -20,6 +20,8 @@ More: [a W3C repo on GitHub](screenshots/github-repo.png), [a w3.org group page]
 
 ## Install
 
+The [W3C Companion website](https://w3c-oss.github.io/w3c-companion/) has these steps too, with the steps for your browser first.
+
 W3C Companion isn’t in the Chrome Web Store or on Firefox Add-ons yet. Until it is, install it from the [latest release](https://github.com/w3c-oss/w3c-companion/releases/latest). It needs Chrome or Edge 148 or later, Firefox 128 or later, or Safari 26 or later.
 
 ### Chrome, Edge, and other Chromium-based browsers
@@ -56,6 +58,7 @@ To update it, remove it from the **Temporary** list in **Settings…** → **Ext
 npm ci
 npm run snapshot     # refresh the data bundled in data/
 npm run build        # build into dist/
+npm run site         # build the website into _site/
 npm test
 npm run screenshots  # regenerate screenshots/ (needs Chrome, ImageMagick, and pngquant)
 ```
@@ -68,9 +71,12 @@ Bump `version` in `package.json`, commit, and push a matching tag (`v1.0.1` for 
 
 - publishes a GitHub release with the zip and the source zip;
 - submits the version to Firefox Add-ons, and attaches the signed `.xpi` to the release once Firefox Add-ons approves it — if that takes more than an hour, run the [Attach Firefox build workflow](.github/workflows/attach-firefox-build.yml) later;
-- uploads the zip to the Chrome Web Store, and submits it for review.
+- uploads the zip to the Chrome Web Store, and submits it for review;
+- points the website’s download links at the release.
 
 That needs these repository secrets: `WEB_EXT_API_KEY` and `WEB_EXT_API_SECRET`, from the [Firefox Add-ons API key page](https://addons.mozilla.org/developers/addon/api/key/); and `CWS_EXTENSION_ID`, `CWS_PUBLISHER_ID`, `CWS_CLIENT_ID`, `CWS_CLIENT_SECRET`, and `CWS_REFRESH_TOKEN`, as [chrome-webstore-upload-keys](https://github.com/fregante/chrome-webstore-upload-keys) describes. Without the Chrome Web Store secrets, the Chrome step does nothing, and the version has to be uploaded in the Chrome Web Store developer dashboard.
+
+The [Pages workflow](.github/workflows/pages.yml) publishes the website from `site/` whenever it changes. It also checks the stores every hour, so the website’s install steps send people to a store as soon as it lists the extension.
 
 ## Built on the WebExtensions spec
 

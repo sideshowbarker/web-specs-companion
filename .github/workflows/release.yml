@@ -3,7 +3,8 @@ name: Release
 # Pushing a tag like v1.0.1 (matching the version in package.json) publishes that version: a GitHub release with the zip
 # for Chromium-based browsers and Safari, and the source zip; a submission to Firefox Add-ons (AMO); and an upload to
 # the Chrome Web Store. AMO signs the version when it approves it, so the Firefox job waits up to an hour for that, and
-# attaches the signed .xpi to the release; if AMO takes longer, the "Attach Firefox build" workflow does it later.
+# attaches the signed .xpi to the release; if AMO takes longer, the "Attach Firefox build" workflow does it later. Once
+# the release is out, the Pages workflow points the website's download links at it.
 
 on:
   push:
@@ -48,6 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     env:
       GH_TOKEN: ${{ github.token }}
       VERSION: ${{ needs.build.outputs.version }}
@@ -60,6 +62,8 @@ jobs:
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "W3C Companion $VERSION" --generate-notes \
             "artifacts/w3c-companion-$VERSION.zip#W3C Companion $VERSION for Chrome, Edge, other Chromium-based browsers, and Safari" \
             "artifacts/w3c-companion-$VERSION-source.zip#W3C Companion $VERSION source code"
+      - name: Point the website at the release
+        run: gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main
 
   firefox:
     needs: [build, github]

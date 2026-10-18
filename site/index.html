@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>W3C Companion</title>
+  <meta name="description" content="A browser extension for reading W3C specs and finding the groups and people behind them.">
+  <meta property="og:title" content="W3C Companion">
+  <meta property="og:description" content="A browser extension for reading W3C specs and finding the groups and people behind them.">
+  <meta property="og:url" content="https://w3c-oss.github.io/w3c-companion/">
+  <meta property="og:image" content="https://w3c-oss.github.io/w3c-companion/screenshots/card-editors-draft.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.png">
+  <link rel="stylesheet" href="site.css">
+  <script src="site.js" defer></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div>
+        <p class="brand"><img src="icon.png" width="128" height="128" alt=""> W3C Companion</p>
+        <h1>A browser extension for reading W3C specs and finding the groups and people behind them</h1>
+        <p class="lede">On any W3C or WHATWG spec, it shows the spec’s maturity, its editor’s draft and TR versions, its repository and issues, its tests, and the group responsible for it — with the group’s chairs, team contacts, and charter end date.</p>
+        <p class="cta"><a class="button" id="install-button" href="#install">Install it</a> <span>Free and open source, and it collects nothing about you.</span></p>
+      </div>
+      <a href="screenshots/card-editors-draft.png"><img class="shot" src="screenshots/card-editors-draft.png" width="1280" height="800" alt="The card for an editor’s draft: its maturity, its links, its group and chairs, and its platform footprint"></a>
+    </div>
+  </header>
+
+  <aside class="tpac">
+    <p class="wrap"><strong>At TPAC 2026</strong> in Dublin, 26–30 October, it shows what’s in session now and next, and when each group meets.</p>
+  </aside>
+
+  <main>
+    <section class="block" aria-labelledby="what">
+      <div class="wrap">
+        <h2 id="what">What it shows</h2>
+        <div class="features">
+          <figure class="feature">
+            <a href="screenshots/used-by-counts.png"><img class="shot" src="screenshots/used-by-counts.png" width="1280" height="800" loading="lazy" alt="The Fetch standard with a count beside each definition, and the list of specs that use “fetch”"></a>
+            <figcaption><h3>How widely each definition is used</h3><p>A count beside each definition in the spec you’re reading says how many other specs use it, and lists them.</p></figcaption>
+          </figure>
+          <figure class="feature">
+            <a href="screenshots/version-radar.png"><img class="shot" src="screenshots/version-radar.png" width="1280" height="800" loading="lazy" alt="The version radar on a dated snapshot of WAI-ARIA 1.2, pointing at the latest TR version and a newer level"></a>
+            <figcaption><h3>Whether you’re reading the latest version</h3><p>It tells you when you’re on a dated snapshot or an old level, and how far the latest TR version lags the editor’s draft.</p></figcaption>
+          </figure>
+          <figure class="feature">
+            <a href="screenshots/github-repo.png"><img class="shot" src="screenshots/github-repo.png" width="1280" height="800" loading="lazy" alt="A W3C repository on GitHub, with the group behind it and the specs it hosts"></a>
+            <figcaption><h3>On W3C repos on GitHub</h3><p>The group behind the repo, and the specs it hosts.</p></figcaption>
+          </figure>
+          <figure class="feature">
+            <a href="screenshots/group-page.png"><img class="shot" src="screenshots/group-page.png" width="1280" height="800" loading="lazy" alt="A w3.org group page, with the group’s specs"></a>
+            <figcaption><h3>On w3.org group pages</h3><p>The specs the group delivers, and its repos.</p></figcaption>
+          </figure>
+          <figure class="feature">
+            <a href="screenshots/side-panel.png"><img class="shot" src="screenshots/side-panel.png" width="1280" height="800" loading="lazy" alt="The panel kept open beside the page, here a live ReSpec draft of WAI-ARIA"></a>
+            <figcaption><h3>Beside the page</h3><p>In Chrome, Edge, and Firefox, it can stay open beside the spec while you read.</p></figcaption>
+          </figure>
+          <figure class="feature">
+            <a href="screenshots/tpac-now-and-next.png"><img class="shot" src="screenshots/tpac-now-and-next.png" width="1280" height="800" loading="lazy" alt="During TPAC 2026, what’s in session now and next, and when each group meets"></a>
+            <figcaption><h3>During TPAC 2026</h3><p>What’s in session now and next, and when each group meets.</p></figcaption>
+          </figure>
+        </div>
+        <h3 class="also">And also</h3>
+        <ul class="also">
+          <li>Search for specs, groups, Web IDL names, and terms: Type <kbd>w3c</kbd> and a space in the address bar (in Chrome, Edge, and Firefox).</li>
+          <li>A check of the spec’s links to other specs, for anchors that no longer exist.</li>
+          <li>A summary of the spec’s place in the web platform.</li>
+          <li>It works offline, from data it bundles and refreshes every few hours.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="block install" id="install" aria-labelledby="install-heading">
+      <div class="wrap">
+        <h2 id="install-heading">Install it</h2>
+        <p>The latest release is version {{version}}. It needs Chrome or Edge 148 or later, Firefox 128 or later, or Safari 26 or later, on a desktop computer.</p>
+        <p class="mobile-note" id="mobile-note" hidden>W3C Companion runs in desktop browsers, so open this page on your computer to install it.</p>
+        <div class="browsers">
+          <section class="browser" id="chrome" aria-labelledby="chrome-heading">
+            <h3 id="chrome-heading">Chrome, Edge, and other Chromium-based browsers</h3>
+<!-- if cws -->
+            <p><a class="button store" href="https://chromewebstore.google.com/detail/hpajpmapkffhaiggemaeajpkehfnapkm">Add to Chrome</a></p>
+            <p>The Chrome Web Store installs it, and keeps it up to date. Edge, Brave, and other Chromium-based browsers install it from there too — Edge first asks you to allow extensions from other stores.</p>
+<!-- endif -->
+<!-- if !cws -->
+            <p>W3C Companion is waiting for review in the Chrome Web Store. Until it’s there, load it from the release zip:</p>
+            <ol>
+              <li><a href="{{zip}}">Download the zip</a>, and unzip it into a folder it can stay in — the browser loads the extension from that folder every time it starts.</li>
+              <li>Open <code>chrome://extensions</code> (<code>edge://extensions</code> in Edge, <code>brave://extensions</code> in Brave).</li>
+              <li>Turn on <b>Developer mode</b>.</li>
+              <li>Click <b>Load unpacked</b>, and select the unzipped folder.</li>
+            </ol>
+            <p class="muted">To update it, unzip a newer release into the same folder, and click the reload button on the extension’s card.</p>
+<!-- endif -->
+          </section>
+          <section class="browser" id="firefox" aria-labelledby="firefox-heading">
+            <h3 id="firefox-heading">Firefox</h3>
+<!-- if amo -->
+            <p><a class="button store" href="https://addons.mozilla.org/firefox/addon/w3c-companion/">Add to Firefox</a></p>
+            <p>Firefox Add-ons installs it, and keeps it up to date.</p>
+<!-- endif -->
+<!-- if !amo -->
+            <p>W3C Companion is waiting for review on Firefox Add-ons. Until it’s there, Firefox can run it as a temporary add-on, which Firefox removes when it quits:</p>
+            <ol>
+              <li><a href="{{zip}}">Download the zip</a>.</li>
+              <li>Open <code>about:debugging</code>, and click <b>This Firefox</b>.</li>
+              <li>Click <b>Load Temporary Add-on…</b>, and select the zip.</li>
+            </ol>
+            <p class="muted">Add it again the same way after Firefox restarts.</p>
+<!-- endif -->
+          </section>
+          <section class="browser" id="safari" aria-labelledby="safari-heading">
+            <h3 id="safari-heading">Safari</h3>
+            <p>Safari 26 or later can run W3C Companion as a temporary extension, which Safari removes when it quits and after 24 hours — so add it again whenever it’s gone.</p>
+            <p>Once, choose <b>Safari</b> → <b>Settings…</b>, select <b>Advanced</b>, and turn on <b>Show features for web developers</b>. Then, each time:</p>
+            <ol>
+              <li><a href="{{zip}}">Download the zip</a>, if you don’t have it already.</li>
+              <li>In <b>Safari</b> → <b>Settings…</b>, select <b>Developer</b>, click <b>Add Temporary Extension…</b>, and select the zip (or the folder, if Safari unzipped it). Authenticate if Safari asks to allow unsigned extensions.</li>
+              <li>Click the extension’s toolbar button, which shows a warning sign until you allow it, and allow it on every website.</li>
+            </ol>
+            <p class="muted">Safari has no address-bar keywords or side panels for extensions, so the <kbd>w3c</kbd> search and the side panel aren’t there.</p>
+          </section>
+        </div>
+        <p class="then">Once it’s installed, pin W3C Companion to the toolbar from the browser’s extensions menu, and click its button on any spec, W3C repo on GitHub, or w3.org group page.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <ul class="links">
+        <li><a href="https://github.com/w3c-oss/w3c-companion">Source code</a></li>
+        <li><a href="https://github.com/w3c-oss/w3c-companion/issues">Report a problem</a></li>
+        <li><a href="https://github.com/w3c-oss/w3c-companion/releases">Releases</a></li>
+        <li><a href="privacy/">Privacy</a></li>
+      </ul>
+      <p>Data comes from public W3C sources: <a href="https://github.com/w3c/browser-specs">browser-specs</a>, <a href="https://github.com/w3c/groups">w3c/groups</a>, <a href="https://github.com/w3c/webref">webref</a>, the <a href="https://api.w3.org/doc">W3C API</a>, the <a href="https://www.w3.org/calendar/tpac2026/">TPAC 2026 calendar</a>, and <a href="https://respec.org/xref/">ReSpec’s xref service</a>.</p>
+      <p><a href="https://github.com/w3c-oss/w3c-companion/blob/main/LICENSE">Apache-2.0</a> © 2026 <a href="https://www.w3.org/">World Wide Web Consortium</a>. The W3C symbol is a W3C trademark, which the license doesn’t cover; see the <a href="https://www.w3.org/policies/logos/">W3C logo policy</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>
