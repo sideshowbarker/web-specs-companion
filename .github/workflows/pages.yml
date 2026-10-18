@@ -1,8 +1,9 @@
 name: Pages
 
 # Publishes the site in site/ to https://w3c-oss.github.io/w3c-companion/. Its install steps link to the latest
-# release's zip, and switch to the store pages once Firefox Add-ons and the Chrome Web Store list the extension. So the
-# workflow also runs after each release and every hour, and an hourly run deploys only when the page has changed.
+# release's zip, and switch to the store pages once Firefox Add-ons and the Chrome Web Store list the extension. And it
+# serves the browser-support file the extension fetches, built from the latest BCD release. So the workflow also runs
+# after each release and every hour, and an hourly run deploys only when the page or that file has changed.
 
 on:
   push:
@@ -13,6 +14,8 @@ on:
       - 'static/icons/**'
       - 'store/privacy.md'
       - 'scripts/site.ts'
+      - 'scripts/bcd.ts'
+      - 'src/logic/implementations.ts'
       - '.github/workflows/pages.yml'
   schedule:
     - cron: '23 * * * *'
@@ -43,10 +46,13 @@ jobs:
         run: |
           tag=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)
           SITE_VERSION=${tag#v} npm run site
-      - name: Compare the page with the deployed one
+      - name: Compare the site with the deployed one
         id: compare
         run: |
-          if [ "$GITHUB_EVENT_NAME" = schedule ] && curl -fsS https://w3c-oss.github.io/w3c-companion/ | cmp -s - _site/index.html; then
+          site=https://w3c-oss.github.io/w3c-companion
+          if [ "$GITHUB_EVENT_NAME" = schedule ] \
+            && curl -fsS "$site/" | cmp -s - _site/index.html \
+            && curl -fsS "$site/data/implementations.json" | cmp -s - _site/data/implementations.json; then
             echo "deploy=false" >> "$GITHUB_OUTPUT"
           else
             echo "deploy=true" >> "$GITHUB_OUTPUT"

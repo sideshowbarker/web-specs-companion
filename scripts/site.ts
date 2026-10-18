@@ -1,9 +1,10 @@
-// Builds the GitHub Pages site into _site/: the pages in site/, the screenshots, the icon, and a privacy page made from
-// store/privacy.md. The install steps on the pages depend on the release they link to, and on which stores list the
-// extension, so the build asks both stores.
+// Builds the GitHub Pages site into _site/: the pages in site/, the screenshots, the icon, a privacy page made from
+// store/privacy.md, and the browser-support file the extension fetches. The install steps on the pages depend on the
+// release they link to, and on which stores list the extension, so the build asks both stores.
 import { marked } from 'marked';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { buildImplementationsFile } from './bcd.ts';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const out = root + '_site/';
@@ -55,8 +56,11 @@ async function main() {
   const zip = `https://github.com/w3c-oss/w3c-companion/releases/download/v${version}/w3c-companion-${version}.zip`;
   const stores = await probeStores();
   console.log(`Version ${version}; Firefox Add-ons lists it: ${stores.amo}; the Chrome Web Store lists it: ${stores.cws}`);
+  const implementations = await buildImplementationsFile();
   await rm(out, { recursive: true, force: true });
   await mkdir(out + 'privacy', { recursive: true });
+  await mkdir(out + 'data');
+  await writeFile(out + 'data/implementations.json', implementations.text);
   const index = await readFile(root + 'site/index.html', 'utf8');
   await writeFile(out + 'index.html', fillTemplate(index, { version, zip }, stores));
   const privacy = await readFile(root + 'site/privacy.html', 'utf8');

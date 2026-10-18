@@ -76,7 +76,7 @@ Bump `version` in `package.json`, commit, and push a matching tag (`v1.0.1` for 
 
 That needs these repository secrets: `WEB_EXT_API_KEY` and `WEB_EXT_API_SECRET`, from the [Firefox Add-ons API key page](https://addons.mozilla.org/developers/addon/api/key/); and `CWS_EXTENSION_ID`, `CWS_PUBLISHER_ID`, `CWS_CLIENT_ID`, `CWS_CLIENT_SECRET`, and `CWS_REFRESH_TOKEN`, as [chrome-webstore-upload-keys](https://github.com/fregante/chrome-webstore-upload-keys) describes. Without the Chrome Web Store secrets, the Chrome step does nothing, and the version has to be uploaded in the Chrome Web Store developer dashboard.
 
-The [Pages workflow](.github/workflows/pages.yml) publishes the website from `site/` whenever it changes. It also checks the stores every hour, so the website’s install steps send people to a store as soon as it lists the extension.
+The [Pages workflow](.github/workflows/pages.yml) publishes the website from `site/` whenever it changes. It also checks the stores every hour, so the website’s install steps send people to a store as soon as it lists the extension. And every hour, it rebuilds `data/implementations.json` from the latest [browser-compat-data](https://github.com/mdn/browser-compat-data) release, so the extension’s browser-support data stays current.
 
 ## Built on the WebExtensions spec
 
