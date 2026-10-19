@@ -286,7 +286,8 @@ describe('MDN button', () => {
     expect(button.getAttribute('aria-expanded')).toBe('false');
     expect(button.getAttribute('aria-controls')).toBe('mdn-list');
     expect(button.querySelector('svg path')!.getAttribute('fill')).toBe('currentColor');
-    expect(button.parentElement!.className).toBe('impl-row');
+    expect(button.parentElement!.className).toBe('refs');
+    expect(button.closest('.impl-row')).toBeTruthy();
     expect(document.querySelector('.impl')).toBeNull();
   });
 
@@ -392,5 +393,170 @@ describe('MDN button', () => {
     await screen.findByAltText('Firefox: implements it');
     expect(screen.queryByRole('button', { name: /MDN article/ })).toBeNull();
     expect(document.getElementById('mdn-list')).toBeNull();
+  });
+});
+
+import type { CiuAnswer, CiuEntry, CiuRun, Support } from '../src/logic/caniuse.ts';
+
+describe('Can I Use button', () => {
+  const run = (from: string, to: string, support: Support, month?: string, more: Partial<CiuRun> = {}): CiuRun => ({
+    from,
+    to,
+    support,
+    ...(month ? { month } : {}),
+    ...more,
+  });
+  const fetchEntry: CiuEntry = {
+    id: 'fetch',
+    title: 'Fetch',
+    usage: 97.27,
+    notes: { 1: 'One.', 2: 'Only in `ServiceWorker` scopes. See [bug 1](https://b.test/1).', 3: 'Three.', 4: 'Four.' },
+    runs: {
+      firefox: [run('2', '33', 'n', '2006-10'), run('34', '38', 'n', '2014-12', { flag: true, notes: [1, 4] }), run('39', '157', 'y', '2015-07', { current: true })],
+      safari: [run('3.1', '10', 'n', '2008-03'), run('10.1', '27', 'y', '2017-03', { current: true }), run('27.1', 'TP', 'y', undefined, { beta: true })],
+      chrome: [
+        run('4', '39', 'n', '2010-01'),
+        run('40', '41', 'a', '2015-01', { notes: [2, 3] }),
+        run('42', '154', 'y', '2015-04', { current: true }),
+        run('155', '157', 'y', undefined, { beta: true }),
+      ],
+    },
+  };
+  const simple = (id: string, title: string): CiuEntry => ({
+    id,
+    title,
+    usage: 90,
+    notes: {},
+    runs: { firefox: [run('3.5', '157', 'y', '2009-06', { current: true })], safari: [run('6', '27', 'y', '2012-07', { current: true })], chrome: [run('13', '154', 'y', '2011-08', { current: true })] },
+  });
+  const source = { version: '1.0.30001816', updated: '2026-10-13' };
+  const answer: CiuAnswer = { features: [simple('cors', 'Cross-Origin Resource Sharing'), fetchEntry], source };
+  const mdn = {
+    count: 1,
+    overviews: [],
+    sections: [{ name: 'Interfaces', items: [{ title: 'Request', url: 'https://developer.mozilla.org/docs/Web/API/Request', children: [], count: 0 }] }],
+    content: { commit: 'a'.repeat(40), date: '2026-10-18' },
+  };
+  const answerAll = (caniuse: CiuAnswer | null, more: { mdn?: unknown; impl?: unknown } = {}) =>
+    sendMock.mockImplementation(async (type: string) =>
+      type === 'get-caniuse' ? { caniuse } : type === 'get-mdn' ? { mdn: more.mdn ?? null } : type === 'get-implementations' ? { impl: more.impl ?? null } : {});
+
+  it('shows the logo and the count after the MDN button, even without browser-support data', async () => {
+    answerAll(answer, { mdn });
+    render(<CardRow shortname="fetch" />);
+    const button = await screen.findByRole('button', { name: '2 Can I Use features' });
+    await screen.findByRole('button', { name: '1 MDN article' });
+    expect(button.textContent).toBe('2');
+    expect(button.getAttribute('title')).toBe('2 Can I Use features');
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(button.getAttribute('aria-controls')).toBe('caniuse-list');
+    const logo = button.querySelector('img')!;
+    expect(logo.getAttribute('src')).toBe('icons/caniuse.png');
+    expect(logo.getAttribute('alt')).toBe('');
+    const refs = button.parentElement!;
+    expect(refs.className).toBe('refs');
+    expect([...refs.children].map((c) => c.getAttribute('aria-controls'))).toEqual(['mdn-list', 'caniuse-list']);
+    expect(document.querySelector('.impl')).toBeNull();
+  });
+
+  it("renders the list only once it's first opened, with each feature's chips, timeline, and notes", async () => {
+    answerAll(answer);
+    render(<CardRow shortname="fetch" />);
+    const button = await screen.findByRole('button', { name: '2 Can I Use features' });
+    const panel = document.getElementById('caniuse-list')!;
+    expect(panel.hidden).toBe(true);
+    expect(panel.innerHTML).toBe('');
+    fireEvent.click(button);
+    expect(panel.hidden).toBe(false);
+    expect(screen.getByText('2 Can I Use features', { selector: 'strong' })).toBeTruthy();
+    const link = screen.getByRole('link', { name: 'Fetch' });
+    expect(link.getAttribute('href')).toBe('https://caniuse.com/fetch');
+    const fetchLine = link.closest('details')!;
+    expect(fetchLine.open).toBe(true);
+    const summary = fetchLine.querySelector('summary')!;
+    expect([...summary.children].map((c) => c.className)).toEqual(['ciu-head']);
+    expect(summary.textContent).toBe('Fetch 97.3%39+10.1+42+');
+    expect(summary.querySelector('.ciu-usage')!.getAttribute('title')).toBe('Global support across all browsers, per caniuse');
+    const bar = screen.getByRole('img', { name: 'Chrome: no in 4\u201339; partial in 40\u201341 (notes 2, 3); yes in 42\u2013154; yes in 155\u2013157 (beta)' });
+    expect(bar.querySelectorAll('.ciu-seg')).toHaveLength(4);
+    expect(bar.querySelector('.ciu-seg.a')!.getAttribute('title')).toBe('Chrome 40\u201341: partial (notes 2, 3), from Jan 2015');
+    expect(bar.querySelector('.ciu-seg')!.getAttribute('style')).toMatch(/--at:.*--w:/);
+    expect(screen.getByText('42+ \u00b7 Apr 2015')).toBeTruthy();
+    expect(screen.getByText('10.1+ \u00b7 Mar 2017')).toBeTruthy();
+    expect(screen.queryByRole('searchbox')).toBeNull();
+    const notes = screen.getByText('Notes (4)').closest('details')!;
+    expect(notes.open).toBe(false);
+    expect(notes.querySelector('code')!.textContent).toBe('ServiceWorker');
+    expect(screen.getByRole('link', { name: 'bug 1' }).getAttribute('href')).toBe('https://b.test/1');
+    const legends = [...panel.querySelectorAll('.ciu-legend')];
+    expect(legends).toHaveLength(2);
+    expect(legends.every((l) => l.closest('details.ciu-feature'))).toBe(true);
+    expect(legends[0].textContent).toBe('YesPartialNoBehind a flagPrefixedBeta');
+    const credit = screen.getByRole('link', { name: 'caniuse.com' });
+    expect(credit.getAttribute('href')).toBe('https://caniuse.com/');
+    expect(credit.closest('p')!.textContent).toBe('From caniuse.com, by Alexis Deveria (CC BY 4.0), data as of 13 October 2026. Desktop Firefox, Safari, and Chrome; mobile and other browsers are on caniuse.com.');
+  });
+
+  it('paints each segment above the ones after it, so the minimum width of a short run shows', async () => {
+    answerAll(answer);
+    render(<CardRow shortname="fetch" />);
+    fireEvent.click(await screen.findByRole('button', { name: '2 Can I Use features' }));
+    const bar = screen.getByRole('img', { name: 'Chrome: no in 4\u201339; partial in 40\u201341 (notes 2, 3); yes in 42\u2013154; yes in 155\u2013157 (beta)' });
+    expect([...bar.querySelectorAll<HTMLElement>('.ciu-seg')].map((s) => s.style.zIndex)).toEqual(['4', '3', '2', '1']);
+    expect(bar.querySelector<HTMLElement>('.ciu-today')!.style.zIndex).toBe('5');
+  });
+
+  it("opens one of the row's three panels at a time", async () => {
+    const impl = {
+      engines: ['webkit', 'blink'], basis: 'shared', core: 2, ships: { gecko: 0, webkit: 2, blink: 2 },
+      lacks: { gecko: { features: [{ key: 'api.A' }], more: 0 } }, bcd: { version: '8.1.6', timestamp: '2026-10-15T10:11:12.000Z' },
+    };
+    answerAll(answer, { mdn, impl });
+    render(<CardRow shortname="fetch" />);
+    const missing = await screen.findByRole('button', { name: 'What\u2019s missing?' });
+    const mdnButton = await screen.findByRole('button', { name: '1 MDN article' });
+    const ciu = await screen.findByRole('button', { name: '2 Can I Use features' });
+    const shown = () => ['impl-why', 'mdn-list', 'caniuse-list'].filter((id) => !document.getElementById(id)!.hidden);
+    fireEvent.click(missing);
+    expect(shown()).toEqual(['impl-why']);
+    fireEvent.click(ciu);
+    expect(shown()).toEqual(['caniuse-list']);
+    fireEvent.click(mdnButton);
+    expect(shown()).toEqual(['mdn-list']);
+    fireEvent.click(mdnButton);
+    expect(shown()).toEqual([]);
+  });
+
+  it("opens a lone feature at once, and says when the features are the series' current level's", async () => {
+    answerAll({ features: [fetchEntry], source, fromSeries: { shortname: 'fetch-2', title: 'Fetch Level 2' } });
+    render(<CardRow shortname="fetch-1" />);
+    fireEvent.click(await screen.findByRole('button', { name: '1 Can I Use feature' }));
+    expect(screen.getByRole('link', { name: 'Fetch' }).closest('details')!.open).toBe(true);
+    expect(screen.getByText('This spec has no Can I Use features of its own, so these are the ones for Fetch Level 2.')).toBeTruthy();
+  });
+
+  it('filters a list of more than 10 features by title', async () => {
+    const many = Array.from({ length: 11 }, (_, i) => simple(`f${i}`, `Feature ${String(i).padStart(2, '0')}`));
+    answerAll({ features: many, source });
+    render(<CardRow shortname="html" />);
+    fireEvent.click(await screen.findByRole('button', { name: '11 Can I Use features' }));
+    expect(screen.getByRole('link', { name: 'Feature 00' }).closest('details')!.open).toBe(false);
+    const filter = screen.getByRole('searchbox', { name: 'Filter features' });
+    expect(filter.getAttribute('placeholder')).toBe('Filter features');
+    fireEvent.input(filter, { target: { value: '07' } });
+    expect(screen.getByRole('link', { name: 'Feature 07' })).toBeTruthy();
+    expect(screen.queryByRole('link', { name: 'Feature 08' })).toBeNull();
+    fireEvent.input(filter, { target: { value: 'zzz' } });
+    expect(screen.getByText('No features match.')).toBeTruthy();
+    fireEvent.input(filter, { target: { value: '' } });
+    expect(screen.getAllByRole('link', { name: /^Feature / })).toHaveLength(11);
+  });
+
+  it('shows no Can I Use button when the spec has no caniuse features', async () => {
+    answerAll(null, { mdn });
+    render(<CardRow shortname="fetch" />);
+    await screen.findByRole('button', { name: '1 MDN article' });
+    expect(screen.queryByRole('button', { name: /Can I Use/ })).toBeNull();
+    expect(document.getElementById('caniuse-list')).toBeNull();
   });
 });
