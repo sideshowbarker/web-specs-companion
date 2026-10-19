@@ -58,6 +58,11 @@ describe('slimSpecs', () => {
     });
   });
 
+  it("keeps a spec's excludePaths", () => {
+    const [s] = slimSpecs([{ ...rawSpec, tests: { ...rawSpec.tests, excludePaths: ['css/css-grid/subgrid', 7] } }]);
+    expect(s.tests).toEqual({ repository: 'https://github.com/web-platform-tests/wpt', testPaths: ['css/css-grid'], excludePaths: ['css/css-grid/subgrid'] });
+  });
+
   it('skips malformed records and rejects non-arrays', () => {
     expect(slimSpecs([{ title: 'no shortname' }, rawSpec])).toHaveLength(1);
     expect(() => slimSpecs({})).toThrow(/array/);

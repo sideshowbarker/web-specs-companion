@@ -19,7 +19,7 @@ export interface SlimSpec {
   };
   release?: { url: string; status?: string; pages?: string[] };
   groups: { name: string; url: string }[];
-  tests?: { repository: string; testPaths?: string[] };
+  tests?: { repository: string; testPaths?: string[]; excludePaths?: string[] };
   obsoletedBy?: string[];
   formerNames?: string[];
 }

@@ -47,7 +47,9 @@ export function slimSpecs(raw: unknown): SlimSpec[] {
       groups: Array.isArray(s.groups)
         ? s.groups.filter((g: Raw) => str(g?.name) && str(g?.url)).map((g: Raw) => ({ name: g.name, url: g.url }))
         : [],
-      tests: str(s.tests?.repository) ? { repository: s.tests.repository, testPaths: strs(s.tests.testPaths) } : undefined,
+      tests: str(s.tests?.repository)
+        ? { repository: s.tests.repository, testPaths: strs(s.tests.testPaths), excludePaths: strs(s.tests.excludePaths) }
+        : undefined,
       obsoletedBy: strs(s.obsoletedBy),
       formerNames: strs(s.formerNames),
     }));
