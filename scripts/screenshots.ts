@@ -169,6 +169,10 @@ async function launch(profile: string, clock?: number) {
         await cmd('Page.reload', { ignoreCache: true }, tab);
         await sleep(500);
       }
+      // Each shot shows a spec's header with its "More details about this document" metadata collapsed.
+      await evaluate(tab, `for (const s of document.querySelectorAll('details > summary')) {
+        if (s.textContent.trim() === 'More details about this document') s.parentElement.open = false;
+      }`);
       await sleep(2500);
     };
     // The footer warns when some live data couldn't be fetched, and a shot of stale data fails the run.
