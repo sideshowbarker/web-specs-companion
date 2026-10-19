@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildImplementations, LACKS_CAP, matchSpecUrl, normalizeUrl, ships, specUrlIndex, type ImplRecord } from '../src/logic/implementations.ts';
+import { buildImplementations, forEachFeature, LACKS_CAP, matchSpecUrl, normalizeUrl, ships, specUrlIndex, type ImplRecord } from '../src/logic/implementations.ts';
 import type { SlimSpec } from '../src/shared/types.ts';
 
 const spec = (shortname: string, over: Partial<SlimSpec> = {}): SlimSpec => ({
@@ -245,5 +245,14 @@ describe('buildImplementations', () => {
       [spec('web-share', { url: ws })],
     );
     expect(file.specs['web-share'].engines).toEqual(['gecko', 'webkit', 'blink']);
+  });
+});
+
+describe('forEachFeature', () => {
+  it("visits each feature in the file's order, outside BCD's list of browsers and its __meta", () => {
+    const seen: string[] = [];
+    const bcd = { __meta: { version: '1' }, browsers: { chrome: { __compat: {} } }, api: { A: { __compat: {}, b: { __compat: {} } }, C: { __compat: {} } } };
+    forEachFeature(bcd, (key) => seen.push(key));
+    expect(seen).toEqual(['api.A', 'api.A.b', 'api.C']);
   });
 });

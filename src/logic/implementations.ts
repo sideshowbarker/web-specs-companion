@@ -122,41 +122,50 @@ interface Feature {
   engines: Engine[];
 }
 
-interface Compat {
+export interface BcdCompat {
   spec_url?: unknown;
   mdn_url?: unknown;
   support?: Record<string, unknown>;
   status?: { deprecated?: unknown };
 }
 
-// Collects, for each spec, the BCD features whose spec URLs match it, from every tree but BCD's list of browsers. A
-// feature with spec URLs in several specs counts once for each of them, and deprecated features don't count.
-function featuresBySpec(bcd: Record<string, unknown>, index: Map<string, string>): Map<string, Feature[]> {
-  const bySpec = new Map<string, Feature[]>();
+// Calls visit with the dotted key and the __compat of each feature in BCD's data.json, in the file's order, in every
+// tree but BCD's list of browsers.
+export function forEachFeature(bcd: unknown, visit: (key: string, compat: BcdCompat) => void): void {
   const walk = (node: Record<string, unknown>, path: string[]) => {
     for (const [name, child] of Object.entries(node)) {
       if (!child || typeof child !== 'object') continue;
-      if (name !== '__compat') {
-        if (!name.startsWith('__')) walk(child as Record<string, unknown>, [...path, name]);
-        continue;
-      }
-      const compat = child as Compat;
-      if (compat.status?.deprecated) continue;
-      const urls = ([] as unknown[]).concat(compat.spec_url ?? []).filter((u): u is string => typeof u === 'string');
-      const shortnames = new Set(urls.map((u) => matchSpecUrl(index, u)).filter((s): s is string => s !== undefined));
-      if (shortnames.size === 0) continue;
-      const feature: Feature = { key: path.join('.'), engines: ENGINES.filter((e) => ships(compat.support, e)) };
-      if (typeof compat.mdn_url === 'string') feature.mdn = compat.mdn_url;
-      for (const s of shortnames) {
-        const list = bySpec.get(s);
-        if (list) list.push(feature);
-        else bySpec.set(s, [feature]);
-      }
+      if (name === '__compat') visit(path.join('.'), child as BcdCompat);
+      else if (!name.startsWith('__')) walk(child as Record<string, unknown>, [...path, name]);
     }
   };
-  for (const [tree, node] of Object.entries(bcd)) {
+  for (const [tree, node] of Object.entries((bcd ?? {}) as Record<string, unknown>)) {
     if (tree !== 'browsers' && !tree.startsWith('__') && node && typeof node === 'object') walk(node as Record<string, unknown>, [tree]);
   }
+}
+
+// The specs a feature's own spec URLs match.
+export function compatSpecs(compat: BcdCompat, index: Map<string, string>): Set<string> {
+  const urls = ([] as unknown[]).concat(compat.spec_url ?? []).filter((u): u is string => typeof u === 'string');
+  return new Set(urls.map((u) => matchSpecUrl(index, u)).filter((s): s is string => s !== undefined));
+}
+
+// Collects, for each spec, the BCD features whose spec URLs match it. A feature with spec URLs in several specs counts
+// once for each of them, and deprecated features don't count.
+function featuresBySpec(bcd: Record<string, unknown>, index: Map<string, string>): Map<string, Feature[]> {
+  const bySpec = new Map<string, Feature[]>();
+  forEachFeature(bcd, (key, compat) => {
+    if (compat.status?.deprecated) return;
+    const shortnames = compatSpecs(compat, index);
+    if (shortnames.size === 0) return;
+    const feature: Feature = { key, engines: ENGINES.filter((e) => ships(compat.support, e)) };
+    if (typeof compat.mdn_url === 'string') feature.mdn = compat.mdn_url;
+    for (const s of shortnames) {
+      const list = bySpec.get(s);
+      if (list) list.push(feature);
+      else bySpec.set(s, [feature]);
+    }
+  });
   return bySpec;
 }
 
