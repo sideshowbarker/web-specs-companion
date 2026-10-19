@@ -5,6 +5,7 @@ import { getGroupDetails, getSpecDetails } from '../data/w3capi.ts';
 import { getExtract, getWebrefIndex, isoFromSpecDate, type WebrefEntry } from '../data/webref.ts';
 import { buildUsedByMap, computeFootprint, specdexUrl } from '../logic/footprint.ts';
 import { isImplRecord } from '../logic/implementations.ts';
+import { mdnView } from '../logic/mdn.ts';
 import { checkLinks, type TargetData } from '../logic/linkcheck.ts';
 import { computeRadar } from '../logic/radar.ts';
 import { fragmentOf } from '../shared/url.ts';
@@ -148,6 +149,18 @@ export function createHandlers(deps: HandlerDeps) {
       const series = current && current !== msg.shortname ? record(current) : undefined;
       if (!current || !series) return { impl: null };
       return { impl: { ...series, bcd: file.bcd, fromSeries: { shortname: current, title: specs.get(current)?.title ?? current } } };
+    },
+    'get-mdn': async (msg) => {
+      const file = await deps.sources.load('mdn').then((l) => l.data, () => undefined);
+      if (!file) return { mdn: null };
+      const own = mdnView(file, msg.shortname);
+      if (own) return { mdn: own };
+      // MDN's pages cite a series by URLs that name no level, so their articles are filed under the current level.
+      const { specs } = await indexes();
+      const current = specs.get(msg.shortname)?.series.currentSpecification;
+      const series = current && current !== msg.shortname ? mdnView(file, current) : undefined;
+      if (!current || !series) return { mdn: null };
+      return { mdn: { ...series, fromSeries: { shortname: current, title: specs.get(current)?.title ?? current } } };
     },
     'check-links': async (msg) => {
       const index = await getWebrefIndex(deps.http, deps.now);

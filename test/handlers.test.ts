@@ -203,4 +203,34 @@ describe('handlers', () => {
     const h = createHandlers(deps({ sources: fakeSources({ implementations: { bcd, specs: { 'fetch-metadata': { implemented: ['gecko'] } } } }) }));
     expect(await h.handle({ type: 'get-implementations', shortname: 'fetch-metadata' }, sender(1))).toEqual({ impl: null });
   });
+
+  it("answers get-mdn with the spec's view, its series' current level's, or null", async () => {
+    const content = { commit: 'a'.repeat(40), date: '2026-10-18' };
+    const mdn = { content, types: ['web-api-interface'], pages: [['Web/API/A', 'A', 0], ['Web/API/B', 'B', 0]], specs: { 'fetch-metadata': [0], 'wai-aria-1.2': [1] } };
+    const h = createHandlers(deps({ sources: fakeSources({ mdn }) }));
+    const item = (title: string) => ({ title, url: `https://developer.mozilla.org/docs/Web/API/${title}`, children: [], count: 0 });
+    expect(await h.handle({ type: 'get-mdn', shortname: 'fetch-metadata' }, sender(1))).toEqual({
+      mdn: { count: 1, overviews: [], sections: [{ name: 'Interfaces', items: [item('A')] }], content },
+    });
+    expect(await h.handle({ type: 'get-mdn', shortname: 'wai-aria-1.3' }, sender(1))).toEqual({
+      mdn: { count: 1, overviews: [], sections: [{ name: 'Interfaces', items: [item('B')] }], content, fromSeries: { shortname: 'wai-aria-1.2', title: 'WAI-ARIA 1.2' } },
+    });
+    expect(await h.handle({ type: 'get-mdn', shortname: 'css-grid-3' }, sender(1))).toEqual({ mdn: null });
+    expect(await h.handle({ type: 'get-mdn', shortname: 'constructor' }, sender(1))).toEqual({ mdn: null });
+  });
+
+  it('answers get-mdn with null when the MDN file fails to load', async () => {
+    const load = vi.fn(async (name: string) => {
+      if (name === 'mdn') throw new Error('offline');
+      return { data: ({ specs, groups, repos } as Record<string, unknown>)[name], fetchedAt: 1, origin: 'bundled' };
+    });
+    const h = createHandlers(deps({ sources: { load } as unknown as Sources }));
+    expect(await h.handle({ type: 'get-mdn', shortname: 'fetch-metadata' }, sender(1))).toEqual({ mdn: null });
+  });
+
+  it('answers get-mdn with null for a stored copy whose indexes fit no page', async () => {
+    const mdn = { content: { commit: 'a'.repeat(40), date: '2026-10-18' }, types: [], pages: [], specs: { 'fetch-metadata': [3] } };
+    const h = createHandlers(deps({ sources: fakeSources({ mdn }) }));
+    expect(await h.handle({ type: 'get-mdn', shortname: 'fetch-metadata' }, sender(1))).toEqual({ mdn: null });
+  });
 });

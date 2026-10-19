@@ -3,6 +3,7 @@ import type { GroupDetails, SpecDetails } from '../data/w3capi.ts';
 import type { OutLink } from '../content/links.ts';
 import type { Footprint, UsedByEntry } from '../logic/footprint.ts';
 import type { ImplView } from '../logic/implementations.ts';
+import type { MdnView } from '../logic/mdn.ts';
 import type { LinkCheckResult } from '../logic/linkcheck.ts';
 import type { Radar } from '../logic/radar.ts';
 import type { SearchItem } from '../logic/search.ts';
@@ -19,6 +20,7 @@ export interface Api {
   'resolve-idl': { req: { name: string }; res: { url: string } };
   'get-footprint': { req: { shortname: string }; res: { footprint: Footprint | null } };
   'get-implementations': { req: { shortname: string }; res: { impl: ImplView | null } };
+  'get-mdn': { req: { shortname: string }; res: { mdn: MdnView | null } };
   'get-used-by': { req: { shortname: string }; res: { map: Record<string, UsedByEntry> | null; specdex: string } };
   'check-links': { req: { shortname: string; links: OutLink[] }; res: LinkCheckResult };
   'get-freshness': { req: Record<string, never>; res: { sources: { name: string; fetchedAt: number; origin: Loaded<unknown>['origin'] }[] } };
