@@ -2,9 +2,9 @@ name: Pages
 
 # Publishes the site in site/ to https://w3c-oss.github.io/w3c-companion/. Its install steps link to the latest
 # release's zip, and switch to the store pages once Firefox Add-ons and the Chrome Web Store list the extension. And it
-# serves the browser-support, MDN, and Can I Use files the extension fetches, built from the latest BCD, mdn/content,
-# caniuse-db, and web-features. So the workflow also runs after each release and every hour, and an hourly run
-# deploys only when the page or one of those files has changed.
+# serves the browser-support, MDN, Can I Use, and test-results files the extension fetches, built from the latest BCD,
+# mdn/content, caniuse-db, web-features, and wpt.fyi runs. So the workflow also runs after each release and every hour,
+# and an hourly run deploys only when the page or one of those files has changed.
 
 on:
   push:
@@ -18,9 +18,11 @@ on:
       - 'scripts/bcd.ts'
       - 'scripts/mdn.ts'
       - 'scripts/caniuse.ts'
+      - 'scripts/wpt.ts'
       - 'src/logic/implementations.ts'
       - 'src/logic/mdn.ts'
       - 'src/logic/caniuse.ts'
+      - 'src/logic/wpt.ts'
       - '.github/workflows/pages.yml'
   schedule:
     - cron: '23 * * * *'
@@ -59,7 +61,8 @@ jobs:
             && curl -fsS "$site/" | cmp -s - _site/index.html \
             && curl -fsS "$site/data/implementations.json" | cmp -s - _site/data/implementations.json \
             && curl -fsS "$site/data/mdn.json" | cmp -s - _site/data/mdn.json \
-            && curl -fsS "$site/data/caniuse.json" | cmp -s - _site/data/caniuse.json; then
+            && curl -fsS "$site/data/caniuse.json" | cmp -s - _site/data/caniuse.json \
+            && curl -fsS "$site/data/wpt.json" | cmp -s - _site/data/wpt.json; then
             echo "deploy=false" >> "$GITHUB_OUTPUT"
           else
             echo "deploy=true" >> "$GITHUB_OUTPUT"

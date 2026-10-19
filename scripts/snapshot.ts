@@ -6,6 +6,7 @@ import { parseIcs } from '../src/data/tpac.ts';
 import { fetchBuildInputs, implementationsText } from './bcd.ts';
 import { buildCaniuseFile } from './caniuse.ts';
 import { buildMdnFile } from './mdn.ts';
+import { buildWptFile } from './wpt.ts';
 
 async function getJson(url: string): Promise<unknown> {
   const res = await fetch(url);
@@ -37,6 +38,10 @@ const caniuse = await buildCaniuseFile(inputs);
 await writeFile('data/caniuse.json', caniuse.text);
 sources.caniuse = caniuse.url;
 console.log('data/caniuse.json');
+const wpt = await buildWptFile(inputs);
+await writeFile('data/wpt.json', wpt.text);
+sources.wpt = wpt.url;
+console.log('data/wpt.json');
 const icsRes = await fetch(URLS.tpac);
 if (!icsRes.ok) throw new Error(`HTTP ${icsRes.status} for ${URLS.tpac}`);
 await writeFile('data/tpac2026.json', JSON.stringify(parseIcs(await icsRes.text())));

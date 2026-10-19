@@ -1,12 +1,13 @@
 // Builds the GitHub Pages site into _site/: the pages in site/, the screenshots, the icon, a privacy page made from
-// store/privacy.md, and the browser-support, MDN, and Can I Use files the extension fetches. The install steps on the
-// pages depend on the release they link to, and on which stores list the extension, so the build asks both stores.
+// store/privacy.md, and the browser-support, MDN, Can I Use, and test-results files the extension fetches. The site's
+// install steps depend on the release they link to, and on which stores list the extension, so the build asks both.
 import { marked } from 'marked';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { fetchBuildInputs, implementationsText } from './bcd.ts';
 import { buildCaniuseFile } from './caniuse.ts';
 import { buildMdnFile } from './mdn.ts';
+import { buildWptFile } from './wpt.ts';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const out = root + '_site/';
@@ -15,7 +16,7 @@ const AMO_API = 'https://addons.mozilla.org/api/v5/addons/addon/w3c-companion/';
 const CWS_PAGE = 'https://chromewebstore.google.com/detail/hpajpmapkffhaiggemaeajpkehfnapkm';
 
 export type Stores = { amo: boolean; cws: boolean };
-export type Fetch = (url: string) => Promise<Response>;
+export type Fetch = (url: string, init?: RequestInit) => Promise<Response>;
 
 // Fills each {{name}} with values[name], and resolves each <!-- if store --> or <!-- if !store --> block, up to its
 // <!-- endif -->, by whether that store lists the extension. Blocks don't nest.
@@ -62,12 +63,14 @@ async function main() {
   const implementations = implementationsText(inputs);
   const mdn = await buildMdnFile(inputs);
   const caniuse = await buildCaniuseFile(inputs);
+  const wpt = await buildWptFile(inputs);
   await rm(out, { recursive: true, force: true });
   await mkdir(out + 'privacy', { recursive: true });
   await mkdir(out + 'data');
   await writeFile(out + 'data/implementations.json', implementations);
   await writeFile(out + 'data/mdn.json', mdn.text);
   await writeFile(out + 'data/caniuse.json', caniuse.text);
+  await writeFile(out + 'data/wpt.json', wpt.text);
   const index = await readFile(root + 'site/index.html', 'utf8');
   await writeFile(out + 'index.html', fillTemplate(index, { version, zip }, stores));
   const privacy = await readFile(root + 'site/privacy.html', 'utf8');
