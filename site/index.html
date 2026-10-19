@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>W3C Companion</title>
-  <meta name="description" content="A browser extension for reading W3C specs and finding the groups and people behind them.">
-  <meta property="og:title" content="W3C Companion">
-  <meta property="og:description" content="A browser extension for reading W3C specs and finding the groups and people behind them.">
-  <meta property="og:url" content="https://w3c-oss.github.io/w3c-companion/">
-  <meta property="og:image" content="https://w3c-oss.github.io/w3c-companion/screenshots/card-editors-draft.png">
+  <title>Web Specs Companion</title>
+  <meta name="description" content="A browser extension for reading web specs and finding the groups and people behind them.">
+  <meta property="og:title" content="Web Specs Companion">
+  <meta property="og:description" content="A browser extension for reading web specs and finding the groups and people behind them.">
+  <meta property="og:url" content="https://sideshowbarker.net/web-specs-companion/">
+  <meta property="og:image" content="https://sideshowbarker.net/web-specs-companion/screenshots/card-editors-draft.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="favicon.png">
   <link rel="stylesheet" href="site.css">
@@ -18,9 +18,10 @@
   <header class="hero">
     <div class="wrap">
       <div>
-        <p class="brand"><img src="icon.png" width="128" height="128" alt=""> W3C Companion</p>
-        <h1>A browser extension for reading W3C specs and finding the groups and people behind them</h1>
-        <p class="lede">On any W3C or WHATWG spec, it shows the spec’s maturity, its editor’s draft and TR versions, its repository and issues, its tests, and the group responsible for it — with the group’s chairs, team contacts, and charter end date.</p>
+        <p class="brand"><img src="icon.png" width="128" height="128" alt=""> Web Specs Companion</p>
+        <h1>A browser extension for reading web specs and finding the groups and people behind them</h1>
+        <p class="lede">On a spec from W3C, WHATWG, TC39, the IETF, Khronos, or elsewhere, it shows what’s known of the spec’s maturity, versions, repository and issue tracker, tests, and the group responsible for it. For a W3C spec, that includes the editor’s draft and TR versions, and the group’s chairs, team contacts, and charter end date.</p>
+        <p class="disclaimer">Web Specs Companion is a personal project. It isn’t affiliated with or endorsed by W3C.</p>
         <p class="cta"><a class="button" id="install-button" href="#install">Install it</a> <span>Free and open source, and it collects nothing about you.</span></p>
       </div>
       <a href="screenshots/card-editors-draft.png"><img class="shot" src="screenshots/card-editors-draft.png" width="1280" height="800" alt="The card for an editor’s draft: its maturity, its links, its group and chairs, and its platform footprint"></a>
@@ -63,7 +64,7 @@
         </div>
         <h3 class="also">And also</h3>
         <ul class="also">
-          <li>Search for specs, groups, Web IDL names, and terms: Type <kbd>w3c</kbd> and a space in the address bar (in Chrome, Edge, and Firefox).</li>
+          <li>Search for specs, groups, Web IDL names, and terms: Type <kbd>spec</kbd> and a space in the address bar (in Chrome, Edge, and Firefox).</li>
           <li>A check of the spec’s links to other specs, for anchors that no longer exist.</li>
           <li>A summary of the spec’s place in the web platform.</li>
           <li>It works offline, from data it bundles and refreshes every few hours.</li>
@@ -75,7 +76,7 @@
       <div class="wrap">
         <h2 id="install-heading">Install it</h2>
         <p>The latest release is version {{version}}. It needs Chrome or Edge 148 or later, Firefox 128 or later, or Safari 26 or later, on a desktop computer.</p>
-        <p class="mobile-note" id="mobile-note" hidden>W3C Companion runs in desktop browsers, so open this page on your computer to install it.</p>
+        <p class="mobile-note" id="mobile-note" hidden>Web Specs Companion runs in desktop browsers, so open this page on your computer to install it.</p>
         <div class="browsers">
           <section class="browser" id="chrome" aria-labelledby="chrome-heading">
             <h3 id="chrome-heading">Chrome, Edge, and other Chromium-based browsers</h3>
@@ -84,7 +85,7 @@
             <p>The Chrome Web Store installs it, and keeps it up to date. Edge, Brave, and other Chromium-based browsers install it from there too — Edge first asks you to allow extensions from other stores.</p>
 <!-- endif -->
 <!-- if !cws -->
-            <p>W3C Companion is waiting for review in the Chrome Web Store. Until it’s there, load it from the release zip:</p>
+            <p>Web Specs Companion is waiting for review in the Chrome Web Store. Until it’s there, load it from the release zip:</p>
             <ol>
               <li><a href="{{zip}}">Download the zip</a>, and unzip it into a folder it can stay in — the browser loads the extension from that folder every time it starts.</li>
               <li>Open <code>chrome://extensions</code> (<code>edge://extensions</code> in Edge, <code>brave://extensions</code> in Brave).</li>
@@ -97,11 +98,11 @@
           <section class="browser" id="firefox" aria-labelledby="firefox-heading">
             <h3 id="firefox-heading">Firefox</h3>
 <!-- if amo -->
-            <p><a class="button store" href="https://addons.mozilla.org/firefox/addon/w3c-companion/">Add to Firefox</a></p>
+            <p><a class="button store" href="https://addons.mozilla.org/firefox/addon/web-specs-companion/">Add to Firefox</a></p>
             <p>Firefox Add-ons installs it, and keeps it up to date.</p>
 <!-- endif -->
 <!-- if !amo -->
-            <p>W3C Companion is waiting for review on Firefox Add-ons. Until it’s there, Firefox can run it as a temporary add-on, which Firefox removes when it quits:</p>
+            <p>Web Specs Companion is waiting for review on Firefox Add-ons. Until it’s there, Firefox can run it as a temporary add-on, which Firefox removes when it quits:</p>
             <ol>
               <li><a href="{{zip}}">Download the zip</a>.</li>
               <li>Open <code>about:debugging</code>, and click <b>This Firefox</b>.</li>
@@ -112,17 +113,17 @@
           </section>
           <section class="browser" id="safari" aria-labelledby="safari-heading">
             <h3 id="safari-heading">Safari</h3>
-            <p>Safari 26 or later can run W3C Companion as a temporary extension, which Safari removes when it quits and after 24 hours — so add it again whenever it’s gone.</p>
+            <p>Safari 26 or later can run Web Specs Companion as a temporary extension, which Safari removes when it quits and after 24 hours — so add it again whenever it’s gone.</p>
             <p>Once, choose <b>Safari</b> → <b>Settings…</b>, select <b>Advanced</b>, and turn on <b>Show features for web developers</b>. Then, each time:</p>
             <ol>
               <li><a href="{{zip}}">Download the zip</a>, if you don’t have it already.</li>
               <li>In <b>Safari</b> → <b>Settings…</b>, select <b>Developer</b>, click <b>Add Temporary Extension…</b>, and select the zip (or the folder, if Safari unzipped it). Authenticate if Safari asks to allow unsigned extensions.</li>
               <li>Click the extension’s toolbar button, which shows a warning sign until you allow it, and allow it on every website.</li>
             </ol>
-            <p class="muted">Safari has no address-bar keywords or side panels for extensions, so the <kbd>w3c</kbd> search and the side panel aren’t there.</p>
+            <p class="muted">Safari has no address-bar keywords or side panels for extensions, so the <kbd>spec</kbd> search and the side panel aren’t there.</p>
           </section>
         </div>
-        <p class="then">Once it’s installed, pin W3C Companion to the toolbar from the browser’s extensions menu, and click its button on any spec, W3C repo on GitHub, or w3.org group page.</p>
+        <p class="then">Once it’s installed, pin Web Specs Companion to the toolbar from the browser’s extensions menu, and click its button on any spec, W3C repo on GitHub, or w3.org group page.</p>
       </div>
     </section>
   </main>
@@ -130,13 +131,13 @@
   <footer>
     <div class="wrap">
       <ul class="links">
-        <li><a href="https://github.com/w3c-oss/w3c-companion">Source code</a></li>
-        <li><a href="https://github.com/w3c-oss/w3c-companion/issues">Report a problem</a></li>
-        <li><a href="https://github.com/w3c-oss/w3c-companion/releases">Releases</a></li>
+        <li><a href="https://github.com/sideshowbarker/web-specs-companion">Source code</a></li>
+        <li><a href="https://github.com/sideshowbarker/web-specs-companion/issues">Report a problem</a></li>
+        <li><a href="https://github.com/sideshowbarker/web-specs-companion/releases">Releases</a></li>
         <li><a href="privacy/">Privacy</a></li>
       </ul>
-      <p>Data comes from public W3C sources: <a href="https://github.com/w3c/browser-specs">browser-specs</a>, <a href="https://github.com/w3c/groups">w3c/groups</a>, <a href="https://github.com/w3c/webref">webref</a>, the <a href="https://api.w3.org/doc">W3C API</a>, the <a href="https://www.w3.org/calendar/tpac2026/">TPAC 2026 calendar</a>, and <a href="https://respec.org/xref/">ReSpec’s xref service</a>.</p>
-      <p><a href="https://github.com/w3c-oss/w3c-companion/blob/main/LICENSE">Apache-2.0</a> © 2026 <a href="https://www.w3.org/">World Wide Web Consortium</a>. The W3C symbol is a W3C trademark, which the license doesn’t cover; see the <a href="https://www.w3.org/policies/logos/">W3C logo policy</a>.</p>
+      <p>Data comes from public sources: <a href="https://github.com/w3c/browser-specs">browser-specs</a>, <a href="https://github.com/w3c/groups">w3c/groups</a>, <a href="https://github.com/w3c/webref">webref</a>, the <a href="https://api.w3.org/doc">W3C API</a>, the <a href="https://www.w3.org/calendar/tpac2026/">TPAC 2026 calendar</a>, and <a href="https://respec.org/xref/">ReSpec’s xref service</a>.</p>
+      <p><a href="https://github.com/sideshowbarker/web-specs-companion/blob/main/LICENSE">Apache-2.0</a></p>
     </div>
   </footer>
 </body>

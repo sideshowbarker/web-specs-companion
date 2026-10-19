@@ -1,6 +1,6 @@
 name: Pages
 
-# Publishes the site in site/ to https://w3c-oss.github.io/w3c-companion/. Its install steps link to the latest
+# Publishes the site in site/ to https://sideshowbarker.net/web-specs-companion/. Its install steps link to the latest
 # release's zip, and switch to the store pages once Firefox Add-ons and the Chrome Web Store list the extension. And it
 # serves the browser-support, MDN, Can I Use, and test-results files the extension fetches, built from the latest BCD,
 # mdn/content, caniuse-db, web-features, and wpt.fyi runs. So the workflow also runs after each release and every hour,
@@ -56,7 +56,7 @@ jobs:
       - name: Compare the site with the deployed one
         id: compare
         run: |
-          site=https://w3c-oss.github.io/w3c-companion
+          site=https://sideshowbarker.net/web-specs-companion
           if [ "$GITHUB_EVENT_NAME" = schedule ] \
             && curl -fsS "$site/" | cmp -s - _site/index.html \
             && curl -fsS "$site/data/implementations.json" | cmp -s - _site/data/implementations.json \

@@ -48,6 +48,7 @@ code, kbd { font: 0.88em/1 ui-monospace, SFMono-Regular, Menlo, monospace; white
 .brand img { width: 44px; height: 44px; padding: 5px; border-radius: 10px; background: #fff; }
 h1 { font-size: clamp(1.7rem, 1.1rem + 2vw, 2.4rem); line-height: 1.15; margin: 0 0 16px; text-wrap: balance; }
 .lede { font-size: 1.1rem; margin: 0 0 24px; max-width: 34em; }
+.disclaimer { margin: -12px 0 24px; max-width: 34em; color: rgb(255 255 255 / 0.85); }
 .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin: 0; }
 .button { display: inline-block; padding: 10px 22px; border-radius: 6px; background: var(--blue); color: #fff; font-weight: 700; text-decoration: none; }
 .button:hover { background: var(--dark-blue); }

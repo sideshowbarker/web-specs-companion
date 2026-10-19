@@ -31,7 +31,7 @@ describe('fillTemplate', () => {
 });
 
 describe('probeStores', () => {
-  const amoApi = 'https://addons.mozilla.org/api/v5/addons/addon/w3c-companion/';
+  const amoApi = 'https://addons.mozilla.org/api/v5/addons/addon/web-specs-companion/';
   const cwsPage = 'https://chromewebstore.google.com/detail/hpajpmapkffhaiggemaeajpkehfnapkm';
   const fake = (amo: { status: number; body?: object }, cws: { status: number; title?: string }): Fetch =>
     async (url) => {
@@ -49,7 +49,7 @@ describe('probeStores', () => {
 
   it('counts the Chrome Web Store as listing the extension once its item page has its name', async () => {
     const amo = { status: 401, body: {} };
-    expect((await probeStores(fake(amo, { status: 200, title: 'W3C Companion - Chrome Web Store' }))).cws).toBe(true);
+    expect((await probeStores(fake(amo, { status: 200, title: 'Web Specs Companion - Chrome Web Store' }))).cws).toBe(true);
     expect((await probeStores(fake(amo, { status: 200, title: 'Chrome Web Store' }))).cws).toBe(false);
     expect((await probeStores(fake(amo, { status: 404 }))).cws).toBe(false);
   });
@@ -69,7 +69,13 @@ describe('renderMarkdown', () => {
 });
 
 describe('the site', () => {
-  const values = { version: '1.2.3', zip: 'https://example.test/w3c-companion-1.2.3.zip' };
+  const values = { version: '1.2.3', zip: 'https://example.test/web-specs-companion-1.2.3.zip' };
+
+  it('says it is a personal project, and claims no W3C copyright or trademark', async () => {
+    const page = fillTemplate(await read('site/index.html'), values, every[0]);
+    expect(page).toContain('<p class="disclaimer">Web Specs Companion is a personal project. It isn\u2019t affiliated with or endorsed by W3C.</p>');
+    expect(page).not.toMatch(/World Wide Web Consortium|trademark/);
+  });
 
   it('builds for every combination of stores, with nothing left unfilled', async () => {
     const page = await read('site/index.html');
@@ -88,7 +94,7 @@ describe('the site', () => {
     expect(section(after, 'chrome')).not.toContain(values.zip);
     expect(section(before, 'firefox')).toContain(values.zip);
     expect(section(before, 'firefox')).not.toContain('addons.mozilla.org');
-    expect(section(after, 'firefox')).toContain('https://addons.mozilla.org/firefox/addon/w3c-companion/');
+    expect(section(after, 'firefox')).toContain('https://addons.mozilla.org/firefox/addon/web-specs-companion/');
     expect(section(after, 'firefox')).not.toContain(values.zip);
     expect(section(after, 'safari')).toContain(values.zip);
   });

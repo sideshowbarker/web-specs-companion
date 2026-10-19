@@ -12,7 +12,7 @@ import { buildWptFile } from './wpt.ts';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const out = root + '_site/';
 
-const AMO_API = 'https://addons.mozilla.org/api/v5/addons/addon/w3c-companion/';
+const AMO_API = 'https://addons.mozilla.org/api/v5/addons/addon/web-specs-companion/';
 const CWS_PAGE = 'https://chromewebstore.google.com/detail/hpajpmapkffhaiggemaeajpkehfnapkm';
 
 export type Stores = { amo: boolean; cws: boolean };
@@ -49,14 +49,14 @@ export async function probeStores(fetchUrl: Fetch = fetch): Promise<Stores> {
   if (!cws.ok && cws.status !== 404) throw new Error(`Chrome Web Store answered HTTP ${cws.status} for ${CWS_PAGE}`);
   return {
     amo: amo.ok && ((await amo.json()) as { status?: string }).status === 'public',
-    cws: cws.ok && /<title>W3C Companion\b/.test(await cws.text()),
+    cws: cws.ok && /<title>Web Specs Companion\b/.test(await cws.text()),
   };
 }
 
 async function main() {
   const pkg = JSON.parse(await readFile(root + 'package.json', 'utf8'));
   const version: string = process.env.SITE_VERSION || pkg.version;
-  const zip = `https://github.com/w3c-oss/w3c-companion/releases/download/v${version}/w3c-companion-${version}.zip`;
+  const zip = `https://github.com/sideshowbarker/web-specs-companion/releases/download/v${version}/web-specs-companion-${version}.zip`;
   const stores = await probeStores();
   console.log(`Version ${version}; Firefox Add-ons lists it: ${stores.amo}; the Chrome Web Store lists it: ${stores.cws}`);
   const inputs = await fetchBuildInputs();
