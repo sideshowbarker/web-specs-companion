@@ -55,7 +55,7 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 browser.tabs.onUpdated.addListener((tabId, info, tab) => {
   const url = info.url ?? (info.status === 'complete' ? tab.url : undefined);
-  if (url) handlers.onTabUrl(tabId, url).catch((err) => console.debug('w3c-companion:', err));
+  if (url) handlers.onTabUrl(tabId, url).catch((err) => console.debug('web-specs-companion:', err));
 });
 
 browser.tabs.onRemoved.addListener((tabId) => {
@@ -67,7 +67,7 @@ const find = async (q: string) => ((await handlers.handle({ type: 'search', quer
 const resolveIdl = async (name: string) => ((await handlers.handle({ type: 'resolve-idl', name }, {})) as { url: string }).url;
 
 if (browser.omnibox) {
-  browser.omnibox.setDefaultSuggestion({ description: 'Search W3C specs, groups, Web IDL, and terms' });
+  browser.omnibox.setDefaultSuggestion({ description: 'Search web specs, W3C groups, Web IDL names, and terms' });
   browser.omnibox.onInputChanged.addListener((text, suggest) => {
     find(text).then((items) => suggest(items.map((i) => suggestionFor(i, markup))), () => suggest([]));
   });

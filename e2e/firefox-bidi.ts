@@ -8,7 +8,7 @@ import { join, resolve } from 'node:path';
 
 const firefox = process.env.FIREFOX ?? '/Applications/Firefox.app/Contents/MacOS/firefox';
 const port = 9333;
-const profile = await mkdtemp(join(tmpdir(), 'w3cc-ff-'));
+const profile = await mkdtemp(join(tmpdir(), 'wsc-ff-'));
 const ff = spawn(firefox, ['--headless', '--remote-debugging-port', String(port), '--profile', profile, '--no-remote'], { stdio: 'ignore' });
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -59,7 +59,7 @@ try {
     let count = 0;
     for (let i = 0; i < 60 && count === 0; i++) {
       const r = await cmd('script.evaluate', {
-        expression: "document.querySelectorAll('[data-w3cc-usedby]').length",
+        expression: "document.querySelectorAll('[data-wsc-usedby]').length",
         target: { context },
         awaitPromise: false,
       });

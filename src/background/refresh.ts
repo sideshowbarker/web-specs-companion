@@ -25,7 +25,7 @@ export async function runAlarm(name: string, sources: Sources, now: number): Pro
       await sources.load(n, { force: true });
       refreshed.push(n);
     } catch (err) {
-      console.debug(`w3c-companion: refresh of ${n} failed:`, err);
+      console.debug(`web-specs-companion: refresh of ${n} failed:`, err);
     }
   }
   return refreshed;

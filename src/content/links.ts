@@ -6,8 +6,8 @@ export interface OutLink {
   text: string;
 }
 
-const SKIP = '#references, #normative, #informative, .head, header, nav#toc, #toc, .dfn-panel, dfn-panel, [data-w3cc-usedby]';
-const STYLE_ID = 'w3cc-linkcheck-style';
+const SKIP = '#references, #normative, #informative, .head, header, nav#toc, #toc, .dfn-panel, dfn-panel, [data-wsc-usedby]';
+const STYLE_ID = 'wsc-linkcheck-style';
 
 export function collectOutboundLinks(doc: Document, pageUrl: string) {
   const here = pageUrl.split('#')[0];
@@ -32,21 +32,21 @@ export function markProblems(doc: Document, elements: HTMLAnchorElement[], probl
   if (!doc.getElementById(STYLE_ID)) {
     const style = doc.createElement('style');
     style.id = STYLE_ID;
-    style.textContent = '[data-w3cc-problem] { outline: 2px solid #c00 !important; outline-offset: 2px; }';
+    style.textContent = '[data-wsc-problem] { outline: 2px solid #c00 !important; outline-offset: 2px; }';
     doc.head.append(style);
   }
   for (const p of problems) {
     const el = elements[p.i];
     if (!el) continue;
-    el.setAttribute('data-w3cc-problem', '');
+    el.setAttribute('data-wsc-problem', '');
     el.title = p.suggestion ? `Broken link: no such anchor in ${p.target.title}. Maybe ${p.suggestion}` : `Broken link: no such anchor in ${p.target.title}`;
   }
 }
 
 export function clearProblems(doc: Document) {
   doc.getElementById(STYLE_ID)?.remove();
-  for (const el of Array.from(doc.querySelectorAll('[data-w3cc-problem]'))) {
-    el.removeAttribute('data-w3cc-problem');
+  for (const el of Array.from(doc.querySelectorAll('[data-wsc-problem]'))) {
+    el.removeAttribute('data-wsc-problem');
     el.removeAttribute('title');
   }
 }

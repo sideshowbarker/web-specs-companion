@@ -133,7 +133,7 @@
     "open_at_install": false
   },
   "omnibox": {
-    "keyword": "w3c"
+    "keyword": "spec"
   },
   "commands": {
     "_execute_action": {
@@ -144,7 +144,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "w3c-companion@w3.org",
+      "id": "web-specs-companion@sideshowbarker.net",
       "strict_min_version": "128.0",
       "data_collection_permissions": {
         "required": [

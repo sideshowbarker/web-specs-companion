@@ -1,10 +1,10 @@
 {
-  "name": "w3c-companion",
+  "name": "web-specs-companion",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "license": "Apache-2.0",
-  "repository": "github:w3c-oss/w3c-companion",
+  "repository": "github:sideshowbarker/web-specs-companion",
   "engines": {
     "node": ">=24"
   },

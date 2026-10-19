@@ -68,14 +68,14 @@ export class UsedByLayer {
     const batchSize = opts.batchSize ?? 200;
     const schedule = opts.schedule ?? idle;
     const targets = Array.from(this.doc.querySelectorAll<HTMLElement>('dfn[id]')).filter(
-      (el) => this.map[el.id] && el.nextElementSibling?.getAttribute('data-w3cc-usedby') !== el.id,
+      (el) => this.map[el.id] && el.nextElementSibling?.getAttribute('data-wsc-usedby') !== el.id,
     );
     let inserted = 0;
     for (let i = 0; i < targets.length; i += batchSize) {
       await new Promise<void>((resolve) => schedule(resolve));
       if (gen !== this.generation) return inserted;
       for (const el of targets.slice(i, i + batchSize)) {
-        if (el.nextElementSibling?.getAttribute('data-w3cc-usedby') === el.id) continue;
+        if (el.nextElementSibling?.getAttribute('data-wsc-usedby') === el.id) continue;
         this.insertBadge(el, this.map[el.id]);
         inserted++;
       }
@@ -85,7 +85,7 @@ export class UsedByLayer {
 
   private insertBadge(dfn: HTMLElement, entry: UsedByEntry) {
     const host = this.doc.createElement('span');
-    host.setAttribute('data-w3cc-usedby', dfn.id);
+    host.setAttribute('data-wsc-usedby', dfn.id);
     const root = host.attachShadow({ mode: 'open' });
     const style = this.doc.createElement('style');
     style.textContent = BADGE_CSS;
@@ -107,7 +107,7 @@ export class UsedByLayer {
   private openPopover(entry: UsedByEntry, opener: HTMLElement) {
     this.closePopover(false);
     const host = this.doc.createElement('div');
-    host.setAttribute('data-w3cc-popover', '');
+    host.setAttribute('data-wsc-popover', '');
     const root = host.attachShadow({ mode: 'open' });
     const style = this.doc.createElement('style');
     style.textContent = POPOVER_CSS;

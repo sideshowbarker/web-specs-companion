@@ -22,11 +22,11 @@ export class MemoryStore implements Store {
 // workers, event pages, and extension pages alike.
 export class CacheApiStore implements Store {
   private cacheName: string;
-  constructor(cacheName = 'w3c-companion-v1') {
+  constructor(cacheName = 'web-specs-companion-v1') {
     this.cacheName = cacheName;
   }
   private keyUrl(key: string) {
-    return `https://w3c-companion.invalid/${encodeURIComponent(key)}`;
+    return `https://web-specs-companion.invalid/${encodeURIComponent(key)}`;
   }
   async get(key: string) {
     const cache = await caches.open(this.cacheName);

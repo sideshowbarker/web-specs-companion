@@ -57,4 +57,4 @@ export async function sendToTab<K extends keyof TabApi>(
   return unwrap(await browser.tabs.sendMessage(tabId, { type, ...(req as object) }));
 }
 
-export const RESPEC_READY = 'w3c-companion:respec-ready';
+export const RESPEC_READY = 'web-specs-companion:respec-ready';

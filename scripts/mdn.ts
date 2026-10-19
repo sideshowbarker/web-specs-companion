@@ -85,7 +85,7 @@ async function cloneContent(dir: string, run: Run): Promise<MdnFile['content']> 
 }
 
 export async function buildMdnFile(inputs: BuildInputs, run: Run = git, minSpecs = MIN_MDN_SPECS): Promise<{ url: string; text: string }> {
-  const tmp = await mkdtemp(join(tmpdir(), 'w3cc-mdn-'));
+  const tmp = await mkdtemp(join(tmpdir(), 'wsc-mdn-'));
   try {
     const dir = join(tmp, 'content');
     const content = await cloneContent(dir, run);

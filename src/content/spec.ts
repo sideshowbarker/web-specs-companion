@@ -66,4 +66,4 @@ async function main() {
   });
 }
 
-main().catch((err) => console.debug('w3c-companion:', err));
+main().catch((err) => console.debug('web-specs-companion:', err));

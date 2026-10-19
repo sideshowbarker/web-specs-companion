@@ -16,7 +16,7 @@ const chromePath = process.env.CHROME ?? '/Applications/Google Chrome.app/Conten
 // clock that starts on breakout day, Wednesday 28 October 2026, at 11:15 Dublin time (GMT).
 const TPAC_MOMENT = Date.UTC(2026, 9, 28, 11, 15);
 
-const work = await mkdtemp(join(tmpdir(), 'w3cc-shots-'));
+const work = await mkdtemp(join(tmpdir(), 'wsc-shots-'));
 const raw = join(work, 'raw');
 await mkdir(raw);
 await mkdir('screenshots', { recursive: true });
@@ -228,10 +228,10 @@ try {
 
     // The definition counts in the Fetch standard, with the popover open for "fetch".
     await b.go('https://fetch.spec.whatwg.org/');
-    await b.waitFor(b.tab, `!!document.querySelector('[data-w3cc-usedby="concept-fetch"]')`);
+    await b.waitFor(b.tab, `!!document.querySelector('[data-wsc-usedby="concept-fetch"]')`);
     await b.evaluate(b.tab, `scrollTo(0, document.getElementById('concept-fetch').getBoundingClientRect().top + scrollY - 230)`);
     await sleep(800);
-    await b.evaluate(b.tab, `document.querySelector('[data-w3cc-usedby="concept-fetch"]').shadowRoot.querySelector('button').click()`);
+    await b.evaluate(b.tab, `document.querySelector('[data-wsc-usedby="concept-fetch"]').shadowRoot.querySelector('button').click()`);
     await sleep(800);
     await b.capture(b.tab, 'used-by-counts');
     magick(join(raw, 'used-by-counts.png'), '-resize', '1280x800', '-strip', join(work, 'used-by-counts.png'));

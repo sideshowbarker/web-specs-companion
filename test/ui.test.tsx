@@ -687,3 +687,19 @@ describe('wpt.fyi button', () => {
     expect(document.getElementById('wpt-list')).toBeNull();
   });
 });
+
+import { ContextView } from '../src/ui/components/ContextView.tsx';
+import { Search } from '../src/ui/components/Search.tsx';
+
+describe('the popup with no page to show', () => {
+  it('says which pages it shows something for', () => {
+    render(<ContextView ctx={null} slots={{}} />);
+    expect(document.querySelector('.empty')?.textContent).toBe(
+      'Open a web spec, a W3C repository on GitHub, or a w3.org group page to see all that\u2019s known about it.');
+  });
+
+  it('labels its search box for web specs', () => {
+    render(<Search />);
+    expect(screen.getByLabelText('Search web specs')).toBeTruthy();
+  });
+});

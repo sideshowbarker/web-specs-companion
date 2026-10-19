@@ -87,7 +87,7 @@ export function createSources(deps: SourceDeps): Sources {
         origin: 'bundled' as const,
       };
       memory.set(name, bundled);
-      console.warn(`w3c-companion: using bundled ${name}:`, err);
+      console.warn(`web-specs-companion: using bundled ${name}:`, err);
       return bundled;
     }
   }

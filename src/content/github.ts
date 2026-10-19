@@ -5,7 +5,7 @@ import { send } from '../shared/messages.ts';
 import { readGitHubFacts, watchNavigation } from './github-facts.ts';
 
 const report = (url: string) =>
-  send('page-facts', { facts: readGitHubFacts(document, url) }).catch((err) => console.debug('w3c-companion:', err));
+  send('page-facts', { facts: readGitHubFacts(document, url) }).catch((err) => console.debug('web-specs-companion:', err));
 
 report(location.href);
 watchNavigation(window, document, report);

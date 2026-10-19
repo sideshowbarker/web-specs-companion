@@ -28,12 +28,12 @@ describe('markProblems / clearProblems / revealLink', () => {
     const problem = { i: 1, href: elements[1].href, text: 'tree', target: { shortname: 'dom', title: 'DOM', url: 'https://dom.spec.whatwg.org/' } };
     markProblems(document, elements, [problem]);
     markProblems(document, elements, [problem]);
-    expect(document.querySelectorAll('[data-w3cc-problem]')).toHaveLength(1);
-    expect(document.querySelectorAll('#w3cc-linkcheck-style')).toHaveLength(1);
+    expect(document.querySelectorAll('[data-wsc-problem]')).toHaveLength(1);
+    expect(document.querySelectorAll('#wsc-linkcheck-style')).toHaveLength(1);
     expect(revealLink(elements, 1)).toBe(true);
     expect(revealLink(elements, 9)).toBe(false);
     clearProblems(document);
-    expect(document.querySelectorAll('[data-w3cc-problem]')).toHaveLength(0);
-    expect(document.getElementById('w3cc-linkcheck-style')).toBeNull();
+    expect(document.querySelectorAll('[data-wsc-problem]')).toHaveLength(0);
+    expect(document.getElementById('wsc-linkcheck-style')).toBeNull();
   });
 });

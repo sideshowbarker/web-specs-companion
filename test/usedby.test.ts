@@ -17,8 +17,8 @@ beforeEach(() => {
   document.body.innerHTML = '<p><dfn id="a">fetch</dfn> and <dfn id="b">thing</dfn> and <dfn id="c">other</dfn></p>';
 });
 
-const hosts = () => document.querySelectorAll('[data-w3cc-usedby]');
-const button = (id: string) => document.querySelector(`[data-w3cc-usedby="${id}"]`)!.shadowRoot!.querySelector('button')!;
+const hosts = () => document.querySelectorAll('[data-wsc-usedby]');
+const button = (id: string) => document.querySelector(`[data-wsc-usedby="${id}"]`)!.shadowRoot!.querySelector('button')!;
 
 describe('UsedByLayer', () => {
   it('adds one count after each definition that other specs use', async () => {
@@ -26,7 +26,7 @@ describe('UsedByLayer', () => {
     expect(hosts()).toHaveLength(2);
     expect(button('a').getAttribute('aria-label')).toBe('Used by 3 other specs');
     expect(button('b').getAttribute('aria-label')).toBe('Not exported, but 1 other spec links to it');
-    expect(document.getElementById('a')!.nextElementSibling?.getAttribute('data-w3cc-usedby')).toBe('a');
+    expect(document.getElementById('a')!.nextElementSibling?.getAttribute('data-wsc-usedby')).toBe('a');
   });
 
   it('renders each count once, however often it runs', async () => {
@@ -54,12 +54,12 @@ describe('UsedByLayer', () => {
     const layer = new UsedByLayer(document, map, links);
     await layer.render({ schedule: now });
     button('a').click();
-    const pop = document.querySelector('[data-w3cc-popover]')!.shadowRoot!;
+    const pop = document.querySelector('[data-wsc-popover]')!.shadowRoot!;
     expect(pop.querySelectorAll('li a')).toHaveLength(3);
     expect(pop.querySelector('a[href="https://dontcallmedom.github.io/webdex/f.html#x"]')).not.toBeNull();
     expect(pop.querySelector('a[href="https://dontcallmedom.github.io/specdex/fetch.html"]')).not.toBeNull();
     pop.querySelector('[role="dialog"]')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true }));
-    expect(document.querySelector('[data-w3cc-popover]')).toBeNull();
+    expect(document.querySelector('[data-wsc-popover]')).toBeNull();
   });
 
   it('removes everything on clear', async () => {
@@ -68,6 +68,6 @@ describe('UsedByLayer', () => {
     button('a').click();
     layer.clear();
     expect(hosts()).toHaveLength(0);
-    expect(document.querySelector('[data-w3cc-popover]')).toBeNull();
+    expect(document.querySelector('[data-wsc-popover]')).toBeNull();
   });
 });

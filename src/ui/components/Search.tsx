@@ -24,7 +24,7 @@ export function Search() {
 
   return (
     <div class="search" role="search">
-      <label for="q">Search W3C</label>
+      <label for="q">Search web specs</label>
       <input
         id="q"
         type="search"
