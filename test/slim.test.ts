@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { slimSpecs, slimGroups, slimRepos, slimIdlNames, slimImplementations } from '../src/data/slim.ts';
+import { slimSpecs, slimGroups, slimRepos, slimIdlNames, slimImplementations, slimMdn } from '../src/data/slim.ts';
 
 const rawSpec = {
   url: 'https://www.w3.org/TR/css-grid-3/',
@@ -137,5 +137,40 @@ describe('slimImplementations', () => {
     expect(Object.keys(file.specs)).toEqual(['fine']);
     const raw = JSON.parse(readFileSync(new URL('../data/implementations.json', import.meta.url), 'utf8'));
     expect(Object.keys(slimImplementations(raw).specs)).toHaveLength(Object.keys(raw.specs).length);
+  });
+});
+
+describe('slimMdn', () => {
+  const good = { content: { commit: 'a'.repeat(40), date: '2026-10-18' }, types: [], pages: [], specs: {} };
+
+  it('accepts the bundled MDN file', () => {
+    const file = slimMdn(JSON.parse(readFileSync(new URL('../data/mdn.json', import.meta.url), 'utf8')));
+    expect(file.content.commit).toMatch(/^[0-9a-f]{40}$/);
+    expect(Object.keys(file.specs).length).toBeGreaterThan(300);
+  });
+
+  it('rejects a file without its commit and date, or its types, pages, or specs', () => {
+    expect(slimMdn(good)).toEqual(good);
+    for (const bad of [
+      { ...good, content: { date: '2026-10-18' } },
+      { ...good, content: { commit: 'a' } },
+      { ...good, types: {} },
+      { ...good, pages: {} },
+      { ...good, specs: [] },
+      null,
+    ]) {
+      expect(() => slimMdn(bad)).toThrow(/mdn/);
+    }
+  });
+
+  it('drops each malformed page and index, and each spec left with no pages', () => {
+    const file = slimMdn({
+      ...good,
+      types: ['guide', 7],
+      pages: [['a', 'A', 0], ['b', 'B', 1], ['c', 3, 0], 'd', ['e', 'E', 0]],
+      specs: { x: [0, 1, 2, 3, 4, 9, '0'], y: [1], z: 'nope' },
+    });
+    expect(file.pages).toEqual([['a', 'A', 0], ['e', 'E', 0]]);
+    expect(file.specs).toEqual({ x: [0, 1] });
   });
 });

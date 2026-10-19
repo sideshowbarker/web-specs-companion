@@ -99,4 +99,17 @@ describe('createSources', () => {
     expect(bundled.origin).toBe('bundled');
     expect(Object.keys(bundled.data.specs)).toEqual(['fetch']);
   });
+
+  it('loads the MDN file, and falls back to the bundled copy when the live one is malformed', async () => {
+    const good = JSON.stringify({ content: { commit: 'a'.repeat(40), date: '2026-10-18' }, types: ['guide'], pages: [['Web/A', 'A', 0]], specs: { fetch: [0] } });
+    const live = await createSources(deps({ fetchImpl: vi.fn(async () => new Response(good)) })).load('mdn');
+    expect(live.origin).toBe('live');
+    expect(live.data.specs).toEqual({ fetch: [0] });
+    const bundled = await createSources(deps({
+      fetchImpl: vi.fn(async () => new Response(JSON.stringify({ specs: {} }))),
+      readBundled: vi.fn(async () => good),
+    })).load('mdn');
+    expect(bundled.origin).toBe('bundled');
+    expect(bundled.data.pages).toEqual([['Web/A', 'A', 0]]);
+  });
 });

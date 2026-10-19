@@ -4,6 +4,7 @@ export const URLS = {
   repos: 'https://w3c.github.io/groups/repositories.json',
   idlnames: 'https://w3c.github.io/webref/ed/idlnames.json',
   implementations: 'https://w3c-oss.github.io/w3c-companion/data/implementations.json',
+  mdn: 'https://w3c-oss.github.io/w3c-companion/data/mdn.json',
   tpac: 'https://www.w3.org/calendar/tpac2026/export/',
   webref: 'https://w3c.github.io/webref/ed/',
   w3capi: 'https://api.w3.org/',

@@ -2,7 +2,7 @@ import { send } from '../api.ts';
 import { relativeAge } from '../format.ts';
 import { useAsync } from '../hooks.ts';
 
-const LABELS: Record<string, string> = { specs: 'Specs', groups: 'Groups', repos: 'Repositories', implementations: 'Browser support', tpac: 'TPAC schedule' };
+const LABELS: Record<string, string> = { specs: 'Specs', groups: 'Groups', repos: 'Repositories', implementations: 'Browser support', mdn: 'MDN articles', tpac: 'TPAC schedule' };
 
 export function Freshness({ now = Date.now() }: { now?: number }) {
   const r = useAsync(() => send('get-freshness', {}), []);

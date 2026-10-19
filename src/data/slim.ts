@@ -1,5 +1,6 @@
 import type { IdlNames, RepoMap, SlimGroup, SlimSpec } from '../shared/types.ts';
 import { isImplRecord, type ImplFile, type ImplRecord } from '../logic/implementations.ts';
+import { isMdnPage, type MdnFile, type MdnPage } from '../logic/mdn.ts';
 
 // Upstream records are untyped JSON; each slimmer reads only the fields it keeps.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,4 +97,27 @@ export function slimImplementations(raw: unknown): ImplFile {
   }
   const valid = Object.entries(specs as Record<string, unknown>).filter((entry): entry is [string, ImplRecord] => isImplRecord(entry[1]));
   return { bcd: { version: r.bcd.version, timestamp: r.bcd.timestamp }, specs: Object.fromEntries(valid) };
+}
+
+// Drops each page whose shape doesn't fit, each index that's out of range or names a dropped page, and each spec left
+// with no pages, so the card lists what's left, rather than failing to render.
+export function slimMdn(raw: unknown): MdnFile {
+  const { content, types, pages, specs } = (raw ?? {}) as Raw;
+  if (typeof content?.commit !== 'string' || typeof content.date !== 'string' || !Array.isArray(types) || !Array.isArray(pages)
+    || !specs || typeof specs !== 'object' || Array.isArray(specs)) {
+    throw new Error('mdn: expected content.commit, content.date, types, pages, and specs');
+  }
+  const kept: MdnPage[] = [];
+  const at = new Map<number, number>();
+  pages.forEach((page: unknown, i: number) => {
+    if (!isMdnPage(page, types)) return;
+    at.set(i, kept.length);
+    kept.push([page[0], page[1], page[2]]);
+  });
+  const bySpec: Record<string, number[]> = {};
+  for (const [shortname, ids] of Object.entries(specs as Record<string, unknown>)) {
+    const valid = Array.isArray(ids) ? ids.filter((i) => at.has(i)).map((i) => at.get(i)!) : [];
+    if (valid.length > 0) bySpec[shortname] = valid;
+  }
+  return { content: { commit: content.commit, date: content.date }, types, pages: kept, specs: bySpec };
 }

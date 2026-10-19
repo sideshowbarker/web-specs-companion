@@ -1,6 +1,6 @@
 import type { Loaded } from '../shared/types.ts';
 import type { Store } from './http.ts';
-import { slimGroups, slimIdlNames, slimImplementations, slimRepos, slimSpecs } from './slim.ts';
+import { slimGroups, slimIdlNames, slimImplementations, slimMdn, slimRepos, slimSpecs } from './slim.ts';
 import { parseIcs } from './tpac.ts';
 import { DAY, MINUTE, URLS } from './urls.ts';
 
@@ -23,6 +23,7 @@ export const SOURCES = {
   repos: def({ url: URLS.repos, bundled: 'data/repos.json', ttlMs: DAY, slim: (t) => slimRepos(JSON.parse(t)) }),
   idlnames: def({ url: URLS.idlnames, bundled: 'data/idlnames.json', ttlMs: DAY, slim: (t) => slimIdlNames(JSON.parse(t)) }),
   implementations: def({ url: URLS.implementations, bundled: 'data/implementations.json', ttlMs: DAY, slim: (t) => slimImplementations(JSON.parse(t)) }),
+  mdn: def({ url: URLS.mdn, bundled: 'data/mdn.json', ttlMs: DAY, slim: (t) => slimMdn(JSON.parse(t)) }),
   tpac: def({ url: URLS.tpac, bundled: 'data/tpac2026.json', ttlMs: 15 * MINUTE, slim: (t) => parseIcs(t) }),
 };
 
