@@ -49,6 +49,15 @@ export interface WebrefIndex {
   entries: Map<string, WebrefEntry>;
 }
 
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+// Turns the date a spec shows, as webref records it ("02 February 2026"), into an ISO date (2026-02-02).
+export function isoFromSpecDate(date: string | undefined): string | undefined {
+  const m = /^(\d{1,2}) ([A-Za-z]+) (\d{4})$/.exec(date ?? '');
+  const month = m ? MONTHS.indexOf(m[2]) + 1 : 0;
+  return m && month ? `${m[3]}-${String(month).padStart(2, '0')}-${m[1].padStart(2, '0')}` : undefined;
+}
+
 const TTL = 6 * HOUR;
 let memo: { at: number; index: WebrefIndex } | undefined;
 

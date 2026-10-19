@@ -143,6 +143,18 @@ describe('handlers', () => {
     expect(r.crawlDate).toBe('9 October 2026');
   });
 
+  it('compares the latest TR with the date webref crawled for its draft', async () => {
+    const files: Record<string, unknown> = {
+      'https://api.w3.org/specifications/fetch-metadata': { _links: { 'latest-version': { href: 'https://api.w3.org/specifications/fetch-metadata/versions/20250815' } } },
+      'https://api.w3.org/specifications/fetch-metadata/versions/20250815': { status: 'Working Draft', date: '2025-08-15', uri: 'https://www.w3.org/TR/2025/WD-fetch-metadata-20250815/' },
+      'https://w3c.github.io/webref/ed/index.json': { date: '19 October 2026', results: [{ shortname: 'fetch-metadata', date: '01 October 2026' }] },
+    };
+    const http = createHttp(new MemoryStore(), vi.fn(async (u: RequestInfo | URL) => (String(u) in files ? new Response(JSON.stringify(files[String(u)])) : new Response('', { status: 404 }))), () => 0);
+    const h = createHandlers(deps({ http, now: () => Date.UTC(2026, 9, 18) }));
+    const r = (await h.handle({ type: 'get-radar', tabId: 1, url: 'https://www.w3.org/TR/fetch-metadata/' }, sender(1))) as { radar: { notes: unknown[] } };
+    expect(r.radar.notes).toContainEqual({ kind: 'behind-ed', months: 13, edDate: '2026-10-01', edUrl: 'https://w3c.github.io/webappsec-fetch-metadata/' });
+  });
+
   it('reports how fresh each source is', async () => {
     const r = (await createHandlers(deps({ sources: fakeSources({ tpac: [] }), now: () => Date.parse('2026-10-27T10:00:00Z') })).handle({ type: 'get-freshness' }, sender(1))) as { sources: { name: string; origin: string }[] };
     expect(r.sources.map((s) => s.name)).toEqual(['specs', 'groups', 'repos', 'implementations', 'tpac']);

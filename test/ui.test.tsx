@@ -9,6 +9,7 @@ vi.mock('../src/shared/settings.ts', () => ({ getSettings: vi.fn(async () => ({ 
 import { send } from '../src/ui/api.ts';
 import { SpecCard } from '../src/ui/components/SpecCard.tsx';
 import { GroupBlock } from '../src/ui/components/GroupBlock.tsx';
+import { Radar } from '../src/ui/components/Radar.tsx';
 import { Tpac } from '../src/ui/components/Tpac.tsx';
 import type { TpacView } from '../src/data/tpac.ts';
 
@@ -236,5 +237,16 @@ describe('Implementations', () => {
     await waitFor(() => expect(sendMock).toHaveBeenCalledWith('get-implementations', { shortname: 'x' }));
     await new Promise((r) => setTimeout(r, 0));
     expect(container.innerHTML).toBe('');
+  });
+});
+
+describe('Radar', () => {
+  it('says how far the latest TR is behind the draft, and links to the draft', async () => {
+    const notes = [{ kind: 'behind-ed', months: 15, edDate: '2026-02-02', edUrl: 'https://w3c.github.io/battery/' }];
+    sendMock.mockImplementation(async (type: string) => (type === 'get-radar' ? { radar: { label: 'Latest TR version', notes } } : { footprint: null }));
+    render(<Radar tabId={1} url="https://www.w3.org/TR/battery-status/" />);
+    const link = await screen.findByRole('link', { name: 'Editor\u2019s Draft' });
+    expect(link.getAttribute('href')).toBe('https://w3c.github.io/battery/');
+    expect(screen.getByRole('listitem').textContent).toBe('This TR is 15 months behind the Editor\u2019s Draft (2026-02-02).');
   });
 });

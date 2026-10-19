@@ -2,7 +2,7 @@ import { GroupIndex } from '../data/groups.ts';
 import type { Http } from '../data/http.ts';
 import type { Sources } from '../data/sources.ts';
 import { getGroupDetails, getSpecDetails } from '../data/w3capi.ts';
-import { getExtract, getWebrefIndex, type WebrefEntry } from '../data/webref.ts';
+import { getExtract, getWebrefIndex, isoFromSpecDate, type WebrefEntry } from '../data/webref.ts';
 import { buildUsedByMap, computeFootprint, specdexUrl } from '../logic/footprint.ts';
 import { isImplRecord } from '../logic/implementations.ts';
 import { checkLinks, type TargetData } from '../logic/linkcheck.ts';
@@ -78,11 +78,16 @@ export function createHandlers(deps: HandlerDeps) {
     'get-radar': async (msg) => {
       const ctx = await contextFor(msg.tabId, msg.url);
       if (!ctx?.spec) return { radar: null };
+      const { shortname } = ctx.spec;
       const details = ctx.spec.organization.startsWith('W3C')
-        ? await getSpecDetails(deps.http, ctx.spec.shortname).catch(() => undefined)
+        ? await getSpecDetails(deps.http, shortname).catch(() => undefined)
+        : undefined;
+      // A latest-TR page shows only its own date, so the draft's comes from webref's crawl of the draft.
+      const draftDate = ctx.pageKind === 'tr' && details?.trDate
+        ? await getWebrefIndex(deps.http, deps.now).then((i) => isoFromSpecDate(i.entries.get(shortname)?.date), () => undefined)
         : undefined;
       const { specs } = await indexes();
-      return { radar: computeRadar(ctx, specs, details) ?? null };
+      return { radar: computeRadar(ctx, specs, details, draftDate) ?? null };
     },
     'search': async (msg) => {
       const { scope, text } = parseQuery(msg.query);

@@ -7,7 +7,8 @@ export type RadarNote =
   | { kind: 'newer-level'; spec: SpecRef }
   | { kind: 'obsolete'; by: SpecRef[] }
   | { kind: 'delta'; base: SpecRef }
-  | { kind: 'tr-lag'; months: number; trDate: string; edDate: string };
+  | { kind: 'tr-lag'; months: number; trDate: string; edDate: string }
+  | { kind: 'behind-ed'; months: number; edDate: string; edUrl: string };
 
 export interface Radar {
   label: string;
@@ -22,7 +23,7 @@ function monthsBetween(a: string, b: string): number {
   return (by - ay) * 12 + (bm - am) - (bd < ad ? 1 : 0);
 }
 
-export function computeRadar(ctx: Context, specs: SpecIndex, details?: SpecDetails): Radar | undefined {
+export function computeRadar(ctx: Context, specs: SpecIndex, details?: SpecDetails, draftDate?: string): Radar | undefined {
   const s = ctx.spec;
   if (ctx.kind !== 'spec' || !s) return undefined;
   const label =
@@ -44,6 +45,10 @@ export function computeRadar(ctx: Context, specs: SpecIndex, details?: SpecDetai
   if (ctx.pageKind === 'ed' && edDate && details?.trDate) {
     const months = monthsBetween(details.trDate, edDate);
     if (months >= LAG_MONTHS) notes.push({ kind: 'tr-lag', months, trDate: details.trDate, edDate });
+  }
+  if (ctx.pageKind === 'tr' && draftDate && details?.trDate && s.nightly?.url) {
+    const months = monthsBetween(details.trDate, draftDate);
+    if (months >= LAG_MONTHS) notes.push({ kind: 'behind-ed', months, edDate: draftDate, edUrl: s.nightly.url });
   }
   return { label, notes };
 }

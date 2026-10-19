@@ -15,6 +15,8 @@ function Note({ n }: { n: RadarNote }) {
       return <>This level lists only its changes; read it together with <A href={n.base.url}>{n.base.title}</A>.</>;
     case 'tr-lag':
       return <>The latest TR ({n.trDate}) is {n.months} months behind this draft.</>;
+    case 'behind-ed':
+      return <>This TR is {n.months} months behind the <A href={n.edUrl}>{'Editor\u2019s Draft'}</A> ({n.edDate}).</>;
   }
 }
 

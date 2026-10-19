@@ -32,6 +32,17 @@ describe('computeRadar', () => {
     expect(recent?.notes.some((n) => n.kind === 'tr-lag')).toBe(false);
   });
 
+  it('reports how far the latest TR is behind the draft webref crawled, from six months on', () => {
+    const tr = ctx('fetch-metadata', { pageKind: 'tr' });
+    expect(computeRadar(tr, si, { trDate: '2025-08-15' }, '2026-10-01')?.notes).toContainEqual(
+      { kind: 'behind-ed', months: 13, edDate: '2026-10-01', edUrl: 'https://w3c.github.io/webappsec-fetch-metadata/' },
+    );
+    const behind = (r: ReturnType<typeof computeRadar>) => r?.notes.some((n) => n.kind === 'behind-ed');
+    expect(behind(computeRadar(tr, si, { trDate: '2026-09-21' }, '2026-10-01'))).toBe(false);
+    expect(behind(computeRadar(tr, si, { trDate: '2025-08-15' }))).toBe(false);
+    expect(behind(computeRadar(ctx('fetch-metadata', { pageKind: 'ed' }), si, { trDate: '2025-08-15' }, '2026-10-01'))).toBe(false);
+  });
+
   it('labels each page kind and returns nothing outside spec pages', () => {
     expect(computeRadar(ctx('fetch-metadata', { pageKind: 'ed' }), si)?.label).toBe('Editor\u2019s Draft');
     expect(computeRadar(ctx('fetch-metadata', { pageKind: 'tr' }), si)?.label).toBe('Latest TR version');
