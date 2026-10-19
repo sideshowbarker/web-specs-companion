@@ -1,6 +1,7 @@
 import type { TpacView } from '../data/tpac.ts';
 import type { GroupDetails, SpecDetails } from '../data/w3capi.ts';
 import type { OutLink } from '../content/links.ts';
+import type { CiuAnswer } from '../logic/caniuse.ts';
 import type { Footprint, UsedByEntry } from '../logic/footprint.ts';
 import type { ImplView } from '../logic/implementations.ts';
 import type { MdnView } from '../logic/mdn.ts';
@@ -21,6 +22,7 @@ export interface Api {
   'get-footprint': { req: { shortname: string }; res: { footprint: Footprint | null } };
   'get-implementations': { req: { shortname: string }; res: { impl: ImplView | null } };
   'get-mdn': { req: { shortname: string }; res: { mdn: MdnView | null } };
+  'get-caniuse': { req: { shortname: string }; res: { caniuse: CiuAnswer | null } };
   'get-used-by': { req: { shortname: string }; res: { map: Record<string, UsedByEntry> | null; specdex: string } };
   'check-links': { req: { shortname: string; links: OutLink[] }; res: LinkCheckResult };
   'get-freshness': { req: Record<string, never>; res: { sources: { name: string; fetchedAt: number; origin: Loaded<unknown>['origin'] }[] } };

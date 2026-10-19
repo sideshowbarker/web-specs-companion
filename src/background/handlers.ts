@@ -3,6 +3,7 @@ import type { Http } from '../data/http.ts';
 import type { Sources } from '../data/sources.ts';
 import { getGroupDetails, getSpecDetails } from '../data/w3capi.ts';
 import { getExtract, getWebrefIndex, isoFromSpecDate, type WebrefEntry } from '../data/webref.ts';
+import { caniuseFeatures } from '../logic/caniuse.ts';
 import { buildUsedByMap, computeFootprint, specdexUrl } from '../logic/footprint.ts';
 import { isImplRecord } from '../logic/implementations.ts';
 import { mdnView } from '../logic/mdn.ts';
@@ -161,6 +162,20 @@ export function createHandlers(deps: HandlerDeps) {
       const series = current && current !== msg.shortname ? mdnView(file, current) : undefined;
       if (!current || !series) return { mdn: null };
       return { mdn: { ...series, fromSeries: { shortname: current, title: specs.get(current)?.title ?? current } } };
+    },
+    'get-caniuse': async (msg) => {
+      const file = await deps.sources.load('caniuse').then((l) => l.data, () => undefined);
+      const source = file?.caniuse;
+      if (!file || typeof source?.version !== 'string' || typeof source.updated !== 'string') return { caniuse: null };
+      const kept = { version: source.version, updated: source.updated };
+      const own = caniuseFeatures(file, msg.shortname);
+      if (own.length > 0) return { caniuse: { features: own, source: kept } };
+      // caniuse's spec links cite a series by URLs that name no level, so its features are filed under the current one.
+      const { specs } = await indexes();
+      const current = specs.get(msg.shortname)?.series.currentSpecification;
+      const series = current && current !== msg.shortname ? caniuseFeatures(file, current) : [];
+      if (!current || series.length === 0) return { caniuse: null };
+      return { caniuse: { features: series, source: kept, fromSeries: { shortname: current, title: specs.get(current)?.title ?? current } } };
     },
     'check-links': async (msg) => {
       const index = await getWebrefIndex(deps.http, deps.now);

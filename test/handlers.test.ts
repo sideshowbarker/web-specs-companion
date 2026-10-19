@@ -233,4 +233,37 @@ describe('handlers', () => {
     const h = createHandlers(deps({ sources: fakeSources({ mdn }) }));
     expect(await h.handle({ type: 'get-mdn', shortname: 'fetch-metadata' }, sender(1))).toEqual({ mdn: null });
   });
+
+  it("answers get-caniuse with the spec's features, its series' current level's, or null", async () => {
+    const source = { version: '1.0.30001816', updated: '2026-10-13' };
+    const feature = (title: string) => ({ title, usage: 90, runs: { firefox: [], safari: [], chrome: [{ from: '42', to: '154', support: 'y', current: true }] }, notes: {} });
+    const caniuse = { caniuse: source, features: { b: feature('B'), a: feature('A'), aria: feature('ARIA') }, specs: { 'fetch-metadata': ['b', 'a'], 'wai-aria-1.2': ['aria'] } };
+    const h = createHandlers(deps({ sources: fakeSources({ caniuse }) }));
+    expect(await h.handle({ type: 'get-caniuse', shortname: 'fetch-metadata' }, sender(1))).toEqual({
+      caniuse: { features: [{ ...feature('A'), id: 'a' }, { ...feature('B'), id: 'b' }], source },
+    });
+    expect(await h.handle({ type: 'get-caniuse', shortname: 'wai-aria-1.3' }, sender(1))).toEqual({
+      caniuse: { features: [{ ...feature('ARIA'), id: 'aria' }], source, fromSeries: { shortname: 'wai-aria-1.2', title: 'WAI-ARIA 1.2' } },
+    });
+    expect(await h.handle({ type: 'get-caniuse', shortname: 'css-grid-3' }, sender(1))).toEqual({ caniuse: null });
+    expect(await h.handle({ type: 'get-caniuse', shortname: 'constructor' }, sender(1))).toEqual({ caniuse: null });
+  });
+
+  it('answers get-caniuse with null when the Can I Use file fails to load', async () => {
+    const load = vi.fn(async (name: string) => {
+      if (name === 'caniuse') throw new Error('offline');
+      return { data: ({ specs, groups, repos } as Record<string, unknown>)[name], fetchedAt: 1, origin: 'bundled' };
+    });
+    const h = createHandlers(deps({ sources: { load } as unknown as Sources }));
+    expect(await h.handle({ type: 'get-caniuse', shortname: 'fetch-metadata' }, sender(1))).toEqual({ caniuse: null });
+  });
+
+  it('answers get-caniuse with null for a stored copy whose features fit nothing', async () => {
+    const caniuse = { caniuse: { version: 'v', updated: '2026-10-13' }, features: { a: { title: 'A' } }, specs: { 'fetch-metadata': ['a'] } };
+    const h = createHandlers(deps({ sources: fakeSources({ caniuse }) }));
+    expect(await h.handle({ type: 'get-caniuse', shortname: 'fetch-metadata' }, sender(1))).toEqual({ caniuse: null });
+    const noSource = { features: {}, specs: {} };
+    const h2 = createHandlers(deps({ sources: fakeSources({ caniuse: noSource }) }));
+    expect(await h2.handle({ type: 'get-caniuse', shortname: 'fetch-metadata' }, sender(1))).toEqual({ caniuse: null });
+  });
 });
