@@ -561,3 +561,122 @@ describe('Can I Use button', () => {
     expect(document.getElementById('caniuse-list')).toBeNull();
   });
 });
+
+import { allUrl, dirUrl, onlyUrl, type WptAnswer, type WptSpec } from '../src/logic/wpt.ts';
+
+describe('wpt.fyi button', () => {
+  const runs = { firefox: { id: 2, version: '158.0', os: 'linux' }, safari: { id: 3, version: '27.0 (22625.1.29.11.27)', os: 'mac' }, chrome: { id: 1, version: '155.0.8059.84', os: 'linux' } };
+  const fetchSpec: WptSpec = {
+    paths: ['cors', 'fetch'],
+    exclude: ['fetch/local-network-access', 'fetch/metadata'],
+    all: { tests: 871, pass: { firefox: [10221, 11321], safari: [10185, 11344], chrome: [10669, 11304] }, interop: 75.1, only: { firefox: 69, safari: 86, chrome: 45 } },
+    dirs: [
+      ['cors', { tests: 27, pass: { firefox: [459, 463], safari: [441, 463], chrome: [463, 463] }, interop: 91.2, only: { firefox: 0, safari: 2, chrome: 0 } }],
+      ['fetch', { tests: 844, pass: { firefox: [9762, 10858], safari: [9744, 10881], chrome: [10206, 10841] }, interop: 74.5, only: { firefox: 69, safari: 84, chrome: 45 } }],
+    ],
+  };
+  const battery: WptSpec = { paths: ['battery-status'], all: { tests: 17, pass: { firefox: [12, 65], safari: [12, 65], chrome: [59, 65] }, interop: 1.8, only: { firefox: 0, safari: 0, chrome: 0 } } };
+  const answer = (spec: WptSpec, more: Partial<WptAnswer> = {}): WptAnswer => ({ spec, runs, revision: '23b0b89b1a', date: '2026-10-18', ...more });
+  const mdn = { count: 1, overviews: [], sections: [{ name: 'Interfaces', items: [{ title: 'Request', url: 'https://developer.mozilla.org/docs/Web/API/Request', children: [], count: 0 }] }], content: { commit: 'a'.repeat(40), date: '2026-10-18' } };
+  const caniuse = { features: [{ id: 'fetch', title: 'Fetch', usage: 97, notes: {}, runs: { firefox: [], safari: [], chrome: [] } }], source: { version: 'v', updated: '2026-10-13' } };
+  const impl = {
+    engines: ['webkit', 'blink'], basis: 'shared', core: 2, ships: { gecko: 0, webkit: 2, blink: 2 },
+    lacks: { gecko: { features: [{ key: 'api.A' }], more: 0 } }, bcd: { version: '8.1.6', timestamp: '2026-10-15T10:11:12.000Z' },
+  };
+  const answerAll = (wpt: WptAnswer | null, more: { mdn?: unknown; caniuse?: unknown; impl?: unknown } = {}) =>
+    sendMock.mockImplementation(async (type: string) =>
+      type === 'get-wpt' ? { wpt } : type === 'get-caniuse' ? { caniuse: more.caniuse ?? null } : type === 'get-mdn' ? { mdn: more.mdn ?? null } : type === 'get-implementations' ? { impl: more.impl ?? null } : {});
+  const label = 'Interop 75.1% across 871 tests on wpt.fyi';
+
+  it('shows the logo and the interop score after the Can I Use button', async () => {
+    answerAll(answer(fetchSpec), { mdn, caniuse });
+    render(<CardRow shortname="fetch" />);
+    const button = await screen.findByRole('button', { name: label });
+    await screen.findByRole('button', { name: '1 Can I Use feature' });
+    expect(button.textContent).toBe('75%');
+    expect(button.getAttribute('title')).toBe(label);
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(button.getAttribute('aria-controls')).toBe('wpt-list');
+    const logo = button.querySelector('img')!;
+    expect([logo.getAttribute('src'), logo.getAttribute('alt')]).toEqual(['icons/wpt.svg', '']);
+    expect([...button.parentElement!.children].map((c) => c.getAttribute('aria-controls'))).toEqual(['mdn-list', 'caniuse-list', 'wpt-list']);
+  });
+
+  it("renders the table only once it's first opened, with a row for all tests and for each directory", async () => {
+    answerAll(answer(fetchSpec));
+    render(<CardRow shortname="fetch" />);
+    const button = await screen.findByRole('button', { name: label });
+    const panel = document.getElementById('wpt-list')!;
+    expect([panel.hidden, panel.innerHTML]).toEqual([true, '']);
+    fireEvent.click(button);
+    expect(panel.hidden).toBe(false);
+    expect(panel.querySelector('caption')!.textContent).toBe('871 tests % of subtests passing');
+    const cols = [...panel.querySelectorAll('thead th')];
+    expect(cols.map((th) => th.querySelector('img')?.getAttribute('alt') ?? th.textContent)).toEqual(['Firefox', 'Safari', 'Chrome', 'Interop']);
+    expect(cols.every((th) => th.getAttribute('scope') === 'col')).toBe(true);
+    const rows = [...panel.querySelectorAll('tbody tr')];
+    expect(rows.map((tr) => [tr.querySelector('th')!.getAttribute('scope'), tr.querySelector('th')!.textContent])).toEqual([['row', 'All tests 871'], ['row', 'cors/ 27'], ['row', 'fetch/ 844']]);
+    expect(rows.map((tr) => [...tr.querySelectorAll('td')].map((td) => td.textContent))).toEqual([['90.3', '89.8', '94.4', '75.1'], ['99.1', '95.2', '100', '91.2'], ['89.9', '89.6', '94.1', '74.5']]);
+    expect([...rows[1].querySelectorAll('td')].map((td) => td.className)).toEqual(['hi', 'hi', 'hi', 'mid']);
+    expect([...rows[0].querySelectorAll('td')].map((td) => td.getAttribute('title'))).toEqual([
+      '10,221 of 11,321 subtests', '10,185 of 11,344 subtests', '10,669 of 11,304 subtests', 'Interop: each test\u2019s lowest pass rate of the three, averaged over the tests',
+    ]);
+    expect(rows[0].className).toBe('total');
+    expect(screen.getByRole('link', { name: 'All tests' }).getAttribute('href')).toBe(allUrl(fetchSpec, runs));
+    expect(screen.getByRole('link', { name: 'fetch/' }).getAttribute('href')).toBe(dirUrl(fetchSpec, 'fetch', runs));
+    const only = panel.querySelector('.wpt-only')!;
+    expect(only.textContent!.startsWith('Fail in only one browser:')).toBe(true);
+    expect([...only.querySelectorAll('a')].map((a) => [a.querySelector('img')!.getAttribute('alt'), a.textContent, a.getAttribute('href'), a.getAttribute('title')])).toEqual([
+      ['Firefox', '69', onlyUrl(fetchSpec, 'firefox', runs), 'Tests where Firefox fails something Safari and Chrome pass'],
+      ['Safari', '86', onlyUrl(fetchSpec, 'safari', runs), 'Tests where Safari fails something Firefox and Chrome pass'],
+      ['Chrome', '45', onlyUrl(fetchSpec, 'chrome', runs), 'Tests where Chrome fails something Firefox and Safari pass'],
+    ]);
+    const credit = screen.getByRole('link', { name: 'wpt.fyi' });
+    expect(credit.getAttribute('href')).toBe('https://wpt.fyi/');
+    expect(credit.closest('p')!.textContent).toBe('From wpt.fyi: stable Firefox 158 and Chrome 155 on Linux, Safari 27 on macOS, at WPT 23b0b89b1a, 18 October 2026.');
+  });
+
+  it('shows just All tests for a spec with one directory, and no fails-only line when every count is zero', async () => {
+    answerAll(answer(battery));
+    render(<CardRow shortname="battery-status" />);
+    const button = await screen.findByRole('button', { name: 'Interop 1.8% across 17 tests on wpt.fyi' });
+    expect(button.textContent).toBe('2%');
+    fireEvent.click(button);
+    expect([...document.querySelectorAll('#wpt-list tbody th')].map((th) => th.textContent)).toEqual(['All tests 17']);
+    expect(screen.getByRole('link', { name: 'All tests' }).getAttribute('href')).toBe('https://wpt.fyi/results/battery-status?run_id=1&run_id=2&run_id=3');
+    expect(document.querySelector('.wpt-only')).toBeNull();
+  });
+
+  it("says when the results are the series' current level's", async () => {
+    answerAll(answer(fetchSpec, { fromSeries: { shortname: 'fetch-2', title: 'Fetch Level 2' } }));
+    render(<CardRow shortname="fetch-1" />);
+    fireEvent.click(await screen.findByRole('button', { name: label }));
+    expect(screen.getByText('This spec has no test results of its own, so these are the ones for Fetch Level 2.')).toBeTruthy();
+  });
+
+  it("opens one of the row's four panels at a time", async () => {
+    answerAll(answer(fetchSpec), { mdn, caniuse, impl });
+    render(<CardRow shortname="fetch" />);
+    const missing = await screen.findByRole('button', { name: 'What\u2019s missing?' });
+    const wpt = await screen.findByRole('button', { name: label });
+    const ciu = await screen.findByRole('button', { name: '1 Can I Use feature' });
+    const shown = () => ['impl-why', 'mdn-list', 'caniuse-list', 'wpt-list'].filter((id) => !document.getElementById(id)!.hidden);
+    fireEvent.click(wpt);
+    expect(shown()).toEqual(['wpt-list']);
+    fireEvent.click(missing);
+    expect(shown()).toEqual(['impl-why']);
+    fireEvent.click(ciu);
+    expect(shown()).toEqual(['caniuse-list']);
+    fireEvent.click(wpt);
+    fireEvent.click(wpt);
+    expect(shown()).toEqual([]);
+  });
+
+  it('shows no wpt.fyi button when the spec has no test results', async () => {
+    answerAll(null, { mdn });
+    render(<CardRow shortname="fetch" />);
+    await screen.findByRole('button', { name: '1 MDN article' });
+    expect(screen.queryByRole('button', { name: /wpt.fyi/ })).toBeNull();
+    expect(document.getElementById('wpt-list')).toBeNull();
+  });
+});

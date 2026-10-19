@@ -85,6 +85,21 @@ ul { margin: 0; padding-inline-start: 18px; }
 .caniuse-list { font-size: 12.5px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; }
 .caniuse-list p { margin: 0 0 6px; }
 .caniuse-list code { font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+.wpt { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; }
+.wpt img { display: block; width: 16px; height: 16px; border-radius: 2px; }
+.wpt-list { font-size: 12.5px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; }
+.wpt-list p { margin: 6px 0 0; }
+.wpt-table { width: 100%; border-collapse: separate; border-spacing: 2px; font-size: 11.5px; }
+.wpt-table caption { text-align: start; margin-bottom: 4px; }
+.wpt-table th { text-align: start; font-weight: 400; overflow-wrap: anywhere; }
+.wpt-table thead img { display: block; margin: auto; }
+.wpt-table td { text-align: center; border-radius: 3px; padding: 1px 2px; min-width: 38px; }
+.wpt-table tr.total th, .wpt-table tr.total td { font-weight: 600; }
+.wpt-table td.hi { background: color-mix(in srgb, var(--ciu-y) 25%, var(--bg)); }
+.wpt-table td.mid { background: color-mix(in srgb, var(--ciu-a) 25%, var(--bg)); }
+.wpt-table td.lo { background: color-mix(in srgb, var(--ciu-n) 25%, var(--bg)); }
+.wpt-only a { display: inline-flex; align-items: center; gap: 3px; margin-inline-end: 6px; }
+.wpt-only img { display: block; }
 .ciu-feature { margin: 0 0 6px; }
 .ciu-feature summary { padding-inline-start: 11px; text-indent: -11px; line-height: 1.9; }
 .ciu-head > * { text-indent: 0; }
