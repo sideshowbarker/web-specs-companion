@@ -1,9 +1,9 @@
 import { execFileSync } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 
-// Renders the extension icons in static/icons/ and the Chrome Web Store's small promo tile from assets/avatar.png, the
-// maintainer's GitHub avatar, whole and unaltered except for its size. Needs ImageMagick (magick), and for the tile's
-// text, the Arial fonts that macOS installs.
+// Renders the extension icons in static/icons/, the Firefox Add-ons listing icon, and the Chrome Web Store's small
+// promo tile from assets/avatar.png, the maintainer's GitHub avatar, whole and unaltered except for its size. Needs
+// ImageMagick (magick), and for the tile's text, the Arial fonts that macOS installs.
 
 const SOURCE = 'assets/avatar.png';
 const BLUE = '#005a9c';
@@ -27,6 +27,10 @@ for (const [size, padding] of [[16, 0], [32, 0], [48, 0], [128, 16]]) {
     '-background', 'none', '-gravity', 'center', '-extent', `${size}x${size}`, '-strip', `PNG32:static/icons/${size}.png`,
   ], square);
 }
+
+// The Firefox Add-ons listing icon fills the whole 128px square, without the padding: AMO doesn't ask for it, and it
+// would make the avatar look small beside other add-ons' icons.
+magick(['png:-', '-filter', 'Lanczos', '-resize', '128x128', '-strip', 'PNG32:store/amo-icon-128.png'], square);
 
 // The tile puts the avatar on a white disc, since on bare W3C Blue its dark outlines and strokes all but vanish, with
 // the name and the tagline beside it.

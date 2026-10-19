@@ -28,7 +28,9 @@ Web Specs Companion is a personal project. It isn’t affiliated with or endorse
 
 **Chrome Web Store screenshots (at most five):** card-editors-draft.png, version-radar.png, caniuse-features.png, side-panel.png, tpac-now-and-next.png.
 
-**Store icon (128×128):** static/icons/128.png.
+**Chrome Web Store icon (128×128):** static/icons/128.png.
+
+**Firefox Add-ons icon (128×128):** store/amo-icon-128.png.
 
 **Small promo tile (440×280, Chrome):** store/promo-tile-440x280.png.
 
