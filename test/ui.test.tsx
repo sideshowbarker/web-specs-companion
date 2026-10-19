@@ -647,6 +647,13 @@ describe('wpt.fyi button', () => {
     expect(document.querySelector('.wpt-only')).toBeNull();
   });
 
+  it('writes a fails-only count of a thousand or more with a thousands separator', async () => {
+    answerAll(answer({ ...battery, all: { ...battery.all, only: { firefox: 1234, safari: 0, chrome: 0 } } }));
+    render(<CardRow shortname="battery-status" />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Interop 1.8% across 17 tests on wpt.fyi' }));
+    expect([...document.querySelectorAll('.wpt-only a')].map((a) => a.textContent)).toEqual(['1,234', '0', '0']);
+  });
+
   it("says when the results are the series' current level's", async () => {
     answerAll(answer(fetchSpec, { fromSeries: { shortname: 'fetch-2', title: 'Fetch Level 2' } }));
     render(<CardRow shortname="fetch-1" />);

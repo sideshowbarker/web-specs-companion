@@ -51,7 +51,7 @@ function OnlyLine({ spec, runs }: { spec: WptSpec; runs: WptFile['runs'] }) {
         return (
           <A key={b} href={onlyUrl(spec, b, runs)} title={`Tests where ${BROWSER_NAMES[b]} fails something ${others} pass`}>
             <img src={LOGOS[b]} width={12} height={12} alt={BROWSER_NAMES[b]} />
-            {only[b]}
+            {only[b].toLocaleString('en-US')}
           </A>
         );
       })}
