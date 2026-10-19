@@ -1,27 +1,28 @@
-# Store listing — W3C Companion 1.0.0
+# Store listing — Web Specs Companion 1.1.0
 
-**Name:** W3C Companion
+**Name:** Web Specs Companion
 
 **Summary (132 characters max):**
-A companion for reading W3C specifications and finding the groups and people behind them.
+A companion for reading web specs and finding the groups and people behind them.
 
 **Description:**
-W3C Companion shows what W3C knows about the page you’re on.
+Web Specs Companion shows all that’s known about the page you’re on.
 
-On a W3C or WHATWG specification, it shows the spec’s maturity, its editor’s draft and TR versions, its
-repository and issue tracker, its tests, and the group responsible for it — with the group’s chairs, team contacts,
-and charter end date. It tells you when you’re reading a dated snapshot or an old level, shows how many other
-specifications use each definition, sums up the spec’s place in the web platform, and checks its links to other
-specs for anchors that no longer exist.
+On a spec from W3C, WHATWG, TC39, the IETF, Khronos, or elsewhere, it shows what’s known of the spec’s maturity, versions, repository and issue tracker, tests, and the group responsible for it. For a W3C spec, that includes the editor’s draft and TR versions, and the group’s chairs, team contacts, and charter end date.
 
-On a W3C repository on GitHub, it shows the group behind the repository and the specs it hosts. On a w3.org group
-page, it shows the group’s specs.
+It tells you when you’re reading a dated snapshot or an old level, and sums up the spec’s place in the web platform. And in W3C and WHATWG specs, it also shows how many other specs use each definition, and checks the spec’s links to other specs for anchors that no longer exist.
 
-Type “w3c” and a space in the address bar to search specs, groups, Web IDL names, and terms.
+A row of buttons on the card says which browser engines implement the spec, and opens its MDN articles, its Can I Use features, and its web-platform-tests results on wpt.fyi.
+
+On a W3C repository on GitHub, it shows the group behind the repository and the specs it hosts. On a w3.org group page, it shows the group’s specs.
+
+Type “spec” and a space in the address bar to search specs, groups, Web IDL names, and terms.
 
 During TPAC 2026 (Dublin, 26–30 October), it shows what’s in session now and next, and when each group meets.
 
-Data comes from public W3C sources: browser-specs, w3c/groups, webref, the W3C API, and the TPAC calendar.
+Data comes from public sources: browser-specs, w3c/groups, webref, the W3C API, MDN’s browser-compat-data and articles, Can I Use, wpt.fyi, and the TPAC calendar.
+
+Web Specs Companion is a personal project. It isn’t affiliated with or endorsed by W3C.
 
 **Screenshots (1280×800, for both stores):** screenshots/card-editors-draft.png, used-by-counts.png, version-radar.png,
 github-repo.png, group-page.png, side-panel.png, tpac-now-and-next.png.
@@ -30,14 +31,13 @@ github-repo.png, group-page.png, side-panel.png, tpac-now-and-next.png.
 
 **Small promo tile (440×280, Chrome):** store/promo-tile-440x280.png.
 
-**Privacy policy URL:** https://github.com/w3c-oss/w3c-companion/blob/main/store/privacy.md
+**Privacy policy URL:** https://github.com/sideshowbarker/web-specs-companion/blob/main/store/privacy.md
 
-**Homepage and support:** https://github.com/w3c-oss/w3c-companion and https://github.com/w3c-oss/w3c-companion/issues
+**Homepage and support:** https://github.com/sideshowbarker/web-specs-companion and https://github.com/sideshowbarker/web-specs-companion/issues
 
 **Category:** Developer Tools (Chrome) / Web Development (Firefox)
 
-**Single purpose (Chrome):** Help people reading W3C specifications find the spec’s versions, group, and related
-specifications.
+**Single purpose (Chrome):** Help people reading web specs find the spec’s versions, group, and related specs.
 
 **Permission justifications (Chrome):**
 - storage: remembers the panel setting and caches public W3C data.

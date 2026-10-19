@@ -1,12 +1,15 @@
-# W3C Companion
+# Web Specs Companion
 
-A browser extension for reading W3C specs and finding the groups and people behind them. Wherever you are — a spec, a W3C GitHub repo, a w3.org group page — it shows a detailed “cheatsheet” of info for all that’s known about it:
+A browser extension for reading web specs and finding the groups and people behind them. Wherever you are — a spec, a W3C GitHub repo, a w3.org group page — it shows a detailed “cheatsheet” of info for all that’s known about it:
 
 - **The card:** the spec’s maturity, its editor’s draft and TR versions, its repository and issues, its tests, and the group responsible for it — with the group’s chairs, team contacts, and charter end date.
 - **The version radar:** whether you’re reading a dated snapshot, whether a newer level exists, and how far the latest TR version lags the draft.
+- **Browser support:** which browser engines implement the spec, and buttons for its [MDN](https://developer.mozilla.org/) articles, its [Can I Use](https://caniuse.com/) features, and its web-platform-tests results on [wpt.fyi](https://wpt.fyi/).
 - **Spec intelligence from [webref](https://github.com/w3c/webref):** how many other specs use each definition (what [specdex](https://dontcallmedom.github.io/specdex/) shows, in the page you’re reading), the spec’s platform footprint, and a check of its links to other specs for anchors that no longer exist (one of [strudy](https://github.com/w3c/strudy)’s checks, run live).
-- **Search:** type `w3c` and a space in the address bar to search specs, groups, Web IDL names ([webidlpedia](https://dontcallmedom.github.io/webidlpedia/)), and terms (ReSpec’s xref service).
+- **Search:** type `spec` and a space in the address bar to search specs, groups, Web IDL names ([webidlpedia](https://dontcallmedom.github.io/webidlpedia/)), and terms (ReSpec’s xref service).
 - **TPAC 2026:** what’s in session now and next, and when each group meets.
+
+Web Specs Companion is a personal project. It isn’t affiliated with or endorsed by W3C.
 
 ## Screenshots
 
@@ -20,13 +23,13 @@ More: [a W3C repo on GitHub](screenshots/github-repo.png), [a w3.org group page]
 
 ## Install
 
-The [W3C Companion website](https://w3c-oss.github.io/w3c-companion/) has these steps too, with the steps for your browser first.
+The [Web Specs Companion website](https://sideshowbarker.net/web-specs-companion/) has these steps too, with the steps for your browser first.
 
-W3C Companion isn’t in the Chrome Web Store or on Firefox Add-ons yet. Until it is, install it from the [latest release](https://github.com/w3c-oss/w3c-companion/releases/latest). It needs Chrome or Edge 148 or later, Firefox 128 or later, or Safari 26 or later.
+Web Specs Companion isn’t in the Chrome Web Store or on Firefox Add-ons yet. Until it is, install it from the [latest release](https://github.com/sideshowbarker/web-specs-companion/releases/latest). It needs Chrome or Edge 148 or later, Firefox 128 or later, or Safari 26 or later.
 
 ### Chrome, Edge, and other Chromium-based browsers
 
-1. Download `w3c-companion-<version>.zip` from the latest release, and unzip it into a folder it can stay in — the browser loads the extension from that folder every time it starts.
+1. Download `web-specs-companion-<version>.zip` from the latest release, and unzip it into a folder it can stay in — the browser loads the extension from that folder every time it starts.
 2. Open `chrome://extensions` (`edge://extensions` in Edge, `brave://extensions` in Brave).
 3. Turn on **Developer mode**.
 4. Click **Load unpacked**, and select the unzipped folder.
@@ -35,18 +38,18 @@ To update it, unzip a newer release into the same folder, and click the reload b
 
 ### Firefox
 
-1. In Firefox, click `w3c-companion-<version>.xpi` in the latest release, and allow the installation when Firefox asks.
+1. In Firefox, click `web-specs-companion-<version>.xpi` in the latest release, and allow the installation when Firefox asks.
 2. Or download the `.xpi`, open `about:addons`, click the gear button, choose **Install Add-on From File…**, and select it.
 
 The `.xpi` is the file Firefox Add-ons signed and serves for that version, so it stays installed after Firefox restarts, and Firefox keeps it up to date from Firefox Add-ons.
 
 ### Safari
 
-Safari 26 or later can run W3C Companion as a temporary extension, from the same zip as Chrome. Safari removes a temporary extension when it quits, and after 24 hours, so add it again whenever it’s gone. Safari has no address-bar keywords or side panels for extensions, so the `w3c` keyword and **Keep this open beside the page** aren’t there.
+Safari 26 or later can run Web Specs Companion as a temporary extension, from the same zip as Chrome. Safari removes a temporary extension when it quits, and after 24 hours, so add it again whenever it’s gone. Safari has no address-bar keywords or side panels for extensions, so the `spec` keyword and **Keep this open beside the page** aren’t there.
 
 Once, in Safari, choose **Safari** → **Settings…**, select **Advanced**, and turn on **Show features for web developers**. Then, each time:
 
-1. Download `w3c-companion-<version>.zip` from the latest release, if you don’t have it already.
+1. Download `web-specs-companion-<version>.zip` from the latest release, if you don’t have it already.
 2. In **Safari** → **Settings…**, select **Developer**, click **Add Temporary Extension…**, and select the zip. Authenticate if Safari asks to allow unsigned extensions.
 3. Safari shows a warning sign on the extension’s toolbar button until you allow it on a website. Click the button, and allow it on that website or on every website. On every website, the definition counts and the link check work on every spec site the extension knows.
 
@@ -102,8 +105,8 @@ The extension collects nothing and sends nothing about you anywhere. It reads th
 
 ## Contributing
 
-Contributions are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the contributor license agreement, and [GOVERNANCE.md](GOVERNANCE.md) says how decisions get made. The Project Community is everyone who takes part in this repository’s issues and pull requests.
+Contributions are welcome: Open an issue or a pull request in this repository.
 
 ## License
 
-[Apache-2.0](LICENSE) © 2026 [World Wide Web Consortium](https://www.w3.org/). The W3C symbol in `assets/` and the icons made from it in `static/icons/` are W3C trademarks, which the license doesn’t cover; see the [W3C logo policy](https://www.w3.org/policies/logos/). `npm run icons` renders the icons from the symbol, and needs [ImageMagick](https://imagemagick.org/). The browser logos in `static/icons/browsers/` are from [alrra/browser-logos](https://github.com/alrra/browser-logos/tree/58881b84c4d73adc03c06fa2c275a7abee02d935/src), under the MIT license in `LICENSE.txt` beside them. The logos themselves are trademarks of Mozilla, Apple, and Google. The MDN mark in `src/ui/components/Mdn.tsx` is the path from [Simple Icons](https://simpleicons.org/)’ MDN Web Docs icon, which is CC0 1.0. MDN Web Docs and its mark are Mozilla’s trademarks. The Can I Use logo in `static/icons/caniuse.png` is caniuse.com’s icon, by Alexis Deveria, used with attribution until it’s released under a free license; this repository’s license doesn’t cover it. The wpt.fyi logo in `static/icons/wpt.svg` is from [wpt.fyi](https://github.com/web-platform-tests/wpt.fyi), under the W3C 3-clause BSD license in `wpt-LICENSE.txt` beside it.
+[Apache-2.0](LICENSE). `npm run icons` renders the icons in `static/icons/` and the promo tile in `store/` from the avatar in `assets/`, and needs [ImageMagick](https://imagemagick.org/). The browser logos in `static/icons/browsers/` are from [alrra/browser-logos](https://github.com/alrra/browser-logos/tree/58881b84c4d73adc03c06fa2c275a7abee02d935/src), under the MIT license in `LICENSE.txt` beside them. The logos themselves are trademarks of Mozilla, Apple, and Google. The MDN mark in `src/ui/components/Mdn.tsx` is the path from [Simple Icons](https://simpleicons.org/)’ MDN Web Docs icon, which is CC0 1.0. MDN Web Docs and its mark are Mozilla’s trademarks. The Can I Use logo in `static/icons/caniuse.png` is caniuse.com’s icon, by Alexis Deveria, used with attribution until it’s released under a free license; this repository’s license doesn’t cover it. The wpt.fyi logo in `static/icons/wpt.svg` is from [wpt.fyi](https://github.com/web-platform-tests/wpt.fyi), under the W3C 3-clause BSD license in `wpt-LICENSE.txt` beside it.

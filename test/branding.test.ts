@@ -1,24 +1,21 @@
 import { describe, it, expect } from 'vitest';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 
 // The names the extension went by as W3C Companion, which nothing in the repo may use: not in a file's path, and not
-// in its text.
+// in its text. Only the files git tracks count, so an editor's backup and undo files don't.
 const OLD = ['W3C Companion', 'w3c-companion', 'w3c-oss', 'w3cc', 'w3c-symbol'];
-const ROOTS = ['src', 'static', 'e2e', 'scripts/mdn.ts', 'scripts/screenshots.ts', 'test/usedby.test.ts', 'test/links.test.ts', 'package.json',
-  'scripts/package.ts', '.github/workflows/release.yml', '.github/workflows/attach-firefox-build.yml', '.github/scripts',
-  'site', 'scripts/site.ts', 'test/site.test.ts', '.github/workflows/pages.yml',
-  'assets', 'scripts/make-icons.ts'];
+const ROOTS = ['src', 'static', 'e2e', 'scripts', 'test', 'site', 'store', '.github', 'assets', 'README.md', 'package.json'];
 const SELF = 'test/branding.test.ts';
 
-const files = (path: string): string[] =>
-  statSync(path).isDirectory() ? readdirSync(path).flatMap((name) => files(join(path, name))) : [path];
+const tracked = (roots: string[]) =>
+  execFileSync('git', ['ls-files', '-z', '--', ...roots], { encoding: 'utf8' }).split('\0').filter(Boolean);
 const read = (path: string) => readFileSync(path, 'utf8');
 const json = (path: string) => JSON.parse(read(path));
 
 describe('the rebrand', () => {
   it('leaves none of the old names', () => {
-    const hits = ROOTS.flatMap(files).filter((f) => f !== SELF).flatMap((f) => {
+    const hits = tracked(ROOTS).filter((f) => f !== SELF).flatMap((f) => {
       const text = /[.](png|jpg)$/.test(f) ? '' : read(f);
       return OLD.filter((old) => f.includes(old) || text.includes(old)).map((old) => `${f}: ${old}`);
     });
@@ -40,5 +37,18 @@ describe('the rebrand', () => {
     const lock = json('package-lock.json');
     expect([pkg.name, pkg.repository, lock.name, lock.packages[''].name]).toEqual(
       ['web-specs-companion', 'github:sideshowbarker/web-specs-companion', 'web-specs-companion', 'web-specs-companion']);
+  });
+
+  it('drops the W3C Open Source Program files', () => {
+    expect(['GOVERNANCE.md', 'CONTRIBUTING.md', 'CODE_OF_CONDUCT.md', 'CODEOWNERS'].filter((f) => existsSync(f))).toEqual([]);
+  });
+
+  it('gives both stores the same summary and description', () => {
+    const listing = read('store/listing.md');
+    const field = (name: string) => listing.split(`**${name}:**`)[1].split('\n\n**')[0].trim();
+    const amo = json('store/amo-metadata.json');
+    const summary = json('static/_locales/en/messages.json').extDescription.message;
+    expect([field('Summary (132 characters max)'), amo.summary['en-US']]).toEqual([summary, summary]);
+    expect(field('Description')).toBe(amo.description['en-US']);
   });
 });

@@ -1,9 +1,9 @@
 {
   "summary": {
-    "en-US": "A companion for reading W3C specifications and finding the groups and people behind them."
+    "en-US": "A companion for reading web specs and finding the groups and people behind them."
   },
   "description": {
-    "en-US": "W3C Companion shows what W3C knows about the page you’re on.\n\nOn a W3C or WHATWG specification, it shows the spec’s maturity, its editor’s draft and TR versions, its repository and issue tracker, its tests, and the group responsible for it — with the group’s chairs, team contacts, and charter end date. It tells you when you’re reading a dated snapshot or an old level, shows how many other specifications use each definition, sums up the spec’s place in the web platform, and checks its links to other specs for anchors that no longer exist.\n\nOn a W3C repository on GitHub, it shows the group behind the repository and the specs it hosts. On a w3.org group page, it shows the group’s specs.\n\nType “w3c” and a space in the address bar to search specs, groups, Web IDL names, and terms.\n\nDuring TPAC 2026 (Dublin, 26–30 October), it shows what’s in session now and next, and when each group meets.\n\nData comes from public W3C sources: browser-specs, w3c/groups, webref, the W3C API, and the TPAC calendar."
+    "en-US": "Web Specs Companion shows all that’s known about the page you’re on.\n\nOn a spec from W3C, WHATWG, TC39, the IETF, Khronos, or elsewhere, it shows what’s known of the spec’s maturity, versions, repository and issue tracker, tests, and the group responsible for it. For a W3C spec, that includes the editor’s draft and TR versions, and the group’s chairs, team contacts, and charter end date.\n\nIt tells you when you’re reading a dated snapshot or an old level, and sums up the spec’s place in the web platform. And in W3C and WHATWG specs, it also shows how many other specs use each definition, and checks the spec’s links to other specs for anchors that no longer exist.\n\nA row of buttons on the card says which browser engines implement the spec, and opens its MDN articles, its Can I Use features, and its web-platform-tests results on wpt.fyi.\n\nOn a W3C repository on GitHub, it shows the group behind the repository and the specs it hosts. On a w3.org group page, it shows the group’s specs.\n\nType “spec” and a space in the address bar to search specs, groups, Web IDL names, and terms.\n\nDuring TPAC 2026 (Dublin, 26–30 October), it shows what’s in session now and next, and when each group meets.\n\nData comes from public sources: browser-specs, w3c/groups, webref, the W3C API, MDN’s browser-compat-data and articles, Can I Use, wpt.fyi, and the TPAC calendar.\n\nWeb Specs Companion is a personal project. It isn’t affiliated with or endorsed by W3C."
   },
   "categories": {
     "firefox": [
@@ -11,13 +11,13 @@
     ]
   },
   "homepage": {
-    "en-US": "https://w3c-oss.github.io/w3c-companion/"
+    "en-US": "https://sideshowbarker.net/web-specs-companion/"
   },
   "support_url": {
-    "en-US": "https://github.com/w3c-oss/w3c-companion/issues"
+    "en-US": "https://github.com/sideshowbarker/web-specs-companion/issues"
   },
   "version": {
     "license": "Apache-2.0",
-    "approval_notes": "The attached source zip builds this version with Node 24 or later: npm ci && npm run build, which writes dist/. The scripts in dist/ are esbuild bundles of src/, unminified, and the JSON files in dist/data/ are snapshots of public W3C data that npm run snapshot regenerates. Source: https://github.com/w3c-oss/w3c-companion"
+    "approval_notes": "The attached source zip builds this version with Node 24 or later: npm ci && npm run build, which writes dist/. The scripts in dist/ are esbuild bundles of src/, unminified, and the JSON files in dist/data/ are snapshots of public data that npm run snapshot regenerates. Source: https://github.com/sideshowbarker/web-specs-companion"
   }
 }
