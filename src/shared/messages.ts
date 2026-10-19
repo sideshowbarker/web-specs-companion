@@ -8,6 +8,7 @@ import type { MdnView } from '../logic/mdn.ts';
 import type { LinkCheckResult } from '../logic/linkcheck.ts';
 import type { Radar } from '../logic/radar.ts';
 import type { SearchItem } from '../logic/search.ts';
+import type { WptAnswer } from '../logic/wpt.ts';
 import type { Context, Loaded, PageFacts } from './types.ts';
 
 export interface Api {
@@ -23,6 +24,7 @@ export interface Api {
   'get-implementations': { req: { shortname: string }; res: { impl: ImplView | null } };
   'get-mdn': { req: { shortname: string }; res: { mdn: MdnView | null } };
   'get-caniuse': { req: { shortname: string }; res: { caniuse: CiuAnswer | null } };
+  'get-wpt': { req: { shortname: string }; res: { wpt: WptAnswer | null } };
   'get-used-by': { req: { shortname: string }; res: { map: Record<string, UsedByEntry> | null; specdex: string } };
   'check-links': { req: { shortname: string; links: OutLink[] }; res: LinkCheckResult };
   'get-freshness': { req: Record<string, never>; res: { sources: { name: string; fetchedAt: number; origin: Loaded<unknown>['origin'] }[] } };

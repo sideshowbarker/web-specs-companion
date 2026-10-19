@@ -266,4 +266,33 @@ describe('handlers', () => {
     const h2 = createHandlers(deps({ sources: fakeSources({ caniuse: noSource }) }));
     expect(await h2.handle({ type: 'get-caniuse', shortname: 'fetch-metadata' }, sender(1))).toEqual({ caniuse: null });
   });
+
+  const wptRuns = { firefox: { id: 2, version: '158.0', os: 'linux' }, safari: { id: 3, version: '27.0', os: 'mac' }, chrome: { id: 1, version: '155.0', os: 'linux' } };
+  const wptStats = { tests: 2, pass: { firefox: [2, 2], safari: [1, 2], chrome: [2, 2] }, interop: 50, only: { firefox: 0, safari: 1, chrome: 0 } };
+
+  it("answers get-wpt with the spec's results, its series' current level's, or null", async () => {
+    const own = { paths: ['fetch/metadata'], all: wptStats };
+    const aria = { paths: ['wai-aria'], all: wptStats };
+    const wpt = { runs: wptRuns, revision: '23b0b89b1a', date: '2026-10-18', specs: { 'fetch-metadata': own, 'wai-aria-1.2': aria } };
+    const h = createHandlers(deps({ sources: fakeSources({ wpt }) }));
+    const meta = { runs: wptRuns, revision: '23b0b89b1a', date: '2026-10-18' };
+    expect(await h.handle({ type: 'get-wpt', shortname: 'fetch-metadata' }, sender(1))).toEqual({ wpt: { spec: own, ...meta } });
+    expect(await h.handle({ type: 'get-wpt', shortname: 'wai-aria-1.3' }, sender(1))).toEqual({
+      wpt: { spec: aria, ...meta, fromSeries: { shortname: 'wai-aria-1.2', title: 'WAI-ARIA 1.2' } },
+    });
+    expect(await h.handle({ type: 'get-wpt', shortname: 'css-grid-3' }, sender(1))).toEqual({ wpt: null });
+    expect(await h.handle({ type: 'get-wpt', shortname: 'constructor' }, sender(1))).toEqual({ wpt: null });
+  });
+
+  it('answers get-wpt with null when the file fails to load, lacks its runs, or has an entry that fits nothing', async () => {
+    const load = vi.fn(async (name: string) => {
+      if (name === 'wpt') throw new Error('offline');
+      return { data: ({ specs, groups, repos } as Record<string, unknown>)[name], fetchedAt: 1, origin: 'bundled' };
+    });
+    expect(await createHandlers(deps({ sources: { load } as unknown as Sources })).handle({ type: 'get-wpt', shortname: 'fetch-metadata' }, sender(1))).toEqual({ wpt: null });
+    const noRuns = { revision: '23b0b89b1a', date: '2026-10-18', specs: { 'fetch-metadata': { paths: ['fetch/metadata'], all: wptStats } } };
+    expect(await createHandlers(deps({ sources: fakeSources({ wpt: noRuns }) })).handle({ type: 'get-wpt', shortname: 'fetch-metadata' }, sender(1))).toEqual({ wpt: null });
+    const misfit = { runs: wptRuns, revision: '23b0b89b1a', date: '2026-10-18', specs: { 'fetch-metadata': { paths: ['fetch/metadata'] } } };
+    expect(await createHandlers(deps({ sources: fakeSources({ wpt: misfit }) })).handle({ type: 'get-wpt', shortname: 'fetch-metadata' }, sender(1))).toEqual({ wpt: null });
+  });
 });

@@ -14,6 +14,7 @@ import { buildSearchItems, IDL_TYPES, parseQuery, search, termSearch, webidlpedi
 import { SpecIndex } from '../data/specs.ts';
 import { eventsForGroup, nowAndNext, tpacVisible } from '../data/tpac.ts';
 import { resolveContext } from '../logic/context.ts';
+import { wptMeta, wptSpec } from '../logic/wpt.ts';
 import type { Api, Message, MessageType } from '../shared/messages.ts';
 import type { Context } from '../shared/types.ts';
 import type { TabStore } from './tabs.ts';
@@ -176,6 +177,19 @@ export function createHandlers(deps: HandlerDeps) {
       const series = current && current !== msg.shortname ? caniuseFeatures(file, current) : [];
       if (!current || series.length === 0) return { caniuse: null };
       return { caniuse: { features: series, source: kept, fromSeries: { shortname: current, title: specs.get(current)?.title ?? current } } };
+    },
+    'get-wpt': async (msg) => {
+      const file = await deps.sources.load('wpt').then((l) => l.data, () => undefined);
+      const meta = wptMeta(file);
+      if (!file || !meta) return { wpt: null };
+      const own = wptSpec(file, msg.shortname);
+      if (own) return { wpt: { spec: own, ...meta } };
+      // A spec without test paths of its own is answered for its series' current level, as the card's other parts are.
+      const { specs } = await indexes();
+      const current = specs.get(msg.shortname)?.series.currentSpecification;
+      const series = current && current !== msg.shortname ? wptSpec(file, current) : undefined;
+      if (!current || !series) return { wpt: null };
+      return { wpt: { spec: series, ...meta, fromSeries: { shortname: current, title: specs.get(current)?.title ?? current } } };
     },
     'check-links': async (msg) => {
       const index = await getWebrefIndex(deps.http, deps.now);
