@@ -19,7 +19,7 @@ Web Specs Companion is a personal project. It isn’t affiliated with or endorse
 
 ![The version radar on a dated snapshot of WAI-ARIA 1.2, pointing at the latest TR version and a newer level](screenshots/version-radar.png)
 
-More: [a W3C repo on GitHub](screenshots/github-repo.png), [a w3.org group page](screenshots/group-page.png), [the side panel beside a live ReSpec draft](screenshots/side-panel.png), and [TPAC Now and Next on breakout day](screenshots/tpac-now-and-next.png).
+More: [the MDN articles](screenshots/mdn-articles.png), [the Can I Use features](screenshots/caniuse-features.png), and [the wpt.fyi results](screenshots/wpt-results.png) for CSS Anchor Positioning, [a W3C repo on GitHub](screenshots/github-repo.png), [a w3.org group page](screenshots/group-page.png), [the side panel beside a live ReSpec draft](screenshots/side-panel.png), and [TPAC Now and Next on breakout day](screenshots/tpac-now-and-next.png).
 
 ## Install
 

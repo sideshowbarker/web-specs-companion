@@ -253,6 +253,20 @@ try {
       popupOver(`${name}-page.png`, `${name}-popup.png`, `${name}.png`);
     }
 
+    // The panels the MDN, Can I Use, and wpt.fyi buttons open, each in the card for CSS Anchor Positioning.
+    await b.go('https://drafts.csswg.org/css-anchor-position-1/');
+    await b.capture(b.tab, 'refs-page');
+    for (const [name, button] of [['mdn-articles', 'mdn'], ['caniuse-features', 'caniuse'], ['wpt-results', 'wpt']]) {
+      const popup = await b.openPopup();
+      await b.waitFor(popup.session, `!!document.querySelector('.refs button.${button}')`);
+      await b.evaluate(popup.session, `document.querySelector('.refs button.${button}').click()`);
+      await sleep(1000);
+      await b.capture(popup.session, `${name}-popup`);
+      await b.cmd('Target.closeTarget', { targetId: popup.target.targetId });
+      await sleep(500);
+      popupOver('refs-page.png', `${name}-popup.png`, `${name}.png`);
+    }
+
     // The definition counts in the Fetch standard, with the popover open for "fetch".
     await b.go('https://fetch.spec.whatwg.org/');
     await b.waitFor(b.tab, `!!document.querySelector('[data-wsc-usedby="concept-fetch"]')`);
@@ -293,7 +307,8 @@ try {
     await t.close();
   }
 
-  for (const name of ['card-editors-draft', 'used-by-counts', 'version-radar', 'github-repo', 'group-page', 'side-panel', 'tpac-now-and-next']) {
+  for (const name of ['card-editors-draft', 'used-by-counts', 'version-radar', 'github-repo', 'group-page', 'mdn-articles',
+    'caniuse-features', 'wpt-results', 'side-panel', 'tpac-now-and-next']) {
     execFileSync('pngquant', ['--quality', '85-98', '--speed', '1', '--strip', '--force', '--output',
       `screenshots/${name}.png`, join(work, `${name}.png`)], { stdio: 'inherit' });
     console.log(`screenshots/${name}.png`);
