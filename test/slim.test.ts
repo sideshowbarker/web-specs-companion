@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { slimSpecs, slimGroups, slimRepos, slimIdlNames, slimImplementations, slimMdn, slimCaniuse } from '../src/data/slim.ts';
+import { slimSpecs, slimGroups, slimRepos, slimIdlNames, slimImplementations, slimMdn, slimCaniuse, slimWpt } from '../src/data/slim.ts';
 
 const rawSpec = {
   url: 'https://www.w3.org/TR/css-grid-3/',
@@ -211,5 +211,28 @@ describe('slimCaniuse', () => {
     });
     expect(Object.keys(file.features)).toEqual(['fetch']);
     expect(file.specs).toEqual({ fetch: ['fetch'] });
+  });
+});
+
+describe('slimWpt', () => {
+  const runs = { firefox: { id: 2, version: '158.0', os: 'linux' }, safari: { id: 3, version: '27.0', os: 'mac' }, chrome: { id: 1, version: '155.0', os: 'linux' } };
+  const good = { runs, revision: '23b0b89b1a', date: '2026-10-18', specs: {} };
+  const stats = { tests: 1, pass: { firefox: [1, 1], safari: [0, 1], chrome: [1, 1] }, interop: 0, only: { firefox: 0, safari: 1, chrome: 0 } };
+
+  it('accepts the bundled file', () => {
+    const file = slimWpt(JSON.parse(readFileSync(new URL('../data/wpt.json', import.meta.url), 'utf8')));
+    expect(file.date).toMatch(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/);
+    expect(Object.keys(file.specs).length).toBeGreaterThan(250);
+  });
+
+  it('rejects a file without the three runs, the revision, the date, or the specs', () => {
+    for (const bad of [null, { ...good, runs: { firefox: runs.firefox, chrome: runs.chrome } }, { ...good, revision: 7 }, { ...good, date: undefined }, { ...good, specs: [] }]) {
+      expect(() => slimWpt(bad)).toThrow(/wpt/);
+    }
+  });
+
+  it("drops each spec entry whose shape doesn't fit", () => {
+    const file = slimWpt({ ...good, extra: 1, specs: { fetch: { paths: ['fetch'], all: stats }, bad: { paths: ['x'] } } });
+    expect(file).toEqual({ runs, revision: '23b0b89b1a', date: '2026-10-18', specs: { fetch: { paths: ['fetch'], all: stats } } });
   });
 });

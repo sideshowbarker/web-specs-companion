@@ -98,12 +98,13 @@ describe('Footprint', () => {
 import { Freshness } from '../src/ui/components/Freshness.tsx';
 
 describe('Freshness', () => {
-  it('lists the browser-support, MDN, and Can I Use data', async () => {
-    sendMock.mockImplementation(async () => ({ sources: [{ name: 'specs', fetchedAt: 0, origin: 'live' }, { name: 'implementations', fetchedAt: 0, origin: 'live' }, { name: 'mdn', fetchedAt: 0, origin: 'live' }, { name: 'caniuse', fetchedAt: 0, origin: 'live' }] }));
+  it('lists the browser-support, MDN, Can I Use, and test-results data', async () => {
+    sendMock.mockImplementation(async () => ({ sources: [{ name: 'specs', fetchedAt: 0, origin: 'live' }, { name: 'implementations', fetchedAt: 0, origin: 'live' }, { name: 'mdn', fetchedAt: 0, origin: 'live' }, { name: 'caniuse', fetchedAt: 0, origin: 'live' }, { name: 'wpt', fetchedAt: 0, origin: 'live' }] }));
     render(<Freshness now={3 * 3_600_000} />);
     expect(await screen.findByText(/Browser support 3 hours ago/)).toBeTruthy();
     expect(screen.getByText(/MDN articles 3 hours ago/)).toBeTruthy();
     expect(screen.getByText(/Can I Use 3 hours ago/)).toBeTruthy();
+    expect(screen.getByText(/Test results 3 hours ago/)).toBeTruthy();
   });
 });
 

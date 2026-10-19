@@ -2,6 +2,7 @@ import type { IdlNames, RepoMap, SlimGroup, SlimSpec } from '../shared/types.ts'
 import { isImplRecord, type ImplFile, type ImplRecord } from '../logic/implementations.ts';
 import { isMdnPage, type MdnFile, type MdnPage } from '../logic/mdn.ts';
 import { isCiuFeature, type CiuFile } from '../logic/caniuse.ts';
+import { isWptSpec, wptMeta, type WptFile } from '../logic/wpt.ts';
 
 // Upstream records are untyped JSON; each slimmer reads only the fields it keeps.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -141,4 +142,14 @@ export function slimCaniuse(raw: unknown): CiuFile {
     }),
   );
   return { caniuse: { version: caniuse.version, updated: caniuse.updated }, features: kept, specs: bySpec };
+}
+
+// Drops each spec entry whose shape doesn't fit, so its card shows no wpt.fyi button, rather than failing to render.
+export function slimWpt(raw: unknown): WptFile {
+  const meta = wptMeta(raw);
+  const specs = (raw as Raw)?.specs;
+  if (!meta || !specs || typeof specs !== 'object' || Array.isArray(specs)) {
+    throw new Error('wpt: expected runs for firefox, safari, and chrome, a revision, a date, and specs');
+  }
+  return { ...meta, specs: Object.fromEntries(Object.entries(specs as Record<string, unknown>).filter((e) => isWptSpec(e[1]))) as WptFile['specs'] };
 }

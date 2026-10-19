@@ -125,4 +125,18 @@ describe('createSources', () => {
     expect(bundled.origin).toBe('bundled');
     expect(bundled.data.caniuse.updated).toBe('2026-10-13');
   });
+
+  it('loads the test-results file, and falls back to the bundled copy when the live one is malformed', async () => {
+    const runs = { firefox: { id: 2, version: '158.0', os: 'linux' }, safari: { id: 3, version: '27.0', os: 'mac' }, chrome: { id: 1, version: '155.0', os: 'linux' } };
+    const good = JSON.stringify({ runs, revision: '23b0b89b1a', date: '2026-10-18', specs: {} });
+    const live = await createSources(deps({ fetchImpl: vi.fn(async () => new Response(good)) })).load('wpt');
+    expect(live.origin).toBe('live');
+    expect(live.data.revision).toBe('23b0b89b1a');
+    const bundled = await createSources(deps({
+      fetchImpl: vi.fn(async () => new Response(JSON.stringify({ specs: {} }))),
+      readBundled: vi.fn(async () => good),
+    })).load('wpt');
+    expect(bundled.origin).toBe('bundled');
+    expect(bundled.data.date).toBe('2026-10-18');
+  });
 });
