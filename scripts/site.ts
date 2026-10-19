@@ -1,10 +1,11 @@
 // Builds the GitHub Pages site into _site/: the pages in site/, the screenshots, the icon, a privacy page made from
-// store/privacy.md, and the browser-support and MDN files the extension fetches. The install steps on the pages depend
-// on the release they link to, and on which stores list the extension, so the build asks both stores.
+// store/privacy.md, and the browser-support, MDN, and Can I Use files the extension fetches. The install steps on the
+// pages depend on the release they link to, and on which stores list the extension, so the build asks both stores.
 import { marked } from 'marked';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { fetchBuildInputs, implementationsText } from './bcd.ts';
+import { buildCaniuseFile } from './caniuse.ts';
 import { buildMdnFile } from './mdn.ts';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -60,11 +61,13 @@ async function main() {
   const inputs = await fetchBuildInputs();
   const implementations = implementationsText(inputs);
   const mdn = await buildMdnFile(inputs);
+  const caniuse = await buildCaniuseFile(inputs);
   await rm(out, { recursive: true, force: true });
   await mkdir(out + 'privacy', { recursive: true });
   await mkdir(out + 'data');
   await writeFile(out + 'data/implementations.json', implementations);
   await writeFile(out + 'data/mdn.json', mdn.text);
+  await writeFile(out + 'data/caniuse.json', caniuse.text);
   const index = await readFile(root + 'site/index.html', 'utf8');
   await writeFile(out + 'index.html', fillTemplate(index, { version, zip }, stores));
   const privacy = await readFile(root + 'site/privacy.html', 'utf8');

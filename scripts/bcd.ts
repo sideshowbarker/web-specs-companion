@@ -20,7 +20,7 @@ export interface BuildInputs {
   specs: SlimSpec[];
 }
 
-async function getJson(fetchUrl: Fetch, url: string): Promise<unknown> {
+export async function getJson(fetchUrl: Fetch, url: string): Promise<unknown> {
   const res = await fetchUrl(url);
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   return res.json();

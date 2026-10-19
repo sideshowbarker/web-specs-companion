@@ -4,6 +4,7 @@ import { URLS } from '../src/data/urls.ts';
 import { slimGroups, slimIdlNames, slimRepos, slimSpecs } from '../src/data/slim.ts';
 import { parseIcs } from '../src/data/tpac.ts';
 import { fetchBuildInputs, implementationsText } from './bcd.ts';
+import { buildCaniuseFile } from './caniuse.ts';
 import { buildMdnFile } from './mdn.ts';
 
 async function getJson(url: string): Promise<unknown> {
@@ -32,6 +33,10 @@ const mdn = await buildMdnFile(inputs);
 await writeFile('data/mdn.json', mdn.text);
 sources.mdn = mdn.url;
 console.log('data/mdn.json');
+const caniuse = await buildCaniuseFile(inputs);
+await writeFile('data/caniuse.json', caniuse.text);
+sources.caniuse = caniuse.url;
+console.log('data/caniuse.json');
 const icsRes = await fetch(URLS.tpac);
 if (!icsRes.ok) throw new Error(`HTTP ${icsRes.status} for ${URLS.tpac}`);
 await writeFile('data/tpac2026.json', JSON.stringify(parseIcs(await icsRes.text())));
