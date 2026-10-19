@@ -157,7 +157,7 @@ describe('handlers', () => {
 
   it('reports how fresh each source is', async () => {
     const r = (await createHandlers(deps({ sources: fakeSources({ tpac: [] }), now: () => Date.parse('2026-10-27T10:00:00Z') })).handle({ type: 'get-freshness' }, sender(1))) as { sources: { name: string; origin: string }[] };
-    expect(r.sources.map((s) => s.name)).toEqual(['specs', 'groups', 'repos', 'implementations', 'mdn', 'tpac']);
+    expect(r.sources.map((s) => s.name)).toEqual(['specs', 'groups', 'repos', 'implementations', 'mdn', 'caniuse', 'tpac']);
     expect(r.sources.every((s) => s.origin === 'bundled')).toBe(true);
   });
 
@@ -172,7 +172,7 @@ describe('handlers', () => {
     const h = createHandlers(deps({ sources: { load } as unknown as Sources, now: () => Date.parse('2026-11-05T10:00:00Z') }));
     expect(await h.handle({ type: 'get-tpac', groupNames: ['x'] }, sender(1))).toMatchObject({ visible: false, now: [], next: [] });
     const f = (await h.handle({ type: 'get-freshness' }, sender(1))) as { sources: { name: string }[] };
-    expect(f.sources.map((s) => s.name)).toEqual(['specs', 'groups', 'repos', 'implementations', 'mdn']);
+    expect(f.sources.map((s) => s.name)).toEqual(['specs', 'groups', 'repos', 'implementations', 'mdn', 'caniuse']);
     expect(load).not.toHaveBeenCalledWith('tpac');
   });
 

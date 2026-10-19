@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { slimSpecs, slimGroups, slimRepos, slimIdlNames, slimImplementations, slimMdn } from '../src/data/slim.ts';
+import { slimSpecs, slimGroups, slimRepos, slimIdlNames, slimImplementations, slimMdn, slimCaniuse } from '../src/data/slim.ts';
 
 const rawSpec = {
   url: 'https://www.w3.org/TR/css-grid-3/',
@@ -172,5 +172,39 @@ describe('slimMdn', () => {
     });
     expect(file.pages).toEqual([['a', 'A', 0], ['e', 'E', 0]]);
     expect(file.specs).toEqual({ x: [0, 1] });
+  });
+});
+
+describe('slimCaniuse', () => {
+  const good = { caniuse: { version: '1.0.30001816', updated: '2026-10-13' }, features: {}, specs: {} };
+  const feature = { title: 'Fetch', usage: 97.3, runs: { firefox: [], safari: [], chrome: [{ from: '42', to: '154', support: 'y', month: '2015-04', current: true }] }, notes: {} };
+
+  it('accepts the bundled Can I Use file', () => {
+    const file = slimCaniuse(JSON.parse(readFileSync(new URL('../data/caniuse.json', import.meta.url), 'utf8')));
+    expect(file.caniuse.updated).toMatch(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/);
+    expect(Object.keys(file.specs).length).toBeGreaterThan(150);
+  });
+
+  it("rejects a file without caniuse-db's version and date, or its features or specs", () => {
+    expect(slimCaniuse(good)).toEqual(good);
+    for (const bad of [
+      { ...good, caniuse: { updated: '2026-10-13' } },
+      { ...good, caniuse: { version: 'v' } },
+      { ...good, features: [] },
+      { ...good, specs: [] },
+      null,
+    ]) {
+      expect(() => slimCaniuse(bad)).toThrow(/caniuse/);
+    }
+  });
+
+  it("drops each feature whose shape doesn't fit, and each spec left with none", () => {
+    const file = slimCaniuse({
+      ...good,
+      features: { fetch: feature, bad: { ...feature, runs: { firefox: [] } } },
+      specs: { fetch: ['fetch', 'bad', 'gone', 7], html: ['bad'], dom: 'nope' },
+    });
+    expect(Object.keys(file.features)).toEqual(['fetch']);
+    expect(file.specs).toEqual({ fetch: ['fetch'] });
   });
 });

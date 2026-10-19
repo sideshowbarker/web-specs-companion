@@ -1,6 +1,7 @@
 import type { IdlNames, RepoMap, SlimGroup, SlimSpec } from '../shared/types.ts';
 import { isImplRecord, type ImplFile, type ImplRecord } from '../logic/implementations.ts';
 import { isMdnPage, type MdnFile, type MdnPage } from '../logic/mdn.ts';
+import { isCiuFeature, type CiuFile } from '../logic/caniuse.ts';
 
 // Upstream records are untyped JSON; each slimmer reads only the fields it keeps.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -120,4 +121,22 @@ export function slimMdn(raw: unknown): MdnFile {
     if (valid.length > 0) bySpec[shortname] = valid;
   }
   return { content: { commit: content.commit, date: content.date }, types, pages: kept, specs: bySpec };
+}
+
+// Drops each feature whose shape doesn't fit (whole, since a history missing a run would be wrong), each spec entry
+// that names a dropped feature, and each spec left with none.
+export function slimCaniuse(raw: unknown): CiuFile {
+  const { caniuse, features, specs } = (raw ?? {}) as Raw;
+  const isPlain = (v: unknown) => !!v && typeof v === 'object' && !Array.isArray(v);
+  if (typeof caniuse?.version !== 'string' || typeof caniuse.updated !== 'string' || !isPlain(features) || !isPlain(specs)) {
+    throw new Error('caniuse: expected caniuse.version, caniuse.updated, features, and specs');
+  }
+  const kept = Object.fromEntries(Object.entries(features as Record<string, unknown>).filter((e) => isCiuFeature(e[1]))) as CiuFile['features'];
+  const bySpec = Object.fromEntries(
+    Object.entries(specs as Record<string, unknown>).flatMap(([shortname, ids]) => {
+      const valid = Array.isArray(ids) ? ids.filter((id): id is string => typeof id === 'string' && Object.hasOwn(kept, id)) : [];
+      return valid.length > 0 ? [[shortname, valid]] : [];
+    }),
+  );
+  return { caniuse: { version: caniuse.version, updated: caniuse.updated }, features: kept, specs: bySpec };
 }

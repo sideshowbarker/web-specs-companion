@@ -16,7 +16,7 @@ export async function ensureAlarms(alarms: AlarmsLike): Promise<void> {
 
 export async function runAlarm(name: string, sources: Sources, now: number): Promise<string[]> {
   const names: SourceName[] =
-    name === 'refresh-data' ? ['specs', 'groups', 'repos', 'idlnames', 'implementations', 'mdn']
+    name === 'refresh-data' ? ['specs', 'groups', 'repos', 'idlnames', 'implementations', 'mdn', 'caniuse']
     : name === 'refresh-tpac' && tpacVisible(now) ? ['tpac']
     : [];
   const refreshed: string[] = [];

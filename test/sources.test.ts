@@ -112,4 +112,17 @@ describe('createSources', () => {
     expect(bundled.origin).toBe('bundled');
     expect(bundled.data.pages).toEqual([['Web/A', 'A', 0]]);
   });
+
+  it('loads the Can I Use file, and falls back to the bundled copy when the live one is malformed', async () => {
+    const good = JSON.stringify({ caniuse: { version: 'v', updated: '2026-10-13' }, features: {}, specs: {} });
+    const live = await createSources(deps({ fetchImpl: vi.fn(async () => new Response(good)) })).load('caniuse');
+    expect(live.origin).toBe('live');
+    expect(live.data.caniuse.version).toBe('v');
+    const bundled = await createSources(deps({
+      fetchImpl: vi.fn(async () => new Response(JSON.stringify({ specs: {} }))),
+      readBundled: vi.fn(async () => good),
+    })).load('caniuse');
+    expect(bundled.origin).toBe('bundled');
+    expect(bundled.data.caniuse.updated).toBe('2026-10-13');
+  });
 });

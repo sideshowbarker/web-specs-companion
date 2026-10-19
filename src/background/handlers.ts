@@ -180,7 +180,7 @@ export function createHandlers(deps: HandlerDeps) {
       return { ...result, crawlDate: index.date };
     },
     'get-freshness': async () => {
-      const names = tpacVisible(deps.now()) ? (['specs', 'groups', 'repos', 'implementations', 'mdn', 'tpac'] as const) : (['specs', 'groups', 'repos', 'implementations', 'mdn'] as const);
+      const names = tpacVisible(deps.now()) ? (['specs', 'groups', 'repos', 'implementations', 'mdn', 'caniuse', 'tpac'] as const) : (['specs', 'groups', 'repos', 'implementations', 'mdn', 'caniuse'] as const);
       const loaded = await Promise.all(names.map((n) => deps.sources.load(n).catch(() => undefined)));
       return {
         sources: loaded.flatMap((l, i) => (l ? [{ name: names[i], fetchedAt: l.fetchedAt, origin: l.origin }] : [])),
