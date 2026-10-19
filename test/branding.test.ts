@@ -7,7 +7,8 @@ import { join } from 'node:path';
 const OLD = ['W3C Companion', 'w3c-companion', 'w3c-oss', 'w3cc', 'w3c-symbol'];
 const ROOTS = ['src', 'static', 'e2e', 'scripts/mdn.ts', 'scripts/screenshots.ts', 'test/usedby.test.ts', 'test/links.test.ts', 'package.json',
   'scripts/package.ts', '.github/workflows/release.yml', '.github/workflows/attach-firefox-build.yml', '.github/scripts',
-  'site', 'scripts/site.ts', 'test/site.test.ts', '.github/workflows/pages.yml'];
+  'site', 'scripts/site.ts', 'test/site.test.ts', '.github/workflows/pages.yml',
+  'assets', 'scripts/make-icons.ts'];
 const SELF = 'test/branding.test.ts';
 
 const files = (path: string): string[] =>
