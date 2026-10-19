@@ -40,8 +40,8 @@ describe('specLinks', () => {
   it('lists the draft, the TR, history, the repo and its issues, and tests', () => {
     const links = specLinks({ kind: 'spec', url: 'x', groups: [], spec: { ...specs[0], tests: { repository: 'https://github.com/web-platform-tests/wpt', testPaths: ['fetch/metadata'] } } });
     expect(links.map((l) => l.label)).toEqual([
-      'Editor\u2019s Draft', 'Latest TR version', 'Publication history', 'Repository', 'Open issues', 'File an issue', 'Tests on wpt.fyi',
+      'Editor\u2019s Draft', 'Latest TR version', 'Publication history', 'Repository', 'Open issues', 'File an issue', 'Tests',
     ]);
-    expect(links.find((l) => l.label === 'Tests on wpt.fyi')?.href).toBe('https://wpt.fyi/results/fetch/metadata');
+    expect(links.find((l) => l.label === 'Tests')?.href).toBe('https://wpt.fyi/results/fetch/metadata');
   });
 });

@@ -52,7 +52,7 @@ export function specLinks(ctx: Context): { label: string; href: string }[] {
   }
   const t = s?.tests;
   if (t?.repository === 'https://github.com/web-platform-tests/wpt' && t.testPaths?.[0]) {
-    out.push({ label: 'Tests on wpt.fyi', href: `https://wpt.fyi/results/${t.testPaths[0]}` });
+    out.push({ label: 'Tests', href: `https://wpt.fyi/results/${t.testPaths[0]}` });
   }
   return out;
 }
