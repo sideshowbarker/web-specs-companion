@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BCD_LATEST, bcdDataUrl, buildImplementationsFile } from '../scripts/bcd.ts';
+import { BCD_LATEST, bcdDataUrl, fetchBuildInputs, implementationsText } from '../scripts/bcd.ts';
 import { URLS } from '../src/data/urls.ts';
 
 type Answers = Record<string, { status?: number; body: unknown }>;
@@ -25,10 +25,15 @@ function fake(answers: Answers) {
   return { asked, fetchUrl };
 }
 
-describe('buildImplementationsFile', () => {
+async function build(fetchUrl: (url: string) => Promise<Response>, minSpecs: number) {
+  const inputs = await fetchBuildInputs(fetchUrl);
+  return { url: inputs.bcdUrl, text: implementationsText(inputs, minSpecs) };
+}
+
+describe('fetchBuildInputs and implementationsText', () => {
   it('builds the file from the exact BCD version npm names as the latest', async () => {
     const f = fake(ok());
-    const { url, text } = await buildImplementationsFile(f.fetchUrl, 1);
+    const { url, text } = await build(f.fetchUrl, 1);
     expect(url).toBe('https://cdn.jsdelivr.net/npm/@mdn/browser-compat-data@8.1.6/data.json');
     expect(f.asked).toContain(url);
     const file = JSON.parse(text);
@@ -39,16 +44,16 @@ describe('buildImplementationsFile', () => {
   it('throws when the download is a different BCD version', async () => {
     const answers = ok();
     answers[bcdDataUrl('8.1.6')] = { body: bcd('8.1.5') };
-    await expect(buildImplementationsFile(fake(answers).fetchUrl, 1)).rejects.toThrow('8.1.5, not 8.1.6');
+    await expect(build(fake(answers).fetchUrl, 1)).rejects.toThrow('8.1.5, not 8.1.6');
   });
 
   it('throws when fewer specs come out than the floor', async () => {
-    await expect(buildImplementationsFile(fake(ok()).fetchUrl, 2)).rejects.toThrow('only 1 specs');
+    await expect(build(fake(ok()).fetchUrl, 2)).rejects.toThrow('only 1 specs');
   });
 
   it('throws on an HTTP error', async () => {
     const answers = ok();
     answers[BCD_LATEST] = { status: 503, body: {} };
-    await expect(buildImplementationsFile(fake(answers).fetchUrl, 1)).rejects.toThrow('HTTP 503');
+    await expect(build(fake(answers).fetchUrl, 1)).rejects.toThrow('HTTP 503');
   });
 });

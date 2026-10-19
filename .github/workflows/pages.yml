@@ -2,8 +2,9 @@ name: Pages
 
 # Publishes the site in site/ to https://w3c-oss.github.io/w3c-companion/. Its install steps link to the latest
 # release's zip, and switch to the store pages once Firefox Add-ons and the Chrome Web Store list the extension. And it
-# serves the browser-support file the extension fetches, built from the latest BCD release. So the workflow also runs
-# after each release and every hour, and an hourly run deploys only when the page or that file has changed.
+# serves the browser-support and MDN files the extension fetches, built from the latest BCD release and mdn/content.
+# So the workflow also runs after each release and every hour, and an hourly run deploys only when the page or one of
+# those files has changed.
 
 on:
   push:
@@ -15,7 +16,9 @@ on:
       - 'store/privacy.md'
       - 'scripts/site.ts'
       - 'scripts/bcd.ts'
+      - 'scripts/mdn.ts'
       - 'src/logic/implementations.ts'
+      - 'src/logic/mdn.ts'
       - '.github/workflows/pages.yml'
   schedule:
     - cron: '23 * * * *'
@@ -52,7 +55,8 @@ jobs:
           site=https://w3c-oss.github.io/w3c-companion
           if [ "$GITHUB_EVENT_NAME" = schedule ] \
             && curl -fsS "$site/" | cmp -s - _site/index.html \
-            && curl -fsS "$site/data/implementations.json" | cmp -s - _site/data/implementations.json; then
+            && curl -fsS "$site/data/implementations.json" | cmp -s - _site/data/implementations.json \
+            && curl -fsS "$site/data/mdn.json" | cmp -s - _site/data/mdn.json; then
             echo "deploy=false" >> "$GITHUB_OUTPUT"
           else
             echo "deploy=true" >> "$GITHUB_OUTPUT"
