@@ -1,10 +1,11 @@
 name: Pages
 
 # Publishes the site in site/ to https://sideshowbarker.net/web-specs-companion/. Its install steps link to the latest
-# release's zip, and switch to the store pages once Firefox Add-ons and the Chrome Web Store list the extension. And it
-# serves the browser-support, MDN, Can I Use, and test-results files the extension fetches, built from the latest BCD,
-# mdn/content, caniuse-db, web-features, and wpt.fyi runs. So the workflow also runs after each release and every hour,
-# and an hourly run deploys only when the page or one of those files has changed.
+# release's zip (or, while the repo has no release, the zip of the version in package.json), and switch to the store
+# pages once Firefox Add-ons and the Chrome Web Store list the extension. And it serves the browser-support, MDN, Can I
+# Use, and test-results files the extension fetches, built from the latest BCD, mdn/content, caniuse-db, web-features,
+# and wpt.fyi runs. So, the workflow also runs after each release and every hour, and an hourly run deploys only when
+# the page or one of those files has changed.
 
 on:
   push:
@@ -51,7 +52,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)
+          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --json tagName,isLatest --jq '.[] | select(.isLatest) | .tagName')
           SITE_VERSION=${tag#v} npm run site
       - name: Compare the site with the deployed one
         id: compare
