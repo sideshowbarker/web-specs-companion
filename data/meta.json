@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-19T04:03:50.500Z",
+  "generatedAt": "2026-10-19T06:06:48.789Z",
   "sources": {
     "specs": "https://w3c.github.io/browser-specs/index.json",
     "groups": "https://w3c.github.io/groups/w3c-groups.json",
@@ -7,6 +7,7 @@
     "idlnames": "https://w3c.github.io/webref/ed/idlnames.json",
     "implementations": "https://cdn.jsdelivr.net/npm/@mdn/browser-compat-data@8.1.6/data.json",
     "mdn": "https://github.com/mdn/content/tree/a1aa79c09717761fc72c20bac94bb9c430ed487a",
+    "caniuse": "https://cdn.jsdelivr.net/npm/caniuse-db@1.0.30001816/fulldata-json/data-2.0.json",
     "tpac": "https://www.w3.org/calendar/tpac2026/export/"
   }
 }
