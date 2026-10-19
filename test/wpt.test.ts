@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { buildWpt, countTest, percent, type WptBrowser, type WptResult, type WptRuns, type WptSummary } from '../src/logic/wpt.ts';
+import {
+  allUrl, buildWpt, countTest, dirUrl, formatPct, isWptSpec, onlyUrl, passRate, percent, roundPct, runsSentence, subtests, tint, wptMeta, wptSpec,
+  type WptBrowser, type WptFile, type WptResult, type WptRuns, type WptSpec, type WptStats, type WptSummary,
+} from '../src/logic/wpt.ts';
 import type { SlimSpec } from '../src/shared/types.ts';
 
 const WPT = 'https://github.com/web-platform-tests/wpt';
@@ -88,5 +91,69 @@ describe('buildWpt', () => {
 
   it('gives the same bytes for the same inputs, whatever order the specs come in', () => {
     expect(JSON.stringify(buildWpt(meta, summaries, only, [...specs].reverse()))).toBe(JSON.stringify(buildWpt(meta, summaries, only, specs)));
+  });
+});
+
+const stats: WptStats = { tests: 1, pass: { firefox: [1, 1], safari: [0, 1], chrome: [1, 1] }, interop: 0, only: { firefox: 0, safari: 1, chrome: 0 } };
+const R = 'run_id=1&run_id=2&run_id=3';
+const fetchSpec: WptSpec = { paths: ['cors', 'fetch'], exclude: ['fetch/local-network-access', 'fetch/metadata'], all: stats, dirs: [['cors', stats], ['fetch', stats]] };
+const htmlSpec: WptSpec = { paths: ['html', 'workers'], exclude: ['html/cross-origin-embedder-policy/credentialless'], all: stats, dirs: [['html', stats], ['workers', stats]] };
+const grid: WptSpec = { paths: ['css/css-grid'], all: stats };
+
+describe('the card view', () => {
+  it("formats percentages, and rounds the button's number by the same rule", () => {
+    expect([100, 0, 91, 41.7, 99.9, 0.1].map(formatPct)).toEqual(['100', '0', '91.0', '41.7', '99.9', '0.1']);
+    expect([100, 0, 99.9, 99.4, 0.1, 1.8, 75.1].map(roundPct)).toEqual([100, 0, 99, 99, 1, 2, 75]);
+    expect(passRate([10221, 11321])).toBe(90.3);
+  });
+
+  it('tints 95 and up, 80 and up, and the rest', () => {
+    expect([100, 95, 94.9, 80, 79.9, 0].map(tint)).toEqual(['hi', 'hi', 'mid', 'mid', 'lo', 'lo']);
+  });
+
+  it('counts subtests with thousands separators', () => {
+    expect(subtests([10221, 11321])).toBe('10,221 of 11,321 subtests');
+    expect(subtests([1, 1])).toBe('1 of 1 subtest');
+  });
+
+  it("pins every link to the three runs, and carries the spec's exclusions", () => {
+    expect(dirUrl(fetchSpec, 'cors', meta.runs)).toBe(`https://wpt.fyi/results/cors?${R}`);
+    expect(dirUrl(fetchSpec, 'fetch', meta.runs)).toBe(`https://wpt.fyi/results/fetch?${R}&q=${encodeURIComponent('!path:/fetch/local-network-access/ !path:/fetch/metadata/')}`);
+    expect(dirUrl(htmlSpec, 'html', meta.runs)).toBe(`https://wpt.fyi/results/html?${R}&q=!path%3A%2Fhtml%2Fcross-origin-embedder-policy%2Fcredentialless%2F`);
+    expect(dirUrl(htmlSpec, 'workers', meta.runs)).toBe(`https://wpt.fyi/results/workers?${R}`);
+    const all = '(path:/cors/ or path:/fetch/) !path:/fetch/local-network-access/ !path:/fetch/metadata/';
+    expect(allUrl(fetchSpec, meta.runs)).toBe(`https://wpt.fyi/results/?${R}&q=${encodeURIComponent(all)}`);
+    expect(onlyUrl(fetchSpec, 'safari', meta.runs)).toBe(`https://wpt.fyi/results/?${R}&q=${encodeURIComponent(`${all} safari:!pass chrome:pass firefox:pass`)}`);
+  });
+
+  it('links a spec with one directory to that directory, keeping its slash unencoded', () => {
+    expect(allUrl(grid, meta.runs)).toBe(`https://wpt.fyi/results/css/css-grid?${R}`);
+    expect(onlyUrl(grid, 'firefox', meta.runs)).toBe(`https://wpt.fyi/results/css/css-grid?${R}&q=firefox%3A!pass%20chrome%3Apass%20safari%3Apass`);
+    expect(onlyUrl(grid, 'chrome', meta.runs)).toBe(`https://wpt.fyi/results/css/css-grid?${R}&q=chrome%3A!pass%20firefox%3Apass%20safari%3Apass`);
+  });
+
+  it('names the runs by browser, major version, and operating system', () => {
+    expect(runsSentence(meta.runs)).toBe('stable Firefox 158 and Chrome 155 on Linux, Safari 27 on macOS');
+    const same = { ...meta.runs, safari: { ...meta.runs.safari, os: 'linux' } };
+    expect(runsSentence(same)).toBe('stable Firefox 158, Safari 27, and Chrome 155 on Linux');
+    const spread = { firefox: { ...meta.runs.firefox, os: 'win' }, safari: meta.runs.safari, chrome: { ...meta.runs.chrome, os: 'android' } };
+    expect(runsSentence(spread)).toBe('stable Firefox 158 on Windows, Safari 27 on macOS, Chrome 155 on android');
+  });
+
+  it("checks the runs' shape", () => {
+    expect(wptMeta({ ...meta, specs: {} })).toEqual(meta);
+    expect(wptMeta({ ...meta, runs: { firefox: meta.runs.firefox, chrome: meta.runs.chrome } })).toBeUndefined();
+    expect(wptMeta({ ...meta, runs: { ...meta.runs, chrome: { ...meta.runs.chrome, id: '1' } } })).toBeUndefined();
+    expect(wptMeta({ runs: meta.runs, revision: meta.revision })).toBeUndefined();
+    expect(wptMeta(null)).toBeUndefined();
+  });
+
+  it("finds a spec's own entry only when its shape fits", () => {
+    const bad = (all: unknown) => ({ ...fetchSpec, all });
+    const file = { ...meta, specs: { fetch: fetchSpec, more: bad({ ...stats, pass: { ...stats.pass, firefox: [2, 1] } }), lost: bad({ ...stats, pass: { firefox: [1, 1], safari: [1, 1] } }), none: { paths: [], all: stats } } } as unknown as WptFile;
+    expect(wptSpec(file, 'fetch')).toBe(fetchSpec);
+    for (const name of ['more', 'lost', 'none', 'constructor', '__proto__', 'css-grid-3']) expect(wptSpec(file, name)).toBeUndefined();
+    expect(isWptSpec({ ...fetchSpec, dirs: [['fetch', { ...stats, only: { firefox: -1, safari: 0, chrome: 0 } }]] })).toBe(false);
+    expect(isWptSpec({ ...fetchSpec, exclude: ['x', 1] })).toBe(false);
   });
 });

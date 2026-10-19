@@ -104,3 +104,121 @@ export function buildWpt(meta: WptRuns, summaries: Record<WptBrowser, WptSummary
   }
   return { runs: meta.runs, revision: meta.revision, date: meta.date, specs: Object.fromEntries(entries) };
 }
+
+export const BROWSER_NAMES: Record<WptBrowser, string> = { firefox: 'Firefox', safari: 'Safari', chrome: 'Chrome' };
+
+export interface WptAnswer extends WptRuns {
+  spec: WptSpec;
+  fromSeries?: { shortname: string; title: string };
+}
+
+export type Tint = 'hi' | 'mid' | 'lo';
+
+export function formatPct(x: number): string {
+  return x === 100 ? '100' : x === 0 ? '0' : x.toFixed(1);
+}
+
+// The button's whole number follows the same rule: 100 and 0 only when exact, so 99.6 reads as 99 and 0.3 as 1.
+export function roundPct(x: number): number {
+  return x === 100 || x === 0 ? x : Math.min(99, Math.max(1, Math.round(x)));
+}
+
+export const tint = (x: number): Tint => (x >= 95 ? 'hi' : x >= 80 ? 'mid' : 'lo');
+
+export function subtests([passing, total]: [number, number]): string {
+  return `${passing.toLocaleString('en-US')} of ${total.toLocaleString('en-US')} ${total === 1 ? 'subtest' : 'subtests'}`;
+}
+
+export const passRate = (pass: [number, number]): number => percent(pass[0], pass[1]);
+
+// wpt.fyi's results page shows the runs it's given in this order, and a search names the other two browsers in it too.
+const RUN_ORDER: readonly WptBrowser[] = ['chrome', 'firefox', 'safari'];
+
+function resultsUrl(path: string, terms: string[], runs: WptFile['runs']): string {
+  const ids = RUN_ORDER.map((b) => `run_id=${runs[b].id}`).join('&');
+  const q = terms.join(' ');
+  return `https://wpt.fyi/results/${path}?${ids}${q ? `&q=${encodeURIComponent(q)}` : ''}`;
+}
+
+// The spec's excluded subdirectories inside any of the given directories, as search terms that leave them out.
+const exclusions = (spec: WptSpec, dirs: string[]) =>
+  (spec.exclude ?? []).filter((e) => dirs.some((d) => e === d || e.startsWith(`${d}/`))).map((e) => `!path:/${e}/`);
+
+// All of a spec's tests: its one directory, or the results root narrowed to its directories.
+function allView(spec: WptSpec): [string, string[]] {
+  if (spec.paths.length === 1) return [spec.paths[0], exclusions(spec, spec.paths)];
+  return ['', [`(${spec.paths.map((p) => `path:/${p}/`).join(' or ')})`, ...exclusions(spec, spec.paths)]];
+}
+
+export function dirUrl(spec: WptSpec, dir: string, runs: WptFile['runs']): string {
+  return resultsUrl(dir, exclusions(spec, [dir]), runs);
+}
+
+export function allUrl(spec: WptSpec, runs: WptFile['runs']): string {
+  const [path, terms] = allView(spec);
+  return resultsUrl(path, terms, runs);
+}
+
+export function onlyUrl(spec: WptSpec, browser: WptBrowser, runs: WptFile['runs']): string {
+  const [path, terms] = allView(spec);
+  const others = RUN_ORDER.filter((b) => b !== browser).map((b) => `${b}:pass`);
+  return resultsUrl(path, [...terms, `${browser}:!pass`, ...others], runs);
+}
+
+const OS_NAMES: Record<string, string> = { linux: 'Linux', mac: 'macOS', win: 'Windows' };
+
+const list = (items: string[]) =>
+  items.length <= 2 ? items.join(' and ') : `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`;
+
+export function runsSentence(runs: WptFile['runs']): string {
+  const byOs = new Map<string, string[]>();
+  for (const b of WPT_BROWSERS) {
+    const { version, os } = runs[b];
+    byOs.set(os, [...(byOs.get(os) ?? []), `${BROWSER_NAMES[b]} ${version.split(/[. ]/)[0]}`]);
+  }
+  const groups = [...byOs].map(([os, names]) => `${list(names)} on ${Object.hasOwn(OS_NAMES, os) ? OS_NAMES[os] : os}`);
+  return `stable ${groups.join(', ')}`;
+}
+
+const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+const isRun = (v: unknown): v is WptRun => isObject(v) && typeof v.id === 'number' && typeof v.version === 'string' && typeof v.os === 'string';
+const isCount = (v: unknown, min: number) => typeof v === 'number' && Number.isInteger(v) && v >= min;
+const isStrings = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string');
+
+// The runs, revision, and date of a file, or undefined when any of them is missing or malformed.
+export function wptMeta(file: unknown): WptRuns | undefined {
+  if (!isObject(file) || !isObject(file.runs) || typeof file.revision !== 'string' || typeof file.date !== 'string') return undefined;
+  const runs = file.runs;
+  if (!WPT_BROWSERS.every((b) => isRun(runs[b]))) return undefined;
+  const picked = Object.fromEntries(WPT_BROWSERS.map((b) => {
+    const { id, version, os } = runs[b] as WptRun;
+    return [b, { id, version, os }];
+  })) as Record<WptBrowser, WptRun>;
+  return { runs: picked, revision: file.revision, date: file.date };
+}
+
+function isStats(v: unknown): v is WptStats {
+  if (!isObject(v)) return false;
+  const { tests, pass, interop, only } = v;
+  return isCount(tests, 1) && typeof interop === 'number' && interop >= 0 && interop <= 100 && isObject(pass) && isObject(only)
+    && WPT_BROWSERS.every((b) => {
+      const p = pass[b];
+      return Array.isArray(p) && p.length === 2 && isCount(p[0], 0) && isCount(p[1], 0) && p[0] <= p[1] && isCount(only[b], 0);
+    });
+}
+
+export function isWptSpec(value: unknown): value is WptSpec {
+  if (!isObject(value)) return false;
+  const { paths, exclude, all, dirs } = value;
+  return isStrings(paths) && paths.length > 0 && paths.every((p) => p !== '')
+    && (exclude === undefined || isStrings(exclude))
+    && isStats(all)
+    && (dirs === undefined || (Array.isArray(dirs) && dirs.every((d) => Array.isArray(d) && d.length === 2 && typeof d[0] === 'string' && isStats(d[1]))));
+}
+
+// A copy stored by another version of the extension isn't slimmed again, so each lookup checks the entry's shape.
+export function wptSpec(file: WptFile, shortname: string): WptSpec | undefined {
+  if (!isObject(file) || !isObject(file.specs) || !Object.hasOwn(file.specs, shortname)) return undefined;
+  const entry: unknown = file.specs[shortname];
+  return isWptSpec(entry) ? entry : undefined;
+}
