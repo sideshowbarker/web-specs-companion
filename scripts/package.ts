@@ -4,8 +4,8 @@ import { mkdir, readFile, rm } from 'node:fs/promises';
 
 const { version } = JSON.parse(await readFile('package.json', 'utf8'));
 await mkdir('artifacts', { recursive: true });
-const ext = `artifacts/w3c-companion-${version}.zip`;
-const src = `artifacts/w3c-companion-${version}-source.zip`;
+const ext = `artifacts/web-specs-companion-${version}.zip`;
+const src = `artifacts/web-specs-companion-${version}-source.zip`;
 await rm(ext, { force: true });
 await rm(src, { force: true });
 execFileSync('zip', ['-qr', `../${ext}`, '.'], { cwd: 'dist', stdio: 'inherit' });

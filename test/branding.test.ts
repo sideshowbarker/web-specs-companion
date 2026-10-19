@@ -5,7 +5,8 @@ import { join } from 'node:path';
 // The names the extension went by as W3C Companion, which nothing in the repo may use: not in a file's path, and not
 // in its text.
 const OLD = ['W3C Companion', 'w3c-companion', 'w3c-oss', 'w3cc', 'w3c-symbol'];
-const ROOTS = ['src', 'static', 'e2e', 'scripts/mdn.ts', 'scripts/screenshots.ts', 'test/usedby.test.ts', 'test/links.test.ts', 'package.json'];
+const ROOTS = ['src', 'static', 'e2e', 'scripts/mdn.ts', 'scripts/screenshots.ts', 'test/usedby.test.ts', 'test/links.test.ts', 'package.json',
+  'scripts/package.ts', '.github/workflows/release.yml', '.github/workflows/attach-firefox-build.yml', '.github/scripts'];
 const SELF = 'test/branding.test.ts';
 
 const files = (path: string): string[] =>
