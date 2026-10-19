@@ -1,8 +1,5 @@
-import { useState } from 'preact/hooks';
 import type { Engine, ImplFeature, ImplView } from '../../logic/implementations.ts';
-import { send } from '../api.ts';
 import { formatDate } from '../format.ts';
-import { useAsync } from '../hooks.ts';
 import { A } from './A.tsx';
 
 const BROWSERS: { engine: Engine; name: string; logo: string }[] = [
@@ -54,7 +51,10 @@ function Lacking({ list }: { list?: { features: ImplFeature[]; more: number } })
   );
 }
 
-function Why({ impl, hidden }: { impl: ImplView; hidden: boolean }) {
+// The list of what each gray engine lacks, which "What's missing?" opens below the row. There's none when all three
+// engines implement the spec.
+export function Why({ impl, hidden }: { impl: ImplView; hidden: boolean }) {
+  if (impl.engines.length === 3) return null;
   const gray = BROWSERS.filter((b) => !impl.engines.includes(b.engine));
   return (
     <div id="impl-why" class="impl-why" hidden={hidden}>
@@ -82,41 +82,30 @@ function Why({ impl, hidden }: { impl: ImplView; hidden: boolean }) {
 }
 
 // Firefox, Safari, and Chrome logos, in color for each engine that implements the spec and gray for each that doesn't,
-// then a check mark when two or three do, and, when any logo is gray, a "What's missing?" button that lists what each
-// gray engine lacks. The right end of the row is left free for other logos.
-export function Implementations({ shortname }: { shortname: string }) {
-  const r = useAsync(() => send('get-implementations', { shortname }), [shortname]);
-  const [open, setOpen] = useState(false);
-  const impl = r.value?.impl;
-  if (!impl) return null;
-  const someGray = impl.engines.length < 3;
+// then a check mark when two or three do, and, when any logo is gray, a "What's missing?" button that opens Why.
+export function Implementations({ impl, open, onToggle }: { impl: ImplView; open: boolean; onToggle: () => void }) {
   return (
-    <>
-      <div class="impl-row">
-        <div class="impl">
-          {BROWSERS.map((b) => {
-            const yes = impl.engines.includes(b.engine);
-            return (
-              <img
-                key={b.engine}
-                src={b.logo}
-                width={20}
-                height={20}
-                class={yes ? undefined : 'no'}
-                alt={`${b.name}: ${yes ? 'implements it' : 'doesn\u2019t implement it'}`}
-                title={tooltip(impl, b.engine, b.name)}
-              />
-            );
-          })}
-          <Check count={impl.engines.length} />
-          {someGray && (
-            <button type="button" class="linkish why" aria-expanded={open} aria-controls="impl-why" onClick={() => setOpen(!open)}>
-              {'What\u2019s missing?'}
-            </button>
-          )}
-        </div>
-      </div>
-      {someGray && <Why impl={impl} hidden={!open} />}
-    </>
+    <div class="impl">
+      {BROWSERS.map((b) => {
+        const yes = impl.engines.includes(b.engine);
+        return (
+          <img
+            key={b.engine}
+            src={b.logo}
+            width={20}
+            height={20}
+            class={yes ? undefined : 'no'}
+            alt={`${b.name}: ${yes ? 'implements it' : 'doesn\u2019t implement it'}`}
+            title={tooltip(impl, b.engine, b.name)}
+          />
+        );
+      })}
+      <Check count={impl.engines.length} />
+      {impl.engines.length < 3 && (
+        <button type="button" class="linkish why" aria-expanded={open} aria-controls="impl-why" onClick={onToggle}>
+          {'What\u2019s missing?'}
+        </button>
+      )}
+    </div>
   );
 }

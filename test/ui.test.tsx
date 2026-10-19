@@ -106,7 +106,7 @@ describe('Freshness', () => {
   });
 });
 
-import { Implementations } from '../src/ui/components/Implementations.tsx';
+import { CardRow } from '../src/ui/components/CardRow.tsx';
 import type { ImplView } from '../src/logic/implementations.ts';
 
 describe('Implementations', () => {
@@ -133,7 +133,7 @@ describe('Implementations', () => {
 
   it('shows all three logos in color, and a green check mark, when all three engines implement the spec', async () => {
     answer(view());
-    render(<Implementations shortname="fetch" />);
+    render(<CardRow shortname="fetch" />);
     const firefox = await screen.findByAltText('Firefox: implements it');
     expect(firefox.getAttribute('title')).toBe('Firefox: ships 4 of the 4 features at least two engines ship');
     expect(firefox.classList.contains('no')).toBe(false);
@@ -145,7 +145,7 @@ describe('Implementations', () => {
 
   it('grays out the engine that lacks the core, and lists what it lacks on request', async () => {
     answer(referrerPolicy);
-    render(<Implementations shortname="referrer-policy" />);
+    render(<CardRow shortname="referrer-policy" />);
     const firefox = await screen.findByAltText('Firefox: doesn\u2019t implement it');
     expect(firefox.classList.contains('no')).toBe(true);
     expect(firefox.getAttribute('title')).toBe('Firefox: ships 3 of the 21 features at least two engines ship');
@@ -168,7 +168,7 @@ describe('Implementations', () => {
   it('leaves the check-mark slot empty when only one engine implements the spec', async () => {
     const lacking = { features: [{ key: 'api.A' }, { key: 'api.B' }], more: 0 };
     answer(view({ engines: ['blink'], basis: 'any', core: 2, ships: { gecko: 0, webkit: 0, blink: 2 }, lacks: { gecko: lacking, webkit: lacking } }));
-    const { container } = render(<Implementations shortname="usb" />);
+    const { container } = render(<CardRow shortname="usb" />);
     expect((await screen.findByAltText('Chrome: implements it')).getAttribute('title')).toBe('Chrome: ships 2 of the 2 features any engine ships');
     const slot = container.querySelector('.check')!;
     expect(slot.getAttribute('aria-hidden')).toBe('true');
@@ -181,7 +181,7 @@ describe('Implementations', () => {
   it('grays out all three logos, and lists the features once, when no engine ships any', async () => {
     const lacking = { features: [{ key: 'api.A' }, { key: 'api.B' }, { key: 'api.C' }], more: 0 };
     answer(view({ engines: [], basis: 'none', core: 3, ships: { gecko: 0, webkit: 0, blink: 0 }, lacks: { gecko: lacking, webkit: lacking, blink: lacking } }));
-    render(<Implementations shortname="x" />);
+    render(<CardRow shortname="x" />);
     const chrome = await screen.findByAltText('Chrome: doesn\u2019t implement it');
     expect(chrome.getAttribute('title')).toBe('No engine ships any of the 3 features BCD lists for this spec');
     fireEvent.click(screen.getByRole('button', { name: 'What\u2019s missing?' }));
@@ -191,7 +191,7 @@ describe('Implementations', () => {
 
   it('words the counts for a core of one feature', async () => {
     answer(view({ engines: ['webkit', 'blink'], core: 1, ships: { gecko: 0, webkit: 1, blink: 1 }, lacks: { gecko: { features: [{ key: 'api.A' }], more: 0 } } }));
-    render(<Implementations shortname="x" />);
+    render(<CardRow shortname="x" />);
     expect((await screen.findByAltText('Firefox: doesn\u2019t implement it')).getAttribute('title'))
       .toBe('Firefox: doesn\u2019t ship the one feature at least two engines ship');
     expect(screen.getByAltText('Safari: implements it').getAttribute('title')).toBe('Safari: ships the one feature at least two engines ship');
@@ -199,7 +199,7 @@ describe('Implementations', () => {
 
   it("says when the data is the series' current level's", async () => {
     answer({ ...referrerPolicy, fromSeries: { shortname: 'css-grid-2', title: 'CSS Grid Layout Module Level 2' } });
-    render(<Implementations shortname="css-grid-1" />);
+    render(<CardRow shortname="css-grid-1" />);
     expect((await screen.findByAltText('Safari: implements it')).getAttribute('title'))
       .toBe('Safari: ships 21 of the 21 features at least two engines ship (from the data for CSS Grid Layout Module Level 2)');
     fireEvent.click(screen.getByRole('button', { name: 'What\u2019s missing?' }));
@@ -208,7 +208,7 @@ describe('Implementations', () => {
 
   it('shows the sentence without a list for a gray engine the record lists nothing for', async () => {
     answer({ ...referrerPolicy, lacks: {} });
-    render(<Implementations shortname="x" />);
+    render(<CardRow shortname="x" />);
     fireEvent.click(await screen.findByRole('button', { name: 'What\u2019s missing?' }));
     expect(screen.getByText('Firefox ships 3 of the 21 features at least two engines ship. It lacks:')).toBeTruthy();
     expect(document.querySelector('#impl-why ul')).toBeNull();
@@ -234,7 +234,7 @@ describe('Implementations', () => {
 
   it('shows no row when there is no data', async () => {
     answer(null);
-    const { container } = render(<Implementations shortname="x" />);
+    const { container } = render(<CardRow shortname="x" />);
     await waitFor(() => expect(sendMock).toHaveBeenCalledWith('get-implementations', { shortname: 'x' }));
     await new Promise((r) => setTimeout(r, 0));
     expect(container.innerHTML).toBe('');
@@ -249,5 +249,147 @@ describe('Radar', () => {
     const link = await screen.findByRole('link', { name: 'Editor\u2019s Draft' });
     expect(link.getAttribute('href')).toBe('https://w3c.github.io/battery/');
     expect(screen.getByRole('listitem').textContent).toBe('This TR is 15 months behind the Editor\u2019s Draft (2026-02-02).');
+  });
+});
+
+import type { MdnItem, MdnView } from '../src/logic/mdn.ts';
+
+describe('MDN button', () => {
+  const content = { commit: 'a'.repeat(40), date: '2026-10-18' };
+  const link = (title: string, slug: string) => ({ title, url: `https://developer.mozilla.org/docs/${slug}` });
+  const item = (title: string, slug: string, children: MdnItem[] = []): MdnItem => ({
+    ...link(title, slug),
+    children,
+    count: children.reduce((n, c) => n + 1 + c.count, 0),
+  });
+  const request = item('Request', 'Web/API/Request', [item('body property', 'Web/API/Request/body'), item('Request() constructor', 'Web/API/Request/Request')]);
+  const fetchView: MdnView = {
+    count: 6,
+    content,
+    overviews: [link('Fetch API', 'Web/API/Fetch_API')],
+    sections: [
+      { name: 'Interfaces', items: [item('Headers', 'Web/API/Headers'), request] },
+      { name: 'CSS properties', items: [item('`grid` CSS property', 'Web/CSS/grid')] },
+    ],
+  };
+  const many = (n: number) => Array.from({ length: n }, (_, i) => item(`Interface ${String(i).padStart(2, '0')}`, `Web/API/I${i}`));
+  const answerMdn = (mdn: MdnView | null, impl: unknown = null) =>
+    sendMock.mockImplementation(async (type: string) => (type === 'get-mdn' ? { mdn } : type === 'get-implementations' ? { impl } : {}));
+
+  it('shows the button at the right end of the row, even without browser-support data', async () => {
+    answerMdn(fetchView);
+    render(<CardRow shortname="fetch" />);
+    const button = await screen.findByRole('button', { name: '6 MDN articles' });
+    expect(button.textContent).toBe('6');
+    expect(button.getAttribute('title')).toBe('6 MDN articles');
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(button.getAttribute('aria-controls')).toBe('mdn-list');
+    expect(button.querySelector('svg path')!.getAttribute('fill')).toBe('currentColor');
+    expect(button.parentElement!.className).toBe('impl-row');
+    expect(document.querySelector('.impl')).toBeNull();
+  });
+
+  it("renders the list only once it's first opened: the overview, the sections, and the members", async () => {
+    answerMdn(fetchView);
+    render(<CardRow shortname="fetch" />);
+    const button = await screen.findByRole('button', { name: '6 MDN articles' });
+    const panel = document.getElementById('mdn-list')!;
+    expect(panel.hidden).toBe(true);
+    expect(panel.innerHTML).toBe('');
+    fireEvent.click(button);
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    expect(panel.hidden).toBe(false);
+    expect(screen.getByText('6 MDN articles', { selector: 'strong' })).toBeTruthy();
+    const overview = screen.getByRole('link', { name: 'Fetch API' });
+    expect(overview.getAttribute('href')).toBe('https://developer.mozilla.org/docs/Web/API/Fetch_API');
+    expect(overview.closest('p')!.textContent).toBe('Overview: Fetch API');
+    expect(screen.getByText('Interfaces (2)').closest('details')!.open).toBe(true);
+    expect(screen.getByText('grid', { selector: 'code' })).toBeTruthy();
+    expect(screen.queryByRole('searchbox')).toBeNull();
+    const toggle = screen.getByRole('button', { name: '2 articles under Request' });
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByRole('link', { name: 'body property' })).toBeNull();
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(document.getElementById(toggle.getAttribute('aria-controls')!)!.hidden).toBe(false);
+    expect(screen.getByRole('link', { name: 'body property' })).toBeTruthy();
+    const source = screen.getByRole('link', { name: 'MDN' });
+    expect(source.getAttribute('href')).toBe('https://github.com/mdn/content');
+    expect(source.closest('p')!.textContent).toBe('From MDN, as of 18 October 2026.');
+    fireEvent.click(button);
+    expect(panel.hidden).toBe(true);
+  });
+
+  it("shows one of the row's two panels at a time", async () => {
+    const impl = {
+      engines: ['webkit', 'blink'], basis: 'shared', core: 2, ships: { gecko: 0, webkit: 2, blink: 2 },
+      lacks: { gecko: { features: [{ key: 'api.A' }], more: 0 } }, bcd: { version: '8.1.6', timestamp: '2026-10-15T10:11:12.000Z' },
+    };
+    answerMdn(fetchView, impl);
+    render(<CardRow shortname="fetch" />);
+    const missing = await screen.findByRole('button', { name: 'What\u2019s missing?' });
+    const mdn = await screen.findByRole('button', { name: '6 MDN articles' });
+    fireEvent.click(missing);
+    expect(document.getElementById('impl-why')!.hidden).toBe(false);
+    fireEvent.click(mdn);
+    expect(document.getElementById('impl-why')!.hidden).toBe(true);
+    expect(missing.getAttribute('aria-expanded')).toBe('false');
+    expect(document.getElementById('mdn-list')!.hidden).toBe(false);
+    fireEvent.click(missing);
+    expect(document.getElementById('mdn-list')!.hidden).toBe(true);
+    expect(document.getElementById('impl-why')!.hidden).toBe(false);
+  });
+
+  it('starts the sections collapsed when the spec has more than 12 top-level articles', async () => {
+    answerMdn({ ...fetchView, count: 15, overviews: [link('Fetch API', 'Web/API/Fetch_API'), link('Streams API', 'Web/API/Streams_API')], sections: [{ name: 'Interfaces', items: many(13) }] });
+    render(<CardRow shortname="fetch" />);
+    fireEvent.click(await screen.findByRole('button', { name: '15 MDN articles' }));
+    expect(screen.getByText('Interfaces (13)').closest('details')!.open).toBe(false);
+    expect(screen.getByRole('link', { name: 'Fetch API' }).closest('p')!.textContent).toBe('Overviews: Fetch API, Streams API');
+  });
+
+  it('filters a list of more than 40 articles, and restores the sections when the filter is cleared', async () => {
+    answerMdn({ ...fetchView, count: 41, sections: [{ name: 'Interfaces', items: [...many(12), request] }] });
+    render(<CardRow shortname="fetch" />);
+    fireEvent.click(await screen.findByRole('button', { name: '41 MDN articles' }));
+    expect(screen.getByText('Interfaces (13)').closest('details')!.open).toBe(false);
+    const filter = screen.getByRole('searchbox', { name: 'Filter articles' });
+    expect(filter.getAttribute('placeholder')).toBe('Filter articles');
+    fireEvent.input(filter, { target: { value: 'body' } });
+    expect(screen.getByText('Interfaces (1)').closest('details')!.open).toBe(true);
+    expect(screen.getByRole('link', { name: 'body property' })).toBeTruthy();
+    expect(screen.queryByRole('link', { name: 'Interface 00' })).toBeNull();
+    const toggle = screen.getByRole('button', { name: '1 article under Request' }) as HTMLButtonElement;
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(toggle.disabled).toBe(true);
+    fireEvent.input(filter, { target: { value: 'zzz' } });
+    expect(screen.getByText('No articles match.')).toBeTruthy();
+    fireEvent.input(filter, { target: { value: '' } });
+    expect(screen.getByText('Interfaces (13)').closest('details')!.open).toBe(false);
+    expect(screen.queryByText('No articles match.')).toBeNull();
+  });
+
+  it("says when the list is the series' current level's, and counts one article as one", async () => {
+    answerMdn({
+      count: 1,
+      content,
+      overviews: [link('CSS display', 'Web/CSS/Guides/Display')],
+      sections: [],
+      fromSeries: { shortname: 'css-display-3', title: 'CSS Display Module Level 3' },
+    });
+    render(<CardRow shortname="css-display-4" />);
+    fireEvent.click(await screen.findByRole('button', { name: '1 MDN article' }));
+    expect(screen.getByText('This spec has no MDN articles of its own, so these are the ones for CSS Display Module Level 3.')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'CSS display' }).closest('p')!.textContent).toBe('Overview: CSS display');
+    expect(document.querySelector('#mdn-list details')).toBeNull();
+  });
+
+  it('shows no MDN button when the spec has no MDN articles', async () => {
+    const impl = { engines: ['gecko', 'webkit', 'blink'], basis: 'shared', core: 1, ships: { gecko: 1, webkit: 1, blink: 1 }, lacks: {}, bcd: { version: '8.1.6', timestamp: '2026-10-15T10:11:12.000Z' } };
+    answerMdn(null, impl);
+    render(<CardRow shortname="fetch" />);
+    await screen.findByAltText('Firefox: implements it');
+    expect(screen.queryByRole('button', { name: /MDN article/ })).toBeNull();
+    expect(document.getElementById('mdn-list')).toBeNull();
   });
 });

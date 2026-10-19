@@ -62,6 +62,15 @@ ul { margin: 0; padding-inline-start: 18px; }
 .impl-why { font-size: 12.5px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; }
 .impl-why ul { margin: 2px 0 6px; }
 .impl-why code { font: 11.5px ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+.mdn { display: inline-flex; align-items: center; gap: 4px; margin-inline-start: auto; font-size: 12.5px; }
+.mdn svg { display: block; width: 16px; height: 16px; color: var(--fg); }
+.mdn-list { font-size: 12.5px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; }
+.mdn-list p { margin: 0 0 6px; }
+.mdn-list ul { list-style: none; margin: 2px 0 4px; padding-inline-start: 12px; }
+.mdn-list details > ul { padding-inline-start: 4px; }
+.mdn-list .members { margin-inline-start: 4px; }
+.mdn-list code { font: 11.5px ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+.mdn-filter { box-sizing: border-box; width: 100%; margin: 0 0 6px; font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--fg); }
 .search { display: grid; gap: 4px; }
 .search label { font-weight: 600; }
 .search input { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--fg); }
