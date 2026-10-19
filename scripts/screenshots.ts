@@ -9,6 +9,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import type { Readable, Writable } from 'node:stream';
+import { URLS } from '../src/data/urls.ts';
 
 const chromePath = process.env.CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
@@ -36,11 +37,24 @@ const clockScript = (start: number) => `(() => {
   globalThis.Date = ShiftedDate;
 })();`;
 
+// The website that serves the browser-support, MDN, Can I Use, and test-results files may not be up yet, so the
+// background gets the build's own copies of those files instead: A fetch of any URL under the site's data/ reads the
+// file of the same name from the extension, and every other fetch goes through unchanged.
+const SITE_DATA = new URL('.', URLS.wpt).href;
+const dataScript = `(() => {
+  const site = ${JSON.stringify(SITE_DATA)};
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (input, init) => {
+    const url = String(input instanceof Request ? input.url : input);
+    return realFetch(url.startsWith(site) ? chrome.runtime.getURL('data/' + url.slice(site.length)) : input, init);
+  };
+})();`;
+
 type Target = { targetId: string; type: string; url: string };
 
 // Starts Chrome with the extension loaded and a tab at 1280x800, optionally with the extension on a shifted clock.
-// Auto-attach pauses each new worker before it runs anything, so the background's clock goes in first; the popup and
-// the side panel get theirs as a script for each new document, and then a reload.
+// Auto-attach pauses each new worker before it runs anything, so the background's data script and clock go in first;
+// the popup and the side panel get their clock as a script for each new document, and then a reload.
 async function launch(profile: string, clock?: number) {
   const chrome = spawn(chromePath, [
     '--remote-debugging-pipe', '--enable-unsafe-extension-debugging', `--user-data-dir=${join(work, profile)}`,
@@ -63,8 +77,9 @@ async function launch(profile: string, clock?: number) {
   const onAttached = async ({ sessionId, targetInfo, waitingForDebugger }: {
     sessionId: string; targetInfo: Target; waitingForDebugger: boolean;
   }) => {
-    if (clock !== undefined && targetInfo.type === 'service_worker') {
-      await cmd('Runtime.evaluate', { expression: clockScript(clock) }, sessionId);
+    if (targetInfo.type === 'service_worker') {
+      await cmd('Runtime.evaluate', { expression: dataScript }, sessionId);
+      if (clock !== undefined) await cmd('Runtime.evaluate', { expression: clockScript(clock) }, sessionId);
     }
     if (waitingForDebugger) await cmd('Runtime.runIfWaitingForDebugger', {}, sessionId);
   };
@@ -83,7 +98,7 @@ async function launch(profile: string, clock?: number) {
       else p.ok(msg.result);
     }
   });
-  if (clock !== undefined) await cmd('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
+  await cmd('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
 
   const targets = async (): Promise<Target[]> => (await cmd('Target.getTargets')).targetInfos;
   const attach = async (targetId: string): Promise<string> =>
@@ -156,12 +171,19 @@ async function launch(profile: string, clock?: number) {
       }
       await sleep(2500);
     };
+    // The footer warns when some live data couldn't be fetched, and a shot of stale data fails the run.
+    const failIfStale = async (session: string) => {
+      if (await evaluate(session, 'document.body.textContent.includes("couldn\u2019t be fetched")')) {
+        throw new Error('the footer warns that some live data couldn\u2019t be fetched');
+      }
+    };
     const openPopup = async () => {
       const opened = await evaluate(worker, 'chrome.action.openPopup().then(() => "ok", (e) => String(e))');
       if (opened !== 'ok') throw new Error(`openPopup: ${opened}`);
       const target = await findTarget(ours('/popup.html'));
       const session = await attach(target.targetId);
       await prepare(session);
+      await failIfStale(session);
       return { target, session };
     };
     // sidePanel.open() needs a user gesture, so the popup's button gets a real mouse click, rather than a script one.
@@ -179,6 +201,7 @@ async function launch(profile: string, clock?: number) {
       }
       const panel = await attach((await findTarget(ours('/sidepanel.html'))).targetId);
       await prepare(panel);
+      await failIfStale(panel);
       await sleep(500);
       const width: number = await evaluate(panel, 'innerWidth');
       await viewport(tab, 1280 - width);
