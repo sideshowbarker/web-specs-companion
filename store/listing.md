@@ -8,7 +8,7 @@ A companion for reading web specs and finding the groups and people behind them.
 **Description:**
 Web Specs Companion shows all that’s known about the page you’re on.
 
-On a spec from W3C, WHATWG, TC39, the IETF, Khronos, or elsewhere, it shows what’s known of the spec’s maturity, versions, repository and issue tracker, tests, and the group responsible for it. For a W3C spec, that includes the editor’s draft and TR versions, and the group’s chairs, team contacts, and charter end date.
+On any web spec, it shows what’s known of the spec’s maturity, versions, repository and issue tracker, tests, and the group responsible for it. For a W3C spec, that includes the editor’s draft and TR versions, and the group’s chairs, team contacts, and charter end date.
 
 It tells you when you’re reading a dated snapshot or an old level, and sums up the spec’s place in the web platform. And in W3C and WHATWG specs, it also shows how many other specs use each definition, and checks the spec’s links to other specs for anchors that no longer exist.
 
@@ -20,7 +20,7 @@ Type “spec” and a space in the address bar to search specs, groups, Web IDL 
 
 During TPAC 2026 (Dublin, 26–30 October), it shows what’s in session now and next, and when each group meets.
 
-Data comes from public sources: browser-specs, w3c/groups, webref, the W3C API, MDN’s browser-compat-data and articles, Can I Use, wpt.fyi, and the TPAC calendar.
+Data comes from public sources, including browser-specs, webref, MDN, Can I Use, and wpt.fyi.
 
 Web Specs Companion is a personal project. It isn’t affiliated with or endorsed by W3C.
 
