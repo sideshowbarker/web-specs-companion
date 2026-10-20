@@ -9,6 +9,7 @@ A browser extension for reading web specs. On any spec — from W3C, WHATWG, or
 - **wpt.fyi:** a button with the interop score of the spec’s web-platform-tests on [wpt.fyi](https://wpt.fyi/), which opens their pass rates in each browser, by test directory, and the tests that fail in only one browser.
 - **Spec intelligence from [webref](https://github.com/w3c/webref):** how many other specs use each definition (what [specdex](https://dontcallmedom.github.io/specdex/) shows, in the page you’re reading), the spec’s platform footprint, and a check of its links to other specs for anchors that no longer exist (one of [strudy](https://github.com/w3c/strudy)’s checks, run live).
 - **Search:** type `spec` and a space in the address bar to search specs, groups, Web IDL names ([webidlpedia](https://dontcallmedom.github.io/webidlpedia/)), and terms (ReSpec’s xref service).
+- **Copying steps:** a copy of an algorithm’s steps keeps each step’s number, as the spec shows it, with nested steps indented, ready to paste into a code comment.
 - **Extra details for W3C specs:** its TR versions and publication history, and its group’s chairs, team contacts, and charter end date.
 - **Version radar for W3C specs:** whether you’re reading a dated snapshot, whether a newer level exists, and how far the latest TR version lags the draft.
 - **On W3C repos and group pages:** for a W3C repo on GitHub, the group behind it and the specs it hosts; for a w3.org group page, the group’s specs.

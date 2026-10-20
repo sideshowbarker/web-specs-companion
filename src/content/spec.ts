@@ -5,6 +5,7 @@ import { send } from '../shared/messages.ts';
 import { getSettings, onSettingsChanged } from '../shared/settings.ts';
 import { extractSpecFacts, whenSpecReady } from './extract.ts';
 import { clearProblems, collectOutboundLinks, markProblems, revealLink } from './links.ts';
+import { copySteps } from './steps.ts';
 import { UsedByLayer } from './usedby.ts';
 
 let layer: UsedByLayer | undefined;
@@ -40,6 +41,9 @@ browser.runtime.onMessage.addListener((msg: { type?: string; i?: number }, _send
   }
   return false;
 });
+
+// A copy of steps gets their numbers on any page this runs on, whether or not it's a spec the extension knows.
+document.addEventListener('copy', copySteps);
 
 async function showUsedBy(shortname: string) {
   const { map, specdex } = await send('get-used-by', { shortname });
