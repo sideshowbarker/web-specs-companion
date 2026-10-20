@@ -77,11 +77,17 @@ function ordinal(item: Element): number {
   return n;
 }
 
-function markerOf(item: Element): Pick<Line, 'marker' | 'step'> {
+// A numbered step's own number, as its list shows it, without the period: '3', 'c', or 'iv'.
+export function stepNumber(item: Element): string | undefined {
   const type = listStyleType(item);
-  if (type === 'none') return { marker: '' };
-  if (BULLETS.has(type) || item.parentElement?.tagName !== 'OL') return { marker: '-' };
-  return { marker: `${(COUNTERS[type] ?? String)(ordinal(item))}.`, step: item };
+  if (type === 'none' || BULLETS.has(type) || item.parentElement?.tagName !== 'OL') return undefined;
+  return (COUNTERS[type] ?? String)(ordinal(item));
+}
+
+function markerOf(item: Element): Pick<Line, 'marker' | 'step'> {
+  if (listStyleType(item) === 'none') return { marker: '' };
+  const number = stepNumber(item);
+  return number === undefined ? { marker: '-' } : { marker: `${number}.`, step: item };
 }
 
 // The selection's text as lines, like the browser's own plain text for it but with each list item's marker. An item

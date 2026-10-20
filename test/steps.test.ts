@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect } from 'vitest';
-import { copySteps, stepsText } from '../src/content/steps.ts';
+import { copySteps, stepNumber, stepsText } from '../src/content/steps.ts';
 
 const ALGORITHM = `<ol>
   <li><p>Let <var>x</var> be
@@ -153,6 +153,14 @@ describe('stepsText', () => {
     expect(stepsText(range('One.', 'Two.'))).toBeUndefined();
     page('<p>Some prose.</p><p>More prose.</p>');
     expect(stepsText(range('Some', 'More prose.'))).toBeUndefined();
+  });
+});
+
+describe('stepNumber', () => {
+  it("gives a step's own number as its list shows it, and nothing for an item without one", () => {
+    page(`<style>ol ol { list-style-type: lower-alpha; }</style>${ALGORITHM}<ul><li>Bullet.</li></ul>`
+      + '<ol style="list-style-type: none"><li>Plain.</li></ol>');
+    expect(Array.from(document.querySelectorAll('li')).map((li) => stepNumber(li))).toEqual(['1', '2', 'a', 'b', '3', undefined, undefined]);
   });
 });
 
