@@ -270,6 +270,18 @@ try {
       popupOver('refs-page.png', `${name}-popup.png`, `${name}.png`);
     }
 
+    // The browser-support logos for a spec that Safari doesn't implement, with "What's missing?" open.
+    await b.go('https://w3c.github.io/requestidlecallback/');
+    await b.capture(b.tab, 'browser-support-page');
+    const support = await b.openPopup();
+    await b.waitFor(support.session, `!!document.querySelector('.impl button.why')`);
+    await b.evaluate(support.session, `document.querySelector('.impl button.why').click()`);
+    await sleep(1000);
+    await b.capture(support.session, 'browser-support-popup');
+    await b.cmd('Target.closeTarget', { targetId: support.target.targetId });
+    await sleep(500);
+    popupOver('browser-support-page.png', 'browser-support-popup.png', 'browser-support.png');
+
     // The definition counts in the Fetch standard, with the popover open for "fetch".
     await b.go('https://fetch.spec.whatwg.org/');
     await b.waitFor(b.tab, `!!document.querySelector('[data-wsc-usedby="concept-fetch"]')`);
@@ -310,8 +322,8 @@ try {
     await t.close();
   }
 
-  for (const name of ['card-editors-draft', 'used-by-counts', 'version-radar', 'github-repo', 'group-page', 'mdn-articles',
-    'caniuse-features', 'wpt-results', 'side-panel', 'tpac-now-and-next']) {
+  for (const name of ['card-editors-draft', 'used-by-counts', 'version-radar', 'github-repo', 'group-page',
+    'browser-support', 'mdn-articles', 'caniuse-features', 'wpt-results', 'side-panel', 'tpac-now-and-next']) {
     execFileSync('pngquant', ['--quality', '85-98', '--speed', '1', '--strip', '--force', '--output',
       `screenshots/${name}.png`, join(work, `${name}.png`)], { stdio: 'inherit' });
     console.log(`screenshots/${name}.png`);

@@ -24,7 +24,7 @@ Data comes from public sources, including browser-specs, webref, MDN, Can I Use,
 
 Web Specs Companion is a personal project. It isn’t affiliated with or endorsed by W3C.
 
-**Screenshots (1280×800):** All ten in screenshots/ go to Firefox Add-ons: card-editors-draft.png, used-by-counts.png, version-radar.png, mdn-articles.png, caniuse-features.png, wpt-results.png, github-repo.png, group-page.png, side-panel.png, tpac-now-and-next.png.
+**Screenshots (1280×800):** These ten in screenshots/ go to Firefox Add-ons: card-editors-draft.png, used-by-counts.png, version-radar.png, mdn-articles.png, caniuse-features.png, wpt-results.png, github-repo.png, group-page.png, side-panel.png, tpac-now-and-next.png.
 
 **Chrome Web Store screenshots (at most five):** card-editors-draft.png, version-radar.png, caniuse-features.png, side-panel.png, tpac-now-and-next.png.
 
