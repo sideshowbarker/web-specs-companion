@@ -10,6 +10,7 @@ import type { Context } from '../shared/types.ts';
 import { createHandlers } from './handlers.ts';
 import { omniboxTarget, suggestionFor } from './omnibox.ts';
 import { ensureAlarms, runAlarm } from './refresh.ts';
+import { ReviewStore } from './reviews.ts';
 import type { SearchItem } from '../logic/search.ts';
 import { TabStore } from './tabs.ts';
 
@@ -31,6 +32,15 @@ const tabs = new TabStore({
   remove: (key) => browser.storage.session.remove(key),
 });
 
+const reviews = new ReviewStore(
+  {
+    get: (key) => browser.storage.local.get(key),
+    set: (items) => browser.storage.local.set(items),
+    remove: (key) => browser.storage.local.remove(key),
+  },
+  Date.now,
+);
+
 function setBadge(tabId: number, ctx: Context) {
   const code = maturityFor(ctx);
   browser.action.setBadgeText({ tabId, text: code ?? '' }).catch(() => {});
@@ -43,7 +53,7 @@ const notify = (tabId: number) => {
   browser.runtime.sendMessage({ type: 'context-changed', tabId }).catch(() => {});
 };
 
-const handlers = createHandlers({ sources, http, tabs, now: Date.now, setBadge, notify });
+const handlers = createHandlers({ sources, http, tabs, reviews, now: Date.now, setBadge, notify });
 
 // Answer through sendResponse, and keep the channel open, which every engine supports.
 browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {

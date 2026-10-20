@@ -7,6 +7,7 @@ import { caniuseFeatures } from '../logic/caniuse.ts';
 import { buildUsedByMap, computeFootprint, specdexUrl } from '../logic/footprint.ts';
 import { isImplRecord } from '../logic/implementations.ts';
 import { mdnView } from '../logic/mdn.ts';
+import { isComment, type IssueTarget } from '../logic/review.ts';
 import { checkLinks, type TargetData } from '../logic/linkcheck.ts';
 import { computeRadar } from '../logic/radar.ts';
 import { fragmentOf } from '../shared/url.ts';
@@ -17,6 +18,7 @@ import { resolveContext } from '../logic/context.ts';
 import { wptMeta, wptSpec } from '../logic/wpt.ts';
 import type { Api, Message, MessageType } from '../shared/messages.ts';
 import type { Context } from '../shared/types.ts';
+import type { ReviewStore } from './reviews.ts';
 import type { TabStore } from './tabs.ts';
 
 export interface Indexes {
@@ -28,6 +30,7 @@ export interface HandlerDeps {
   sources: Sources;
   http: Http;
   tabs: TabStore;
+  reviews: ReviewStore;
   now: () => number;
   setBadge: (tabId: number, ctx: Context) => void | Promise<void>;
   /** Tells open panels that a tab's context changed after its URL did (page facts arrive later). */
@@ -63,6 +66,23 @@ export function createHandlers(deps: HandlerDeps) {
     const facts = state?.facts && state.facts.url.split('#')[0] === u.split('#')[0] ? state.facts : undefined;
     const { specs, groups } = await indexes();
     return resolveContext(u, facts, specs, groups);
+  }
+
+  async function specTitle(shortname: string): Promise<string> {
+    const { specs } = await indexes();
+    return specs.get(shortname)?.title ?? shortname;
+  }
+
+  // Where a spec's issues go: The repository browser-specs lists for it, or else the one its page links to. A
+  // repository that holds more than one series of specs (the CSSWG's) wants the spec's shortname before issue titles.
+  async function issueTarget(shortname: string, tabId?: number): Promise<IssueTarget | null> {
+    const { specs } = await indexes();
+    const nwoOf = (url?: string) => /^https:\/\/github\.com\/([^/]+\/[^/]+?)(?:\.git)?\/?$/.exec(url ?? '')?.[1];
+    let nwo = nwoOf(specs.get(shortname)?.nightly?.repository);
+    if (!nwo && tabId !== undefined) nwo = nwoOf((await contextFor(tabId))?.facts?.repoUrl);
+    if (!nwo) return null;
+    const series = new Set(specs.specsInRepo(nwo).map((s) => s.series.shortname));
+    return { repo: `https://github.com/${nwo}`, ...(series.size > 1 ? { prefix: `[${shortname}]` } : {}) };
   }
 
   const table: HandlerTable = {
@@ -191,6 +211,24 @@ export function createHandlers(deps: HandlerDeps) {
       if (!current || !series) return { wpt: null };
       return { wpt: { spec: series, ...meta, fromSeries: { shortname: current, title: specs.get(current)?.title ?? current } } };
     },
+    'get-review': async (msg, sender) => {
+      const [review, title, target] = await Promise.all([
+        deps.reviews.get(msg.shortname),
+        specTitle(msg.shortname),
+        issueTarget(msg.shortname, msg.tabId ?? sender.tab?.id),
+      ]);
+      return { review: review ?? null, title, target };
+    },
+    'save-comment': async (msg) => {
+      if (!isComment(msg.comment)) throw new Error('not a review comment');
+      return { review: await deps.reviews.save(msg.shortname, await specTitle(msg.shortname), msg.comment) };
+    },
+    'delete-comment': async (msg) => ({ review: (await deps.reviews.remove(msg.shortname, msg.id)) ?? null }),
+    'delete-review': async (msg) => {
+      await deps.reviews.clear(msg.shortname);
+      return { ok: true as const };
+    },
+    'mark-filed': async (msg) => ({ review: (await deps.reviews.markFiled(msg.shortname, msg.ids)) ?? null }),
     'check-links': async (msg) => {
       const index = await getWebrefIndex(deps.http, deps.now);
       const { specs } = await indexes();

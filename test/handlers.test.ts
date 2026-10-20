@@ -6,31 +6,7 @@ import type { Sources } from '../src/data/sources.ts';
 import { specs, groups, repos } from './fixtures/catalog.ts';
 import { parseIcs } from '../src/data/tpac.ts';
 import { readFileSync } from 'node:fs';
-
-export function fakeSession(): SessionArea {
-  const m = new Map<string, unknown>();
-  return {
-    async get(key) { return m.has(key) ? { [key]: m.get(key) } : {}; },
-    async set(items) { for (const [k, v] of Object.entries(items)) m.set(k, v); },
-    async remove(key) { m.delete(key); },
-  };
-}
-
-export function fakeSources(extra: Record<string, unknown> = {}): Sources {
-  const data: Record<string, unknown> = { specs, groups, repos, idlnames: {}, ...extra };
-  return { load: async (name: string) => ({ data: data[name], fetchedAt: 1, origin: 'bundled' }) } as unknown as Sources;
-}
-
-export function deps(over: Partial<HandlerDeps> = {}): HandlerDeps {
-  return {
-    sources: fakeSources(),
-    http: createHttp(new MemoryStore(), vi.fn(async () => new Response('', { status: 404 })), () => 0),
-    tabs: new TabStore(fakeSession()),
-    now: () => Date.UTC(2026, 9, 16),
-    setBadge: vi.fn(),
-    ...over,
-  };
-}
+import { deps, fakeSession, fakeSources } from './fixtures/background.ts';
 
 const sender = (id: number) => ({ tab: { id } }) as chrome.runtime.MessageSender;
 
@@ -294,5 +270,62 @@ describe('handlers', () => {
     expect(await createHandlers(deps({ sources: fakeSources({ wpt: noRuns }) })).handle({ type: 'get-wpt', shortname: 'fetch-metadata' }, sender(1))).toEqual({ wpt: null });
     const misfit = { runs: wptRuns, revision: '23b0b89b1a', date: '2026-10-18', specs: { 'fetch-metadata': { paths: ['fetch/metadata'] } } };
     expect(await createHandlers(deps({ sources: fakeSources({ wpt: misfit }) })).handle({ type: 'get-wpt', shortname: 'fetch-metadata' }, sender(1))).toEqual({ wpt: null });
+  });
+});
+
+describe('review messages', () => {
+  const none = {} as chrome.runtime.MessageSender;
+  const c = {
+    id: 'a', kind: 'comment', title: '', text: 'x', url: 'https://fetch.spec.whatwg.org/',
+    quote: { exact: 'x', prefix: '', suffix: '' }, excerpt: 'x', where: {}, position: 0, created: 1, updated: 1,
+  };
+
+  it("answers a spec's review with its title and where its issues go", async () => {
+    const h = createHandlers(deps());
+    expect(await h.handle({ type: 'get-review', shortname: 'fetch' }, none)).toEqual({
+      review: null, title: 'Fetch Standard', target: { repo: 'https://github.com/whatwg/fetch' },
+    });
+    await h.handle({ type: 'save-comment', shortname: 'fetch', comment: c }, none);
+    expect(await h.handle({ type: 'get-review', shortname: 'fetch' }, none)).toMatchObject({
+      review: { shortname: 'fetch', title: 'Fetch Standard', comments: [c] },
+    });
+  });
+
+  it("puts the shortname in front of an issue's title for a repository of more than one spec series", async () => {
+    const grid = specs.find((s) => s.shortname === 'css-grid-3')!;
+    const flexbox = { ...grid, shortname: 'css-flexbox-1', series: { shortname: 'css-flexbox', currentSpecification: 'css-flexbox-1' } };
+    const h = createHandlers(deps({ sources: fakeSources({ specs: [...specs, flexbox] }) }));
+    expect(((await h.handle({ type: 'get-review', shortname: 'css-grid-3' }, none)) as { target: unknown }).target).toEqual({
+      repo: 'https://github.com/w3c/csswg-drafts', prefix: '[css-grid-3]',
+    });
+    expect(((await h.handle({ type: 'get-review', shortname: 'css-grid-2' }, none)) as { target: unknown }).target).toEqual({
+      repo: 'https://github.com/w3c/csswg-drafts', prefix: '[css-grid-2]',
+    });
+    const solo = createHandlers(deps());
+    expect(((await solo.handle({ type: 'get-review', shortname: 'css-grid-3' }, none)) as { target: unknown }).target).toEqual({
+      repo: 'https://github.com/w3c/csswg-drafts',
+    });
+  });
+
+  it('falls back to the repository the page links to, for a spec browser-specs gives none', async () => {
+    const fetch = specs.find((s) => s.shortname === 'fetch')!;
+    const bare = { ...fetch, shortname: 'bare', url: 'https://example.org/bare/', nightly: { url: 'https://example.org/bare/', alternateUrls: [] } };
+    const h = createHandlers(deps({ sources: fakeSources({ specs: [...specs, bare] }) }));
+    await h.handle({ type: 'page-facts', facts: { kind: 'spec', url: 'https://example.org/bare/', repoUrl: 'https://github.com/example/bare' } }, sender(5));
+    expect(await h.handle({ type: 'get-review', shortname: 'bare', tabId: 5 }, none)).toMatchObject({ target: { repo: 'https://github.com/example/bare' } });
+    expect(await h.handle({ type: 'get-review', shortname: 'bare' }, none)).toMatchObject({ target: null });
+  });
+
+  it('refuses a comment of the wrong shape, and deletes comments and reviews', async () => {
+    const h = createHandlers(deps());
+    await expect(h.handle({ type: 'save-comment', shortname: 'fetch', comment: { ...c, kind: 'blocker' } }, none)).rejects.toThrow('not a review comment');
+    await h.handle({ type: 'save-comment', shortname: 'fetch', comment: c }, none);
+    await h.handle({ type: 'save-comment', shortname: 'fetch', comment: { ...c, id: 'b' } }, none);
+    expect(await h.handle({ type: 'mark-filed', shortname: 'fetch', ids: ['b'] }, none)).toMatchObject({
+      review: { comments: [{ id: 'a' }, { id: 'b', filed: Date.UTC(2026, 9, 21) }] },
+    });
+    expect(await h.handle({ type: 'delete-comment', shortname: 'fetch', id: 'a' }, none)).toMatchObject({ review: { comments: [{ id: 'b' }] } });
+    expect(await h.handle({ type: 'delete-review', shortname: 'fetch' }, none)).toEqual({ ok: true });
+    expect(await h.handle({ type: 'get-review', shortname: 'fetch' }, none)).toMatchObject({ review: null });
   });
 });

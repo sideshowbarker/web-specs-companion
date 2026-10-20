@@ -5,6 +5,7 @@ import type { CiuAnswer } from '../logic/caniuse.ts';
 import type { Footprint, UsedByEntry } from '../logic/footprint.ts';
 import type { ImplView } from '../logic/implementations.ts';
 import type { MdnView } from '../logic/mdn.ts';
+import type { IssueTarget, Review, ReviewComment } from '../logic/review.ts';
 import type { LinkCheckResult } from '../logic/linkcheck.ts';
 import type { Radar } from '../logic/radar.ts';
 import type { SearchItem } from '../logic/search.ts';
@@ -27,6 +28,11 @@ export interface Api {
   'get-wpt': { req: { shortname: string }; res: { wpt: WptAnswer | null } };
   'get-used-by': { req: { shortname: string }; res: { map: Record<string, UsedByEntry> | null; specdex: string } };
   'check-links': { req: { shortname: string; links: OutLink[] }; res: LinkCheckResult };
+  'get-review': { req: { shortname: string; tabId?: number }; res: { review: Review | null; title: string; target: IssueTarget | null } };
+  'save-comment': { req: { shortname: string; comment: ReviewComment }; res: { review: Review } };
+  'delete-comment': { req: { shortname: string; id: string }; res: { review: Review | null } };
+  'delete-review': { req: { shortname: string }; res: { ok: true } };
+  'mark-filed': { req: { shortname: string; ids: string[] }; res: { review: Review | null } };
   'get-freshness': { req: Record<string, never>; res: { sources: { name: string; fetchedAt: number; origin: Loaded<unknown>['origin'] }[] } };
 }
 
