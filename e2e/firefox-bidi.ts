@@ -1,6 +1,8 @@
 // Installs dist/ in Firefox through WebDriver BiDi's webExtension.install (the command the WebExtensions spec's
 // WebDriver section mirrors), then loads a Bikeshed spec and a live ReSpec draft, and waits for the in-page "used by"
-// counts on each, which exercises the manifest, both content scripts, the background, and the live webref fetches.
+// counts on each, which exercises the manifest, both content scripts, the background, and the live webref fetches. Back
+// on Fetch, it then comments on one of the spec's steps, through the page's own Comment button and editor, and waits
+// for that comment's highlight.
 import { spawn } from 'node:child_process';
 import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -69,6 +71,44 @@ try {
     if (count === 0) throw new Error(`no used-by counts appeared on ${url}`);
     console.log(`ok: ${count} used-by counts on ${url}`);
   }
+
+  const until = async (expression: string, failure: string) => {
+    for (let i = 0; i < 30; i++) {
+      const r = await cmd('script.evaluate', { expression, target: { context }, awaitPromise: false });
+      if (r.result?.value === true) return;
+      await sleep(1000);
+    }
+    throw new Error(failure);
+  };
+  const fetchUrl = 'https://fetch.spec.whatwg.org/';
+  await cmd('browsingContext.navigate', { context, url: fetchUrl, wait: 'complete' });
+  await until("document.querySelectorAll('[data-wsc-usedby]').length > 0", `no used-by counts appeared on ${fetchUrl}`);
+  // The selection is made again on each try, since the page script may start listening for it only after the first.
+  await until(`(() => {
+    const p = document.querySelector('div.algorithm ol > li p');
+    if (!p) return false;
+    const r = document.createRange();
+    r.selectNodeContents(p);
+    getSelection().removeAllRanges();
+    getSelection().addRange(r);
+    document.dispatchEvent(new Event('selectionchange'));
+    const host = document.querySelector('[data-wsc-review="button"]');
+    const button = host?.shadowRoot?.querySelector('button');
+    if (!button || host.hidden) return false;
+    button.click();
+    return true;
+  })()`, `no Comment button appeared on ${fetchUrl}`);
+  await until(`(() => {
+    const editor = document.querySelector('[data-wsc-review="editor"]')?.shadowRoot;
+    if (!editor) return false;
+    const text = editor.querySelector('textarea');
+    text.value = 'e2e';
+    text.dispatchEvent(new Event('input'));
+    [...editor.querySelectorAll('button')].find((b) => b.textContent === 'Save').click();
+    return true;
+  })()`, `no comment editor opened on ${fetchUrl}`);
+  await until("CSS.highlights.has('wsc-review-comment')", `no comment highlight appeared on ${fetchUrl}`);
+  console.log(`ok: a comment's highlight on ${fetchUrl}`);
 } finally {
   ws.close();
   ff.kill();

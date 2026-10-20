@@ -10,6 +10,7 @@ A browser extension for reading web specs. On any spec — from W3C, WHATWG, or
 - **Spec intelligence from [webref](https://github.com/w3c/webref):** how many other specs use each definition (what [specdex](https://dontcallmedom.github.io/specdex/) shows, in the page you’re reading), the spec’s platform footprint, and a check of its links to other specs for anchors that no longer exist (one of [strudy](https://github.com/w3c/strudy)’s checks, run live).
 - **Search:** type `spec` and a space in the address bar to search specs, groups, Web IDL names ([webidlpedia](https://dontcallmedom.github.io/webidlpedia/)), and terms (ReSpec’s xref service).
 - **Copying steps:** a copy of an algorithm’s steps keeps each step’s number, as the spec shows it, with nested steps indented, ready to paste into a code comment.
+- **Reviewing a spec:** select text in a spec and comment on it. Each comment keeps its quote, the section and step it’s in, and a link that lands on the quoted words. It stays highlighted in the page and listed in the popup and side panel, and files as a GitHub issue against the spec’s repository, which the list then marks with the day it was filed. Or file the whole review as one issue, or copy it as Markdown.
 - **Extra details for W3C specs:** its TR versions and publication history, and its group’s chairs, team contacts, and charter end date.
 - **Version radar for W3C specs:** whether you’re reading a dated snapshot, whether a newer level exists, and how far the latest TR version lags the draft.
 - **On W3C repos and group pages:** for a W3C repo on GitHub, the group behind it and the specs it hosts; for a w3.org group page, the group’s specs.
@@ -115,7 +116,6 @@ The extension collects nothing and sends nothing about you anywhere. It reads th
 
 Some ideas for what comes next:
 
-- **Reviewing a spec:** comments on selected text in a spec, each filed as a GitHub issue against the spec’s repository, with its quote, the section and step it’s in, and a link to the quoted words — or the whole review filed as one issue, or copied as Markdown, as Martin Thomson’s [spec-comment](https://github.com/martinthomson/spec-comment) extension does.
 - **The standards body on the card:** the name and logo of the body each spec comes from, beside the group responsible for it.
 - **From MDN to the spec:** on an MDN page, the card for the spec it documents, with the spec’s group and standards body.
 - **Definition counts in the specs themselves:** Bikeshed and ReSpec could list the other specs that use each definition right in their own definition panels, from webref’s data ([speced/bikeshed#3155](https://github.com/speced/bikeshed/issues/3155), [speced/respec#5435](https://github.com/speced/respec/issues/5435)). The extension’s counts would then matter only for specs built some other way.

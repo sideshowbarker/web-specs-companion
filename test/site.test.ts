@@ -64,7 +64,7 @@ describe('renderMarkdown', () => {
   it('renders the privacy policy', async () => {
     const html = renderMarkdown(await read('store/privacy.md'));
     expect(html).toMatch(/<h1[^>]*>Privacy<\/h1>/);
-    expect(html.match(/<li>/g)).toHaveLength(4);
+    expect(html.match(/<li>/g)).toHaveLength(5);
   });
 });
 
