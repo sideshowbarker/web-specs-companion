@@ -53,6 +53,6 @@ Web Specs Companion is a personal project. It isn’t affiliated with or endorse
 
 **App icon (1024×1024):** store/app-icon-1024.png.
 
-**Screenshots (16:10, at 1280×800, 1440×900, 2560×1600, or 2880×1800; 1 to 10):** Taken in Safari.
+**Screenshots (16:10, 1 to 10):** These five, at 2880×1800 and taken in Safari, in this order: store/app-store-screenshots/card-editors-draft.png, version-radar.png, used-by-counts.png, caniuse-features.png, github-repo.png.
 
 **Bundle ID:** net.sideshowbarker.WebSpecsCompanion
