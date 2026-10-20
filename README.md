@@ -1,18 +1,20 @@
 # Web Specs Companion
 
-A browser extension for reading web specs and finding the groups and people behind them. Wherever you are — a spec, a W3C GitHub repo, a w3.org group page — it shows a detailed “cheatsheet” of info for all that’s known about it:
+A browser extension for reading web specs. On any spec — from W3C, WHATWG, or another standards body — it shows a detailed “cheatsheet” of all that’s known about it:
 
-- **The card:** the spec’s maturity, its editor’s draft and TR versions, its repository and issues, its tests, and the group responsible for it — with the group’s chairs, team contacts, and charter end date.
-- **The version radar:** whether you’re reading a dated snapshot, whether a newer level exists, and how far the latest TR version lags the draft.
+- **The card:** the spec’s type (Living Standard, Editor’s Draft, Working Draft, Candidate Recommendation, etc.), related drafts, its repository and issues, its tests, and the group responsible for it.
 - **Browser support:** Firefox, Safari, and Chrome logos, each in color when that browser’s engine implements the spec and gray when it doesn’t, going by MDN’s [browser-compat-data](https://github.com/mdn/browser-compat-data). For a gray one, **What’s missing?** lists the features it lacks.
 - **MDN:** a button with the number of the spec’s [MDN](https://developer.mozilla.org/) articles, which opens them, grouped by kind: interfaces, CSS properties, and more.
 - **Can I Use:** a button with the number of the spec’s [Can I Use](https://caniuse.com/) features, which opens each one’s global support, and a timeline of when Firefox, Safari, and Chrome shipped it.
 - **wpt.fyi:** a button with the interop score of the spec’s web-platform-tests on [wpt.fyi](https://wpt.fyi/), which opens their pass rates in each browser, by test directory, and the tests that fail in only one browser.
 - **Spec intelligence from [webref](https://github.com/w3c/webref):** how many other specs use each definition (what [specdex](https://dontcallmedom.github.io/specdex/) shows, in the page you’re reading), the spec’s platform footprint, and a check of its links to other specs for anchors that no longer exist (one of [strudy](https://github.com/w3c/strudy)’s checks, run live).
 - **Search:** type `spec` and a space in the address bar to search specs, groups, Web IDL names ([webidlpedia](https://dontcallmedom.github.io/webidlpedia/)), and terms (ReSpec’s xref service).
+- **Extra details for W3C specs:** its TR versions and publication history, and its group’s chairs, team contacts, and charter end date.
+- **Version radar for W3C specs:** whether you’re reading a dated snapshot, whether a newer level exists, and how far the latest TR version lags the draft.
+- **On W3C repos and group pages:** for a W3C repo on GitHub, the group behind it and the specs it hosts; for a w3.org group page, the group’s specs.
 - **TPAC 2026:** what’s in session now and next, and when each group meets.
 
-Web Specs Companion is a personal project. It isn’t affiliated with or endorsed by W3C.
+Web Specs Companion isn’t formally affiliated with or endorsed by W3C, WHATWG, or any other standards body.
 
 ## Screenshots
 

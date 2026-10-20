@@ -71,9 +71,12 @@ describe('renderMarkdown', () => {
 describe('the site', () => {
   const values = { version: '1.2.3', zip: 'https://example.test/web-specs-companion-1.2.3.zip' };
 
-  it('says it is a personal project, and claims no W3C copyright or trademark', async () => {
+  it('disclaims any formal affiliation, and claims no W3C copyright or trademark', async () => {
     const page = fillTemplate(await read('site/index.html'), values, every[0]);
-    expect(page).toContain('<p class="disclaimer">Web Specs Companion is a personal project. It isn\u2019t affiliated with or endorsed by W3C.</p>');
+    expect(page).toContain(
+      '<p class="disclaimer">Web Specs Companion isn\u2019t formally affiliated with or endorsed by W3C, WHATWG, or any ' +
+        'other standards body.</p>',
+    );
     expect(page).not.toMatch(/World Wide Web Consortium|trademark/);
   });
 
