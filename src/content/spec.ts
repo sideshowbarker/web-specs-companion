@@ -50,6 +50,14 @@ browser.runtime.onMessage.addListener((msg: { type?: string; i?: number; id?: st
     sendResponse({ missing: review?.missing() ?? [] });
     return false;
   }
+  if (msg.type === 'open-comment-editor') {
+    sendResponse({ ok: review?.openEditor() ?? false });
+    return false;
+  }
+  if (msg.type === 'edit-comment' && typeof msg.id === 'string') {
+    sendResponse({ ok: review?.edit(msg.id) ?? false });
+    return false;
+  }
   return false;
 });
 
@@ -64,8 +72,8 @@ async function showUsedBy(shortname: string) {
 }
 
 // The spec's review: Its comments' highlights, following the review as it changes in storage.
-function startReview(shortname: string) {
-  review = new ReviewLayer(document, { shortname });
+function startReview(shortname: string, button: boolean) {
+  review = new ReviewLayer(document, { shortname, button });
   review.start().catch((err) => console.debug('web-specs-companion:', err));
   const key = `review:${shortname}`;
   browser.storage.onChanged.addListener((changes, area) => {
@@ -86,9 +94,11 @@ async function main() {
   const { shortname } = await send('page-facts', { facts });
   currentShortname = shortname;
   if (!shortname) return;
-  startReview(shortname);
-  if ((await getSettings()).usedBy) await showUsedBy(shortname);
+  const settings = await getSettings();
+  startReview(shortname, settings.reviewButton);
+  if (settings.usedBy) await showUsedBy(shortname);
   onSettingsChanged((s) => {
+    review?.setButton(s.reviewButton);
     if (s.usedBy) showUsedBy(shortname).catch(() => {});
     else hideUsedBy();
   });

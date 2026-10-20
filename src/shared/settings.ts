@@ -1,8 +1,10 @@
 export interface Settings {
   usedBy: boolean;
+  // Whether selecting text in a spec shows a Comment button.
+  reviewButton: boolean;
 }
 
-export const DEFAULT_SETTINGS: Settings = { usedBy: true };
+export const DEFAULT_SETTINGS: Settings = { usedBy: true, reviewButton: true };
 
 export async function getSettings(): Promise<Settings> {
   const stored = (await browser.storage.local.get('settings')).settings as Partial<Settings> | undefined;

@@ -141,6 +141,12 @@
       "suggested_key": {
         "default": "Alt+Shift+W"
       }
+    },
+    "comment-on-selection": {
+      "suggested_key": {
+        "default": "Alt+Shift+C"
+      },
+      "description": "__MSG_commentCommand__"
     }
   },
   "browser_specific_settings": {

@@ -6,6 +6,7 @@ import '../shared/browser.ts';
 import { CacheApiStore, createHttp } from '../data/http.ts';
 import { createSources } from '../data/sources.ts';
 import { badgeColor, maturityFor } from '../logic/maturity.ts';
+import { sendToTab } from '../shared/messages.ts';
 import type { Context } from '../shared/types.ts';
 import { createHandlers } from './handlers.ts';
 import { omniboxTarget, suggestionFor } from './omnibox.ts';
@@ -89,6 +90,16 @@ if (browser.omnibox) {
     });
   });
 }
+
+// The keyboard command goes to the page script in the tab, which opens the comment editor for the selection there.
+browser.commands?.onCommand.addListener((command, tab) => {
+  if (command !== 'comment-on-selection') return;
+  const open = (tabId?: number) => {
+    if (tabId !== undefined) sendToTab(tabId, 'open-comment-editor', {}).catch(() => {});
+  };
+  if (tab?.id !== undefined) open(tab.id);
+  else browser.tabs.query({ active: true, currentWindow: true }).then(([t]) => open(t?.id), () => {});
+});
 
 // Alarms schedule the data refreshes. The WebExtensions WG is specifying this API: w3c/webextensions PR #1110.
 browser.runtime.onInstalled.addListener(() => {

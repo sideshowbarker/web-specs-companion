@@ -43,3 +43,11 @@ describe('the manifest icons', () => {
     }
   });
 });
+
+describe('the comment command', () => {
+  it('is declared with its suggested key and a localized description', () => {
+    const manifest = JSON.parse(readFileSync('static/manifest.json', 'utf8'));
+    expect(manifest.commands['comment-on-selection']).toEqual({ suggested_key: { default: 'Alt+Shift+C' }, description: '__MSG_commentCommand__' });
+    expect(JSON.parse(readFileSync('static/_locales/en/messages.json', 'utf8')).commentCommand).toEqual({ message: 'Comment on the selected text' });
+  });
+});

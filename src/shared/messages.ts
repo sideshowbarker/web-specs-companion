@@ -54,6 +54,8 @@ export interface TabApi {
   'clear-link-check': { req: Record<string, never>; res: { ok: boolean } };
   'show-comment': { req: { id: string }; res: { ok: boolean } };
   'review-status': { req: Record<string, never>; res: { missing: string[] } };
+  'open-comment-editor': { req: Record<string, never>; res: { ok: boolean } };
+  'edit-comment': { req: { id: string }; res: { ok: boolean } };
 }
 export type TabMessage = { [K in keyof TabApi]: { type: K } & TabApi[K]['req'] }[keyof TabApi];
 
