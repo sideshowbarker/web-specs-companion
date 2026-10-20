@@ -229,6 +229,8 @@ export function createHandlers(deps: HandlerDeps) {
       return { ok: true as const };
     },
     'mark-filed': async (msg) => ({ review: (await deps.reviews.markFiled(msg.shortname, msg.ids)) ?? null }),
+    // The page placed its review; the popup and side panel hear the same message, and ask the page what it found.
+    'review-placed': async () => ({ ok: true as const }),
     'check-links': async (msg) => {
       const index = await getWebrefIndex(deps.http, deps.now);
       const { specs } = await indexes();

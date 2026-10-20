@@ -28,7 +28,9 @@ export function SpecCard({ ctx, tabId, slots }: { ctx: Context; tabId: number; s
       </ul>
       {ctx.groups.map((g) => <GroupBlock key={g.identifier} group={g} slots={slots[g.name]} />)}
       {ctx.spec && <Footprint shortname={ctx.spec.shortname} pageKind={ctx.pageKind} pageRevision={ctx.facts?.revision} />}
-      {ctx.spec && ctx.facts?.kind === 'spec' && <SpecTools tabId={tabId} />}
+      {ctx.spec && ctx.facts?.kind === 'spec' && (
+        <SpecTools tabId={tabId} shortname={ctx.spec.shortname} url={ctx.url} />
+      )}
     </section>
   );
 }

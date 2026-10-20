@@ -3,10 +3,17 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { cleanup, render, screen, waitFor, fireEvent } from '@testing-library/preact';
 import { specs, groups } from './fixtures/catalog.ts';
 
-vi.mock('../src/ui/api.ts', () => ({ send: vi.fn(), sendToTab: vi.fn(), open: vi.fn(), activeTab: vi.fn() }));
-vi.mock('../src/shared/settings.ts', () => ({ getSettings: vi.fn(async () => ({ usedBy: true })), setSettings: vi.fn(async () => {}) }));
+vi.mock('../src/ui/api.ts', () => ({
+  send: vi.fn(), sendToTab: vi.fn(), open: vi.fn(), activeTab: vi.fn(),
+  copyText: vi.fn(async () => {}), navigate: vi.fn(), onReviewChanged: vi.fn(() => () => {}), onReviewPlaced: vi.fn(() => () => {}),
+}));
+vi.mock('../src/shared/settings.ts', () => ({ getSettings: vi.fn(async () => ({ usedBy: true, reviewButton: true })), setSettings: vi.fn(async () => {}) }));
 
-import { send } from '../src/ui/api.ts';
+import { copyText, navigate, onReviewPlaced, open, send, sendToTab } from '../src/ui/api.ts';
+import { setSettings } from '../src/shared/settings.ts';
+import { commentMarkdown, issueLink, issueTitle, quoteLink, reviewMarkdown, type ReviewComment } from '../src/logic/review.ts';
+import { ReviewBlock } from '../src/ui/components/Review.tsx';
+import { SpecTools } from '../src/ui/components/SpecTools.tsx';
 import { SpecCard } from '../src/ui/components/SpecCard.tsx';
 import { GroupBlock } from '../src/ui/components/GroupBlock.tsx';
 import { Radar } from '../src/ui/components/Radar.tsx';
@@ -701,5 +708,115 @@ describe('the popup with no page to show', () => {
   it('labels its search box for web specs', () => {
     render(<Search />);
     expect(screen.getByLabelText('Search web specs')).toBeTruthy();
+  });
+});
+
+describe('Review', () => {
+  const FETCH = 'https://fetch.spec.whatwg.org/';
+  const target = { repo: 'https://github.com/whatwg/fetch' };
+  const where = { section: { number: '4.2', title: 'Main fetch' }, step: '5.2' };
+  const c = (id: string, over: Partial<ReviewComment> = {}): ReviewComment => ({
+    id, kind: 'comment', title: '', text: `Text ${id}.`, url: FETCH, quote: { exact: 'q', prefix: '', suffix: '' },
+    excerpt: 'q', where, position: 0, created: 1, updated: 1, ...over,
+  });
+  const fetchReview = (comments: ReviewComment[]) => ({ shortname: 'fetch', title: 'Fetch Standard', comments });
+  const toTab = sendToTab as unknown as ReturnType<typeof vi.fn>;
+
+  function answer(comments: ReviewComment[], missing: string[] = []) {
+    sendMock.mockImplementation(async (type: string) =>
+      type === 'get-review'
+        ? { review: comments.length ? fetchReview(comments) : null, title: 'Fetch Standard', target }
+        : { review: null, ok: true });
+    toTab.mockReset();
+    toTab.mockImplementation(async (_tab: number, type: string) => (type === 'review-status' ? { missing } : { ok: true }));
+  }
+
+  const block = (url = FETCH) => render(<ReviewBlock tabId={1} shortname="fetch" url={url} />);
+
+  it('says how to start a review when there is none', async () => {
+    answer([]);
+    block();
+    await screen.findByText('Select text in the spec, and choose Comment to start a review.');
+    expect(screen.getByRole('heading', { name: 'Your review' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Copy review' })).toBeNull();
+  });
+
+  it('lists the comments, major issues first, with where each is and what became of it', async () => {
+    // Half past midnight on 21 October where the test runs, which is 20 October in UTC east of Greenwich.
+    const filed = new Date(2026, 9, 21, 0, 30).getTime();
+    answer([c('a', { kind: 'nit', title: 'Typo' }), c('b', { kind: 'major', filed }), c('m', { text: 'Gone.' })], ['m']);
+    block();
+    await screen.findByRole('heading', { name: 'Your review: 3 comments' });
+    const items = screen.getAllByRole('listitem').map((li) => li.textContent ?? '');
+    expect(items[0]).toContain('Major issue');
+    expect(items[0]).toContain('Text b.');
+    expect(items[0]).toContain('4.2. Main fetch, step 5.2');
+    expect(items[0]).toContain('Filed as an issue on 21 October 2026');
+    expect(items[1]).toContain('Not found in this version of the page');
+    expect(items[2]).toContain('Typo');
+  });
+
+  it('asks the page again once it has placed its review, and when the tab moves to another page', async () => {
+    answer([c('m')]);
+    const { rerender } = block();
+    await screen.findByRole('heading', { name: 'Your review: 1 comment' });
+    expect(screen.queryByText('Not found in this version of the page')).toBeNull();
+    answer([c('m')], ['m']);
+    const placed = (onReviewPlaced as unknown as ReturnType<typeof vi.fn>).mock.calls.at(-1)![1] as () => void;
+    placed();
+    await screen.findByText('Not found in this version of the page');
+    answer([c('m', { url: `${FETCH}other.html` })]);
+    rerender(<ReviewBlock tabId={1} shortname="fetch" url={`${FETCH}other.html`} />);
+    await waitFor(() => expect(screen.queryByText('Not found in this version of the page')).toBeNull());
+    expect(screen.getByRole('button', { name: /^Edit the comment on/ })).toBeTruthy();
+  });
+
+  it('shows a comment in the page, or opens the page it was made on', async () => {
+    const other = c('o', { url: 'https://fetch.spec.whatwg.org/other.html' });
+    answer([c('a'), other]);
+    block(`${FETCH}#main-fetch`);
+    const shows = await screen.findAllByRole('button', { name: /^Show the comment on/ });
+    fireEvent.click(shows[0]);
+    expect(toTab).toHaveBeenCalledWith(1, 'show-comment', { id: 'a' });
+    fireEvent.click(shows[1]);
+    expect(navigate).toHaveBeenCalledWith(1, quoteLink(other));
+    expect(screen.getAllByRole('button', { name: /^Edit the comment on/ })).toHaveLength(1);
+  });
+
+  it('copies the review as Markdown', async () => {
+    answer([c('a')]);
+    block();
+    fireEvent.click(await screen.findByRole('button', { name: 'Copy review' }));
+    await waitFor(() => expect(copyText).toHaveBeenCalledWith(reviewMarkdown(fetchReview([c('a')]))));
+    await screen.findByText('Copied the review.');
+  });
+
+  it('files a comment, and the whole review, as new issues', async () => {
+    answer([c('a'), c('b')]);
+    block();
+    fireEvent.click((await screen.findAllByRole('button', { name: /^File the comment on/ }))[0]);
+    expect(open).toHaveBeenCalledWith(issueLink(target, issueTitle(c('a'), target, 'Fetch Standard'), commentMarkdown(c('a'), 'Fetch Standard')).url);
+    await waitFor(() => expect(sendMock).toHaveBeenCalledWith('mark-filed', { shortname: 'fetch', ids: ['a'] }));
+    fireEvent.click(screen.getByRole('button', { name: 'File review as one issue' }));
+    expect(open).toHaveBeenLastCalledWith(issueLink(target, 'Review of Fetch Standard', reviewMarkdown(fetchReview([c('a'), c('b')]))).url);
+    await waitFor(() => expect(sendMock).toHaveBeenCalledWith('mark-filed', { shortname: 'fetch', ids: ['a', 'b'] }));
+  });
+
+  it('asks before deleting the whole review', async () => {
+    answer([c('a'), c('b')]);
+    block();
+    fireEvent.click(await screen.findByRole('button', { name: 'Delete review' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Keep them' }));
+    expect(sendMock).not.toHaveBeenCalledWith('delete-review', expect.anything());
+    fireEvent.click(screen.getByRole('button', { name: 'Delete review' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete all 2 comments' }));
+    await waitFor(() => expect(sendMock).toHaveBeenCalledWith('delete-review', { shortname: 'fetch' }));
+  });
+
+  it('turns the Comment button off', async () => {
+    answer([]);
+    render(<SpecTools tabId={1} shortname="fetch" url={FETCH} />);
+    fireEvent.click(await screen.findByRole('checkbox', { name: 'Show a Comment button beside text you select' }));
+    await waitFor(() => expect(setSettings).toHaveBeenCalledWith({ reviewButton: false }));
   });
 });

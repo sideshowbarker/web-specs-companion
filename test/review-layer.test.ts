@@ -9,10 +9,11 @@ import { fakeSession } from './fixtures/background.ts';
 import { range } from './fixtures/ranges.ts';
 
 // The page script's messages go to the real handlers, over a review store this file can read.
-const state = vi.hoisted(() => ({ reviews: undefined as unknown }));
+const state = vi.hoisted(() => ({ reviews: undefined as unknown, sent: [] as string[] }));
 vi.mock('../src/shared/messages.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../src/shared/messages.ts')>()),
   send: async (type: string, req: object) => {
+    state.sent.push(type);
     const { createHandlers } = await import('../src/background/handlers.ts');
     const { deps } = await import('./fixtures/background.ts');
     return createHandlers(deps({ reviews: state.reviews as ReviewStore })).handle({ type, ...req }, {} as chrome.runtime.MessageSender);
@@ -47,6 +48,7 @@ function commentOn(r: Range, over: Partial<ReviewComment> = {}): ReviewComment {
 beforeEach(() => {
   store = new ReviewStore(fakeSession(), () => 7);
   state.reviews = store;
+  state.sent = [];
   highlights = new Map();
   Object.defineProperty(window, 'CSS', { value: { highlights }, configurable: true });
   Object.defineProperty(window, 'Highlight', { value: FakeHighlight, configurable: true });
@@ -294,5 +296,13 @@ describe('ReviewLayer: big and changing pages', () => {
     buttonNamed(inside('editor'), 'Save').click();
     await vi.waitFor(async () => expect(await savedComments()).toHaveLength(2));
     expect((await savedComments())[1].quote.exact).toBe('extra.');
+  });
+});
+
+describe('ReviewLayer: the side panel', () => {
+  it('tells the side panel each time it has placed the review', async () => {
+    layer = new ReviewLayer(document, { shortname: 'fetch' });
+    await layer.start();
+    await vi.waitFor(() => expect(state.sent).toContain('review-placed'));
   });
 });

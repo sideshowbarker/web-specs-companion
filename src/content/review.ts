@@ -185,6 +185,8 @@ export class ReviewLayer {
         else this.notFound.push(c.id);
       }
     }
+    // The side panel asks again which comments were found, once the page has placed them.
+    send('review-placed', {}).catch(() => {});
     const api = this.api();
     if (!api) return;
     this.addStyle();

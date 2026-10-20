@@ -33,6 +33,7 @@ export interface Api {
   'delete-comment': { req: { shortname: string; id: string }; res: { review: Review | null } };
   'delete-review': { req: { shortname: string }; res: { ok: true } };
   'mark-filed': { req: { shortname: string; ids: string[] }; res: { review: Review | null } };
+  'review-placed': { req: Record<string, never>; res: { ok: true } };
   'get-freshness': { req: Record<string, never>; res: { sources: { name: string; fetchedAt: number; origin: Loaded<unknown>['origin'] }[] } };
 }
 

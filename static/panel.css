@@ -16,6 +16,11 @@
   --ciu-a: #e0b72a;
   --ciu-n: #d9534f;
   --ciu-u: #adb5bd;
+  --review-chip-fg: #ffffff;
+  --review-major: #b91c26;
+  --review-minor: #7d5600;
+  --review-comment: #0757b8;
+  --review-nit: #57606a;
   font: 14px/1.45 "Noto Sans", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -34,6 +39,11 @@
     --ciu-a: #d4a72c;
     --ciu-n: #f85149;
     --ciu-u: #6e7781;
+    --review-chip-fg: #11161c;
+    --review-major: #f85149;
+    --review-minor: #d4a72c;
+    --review-comment: #58a6ff;
+    --review-nit: #8b949e;
   }
 }
 html, body { margin: 0; background: var(--bg); color: var(--fg); }
@@ -147,3 +157,14 @@ button.linkish { border: 0; padding: 0; text-decoration: underline; }
 .events { list-style: none; padding: 0; display: grid; gap: 4px; }
 .empty { color: var(--muted); }
 footer { border-top: 1px solid var(--line); padding-top: 8px; display: grid; gap: 6px; }
+.review { margin-top: 12px; display: grid; gap: 6px; }
+.review ol.comments { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.review ol.comments > li { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; }
+.review p { margin: 0 0 2px; }
+.review .kind { display: inline-block; color: var(--review-chip-fg); font: 700 11px/1 system-ui, sans-serif; padding: 3px 6px; border-radius: 3px; }
+.review .kind-major { background: var(--review-major); }
+.review .kind-minor { background: var(--review-minor); }
+.review .kind-comment { background: var(--review-comment); }
+.review .kind-nit { background: var(--review-nit); }
+.review-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.review-actions button { padding: 2px 8px; font-size: 12.5px; }
