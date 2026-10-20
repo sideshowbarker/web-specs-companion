@@ -52,6 +52,8 @@ export interface TabApi {
   'run-link-check': { req: Record<string, never>; res: LinkCheckResult };
   'reveal-link': { req: { i: number }; res: { ok: boolean } };
   'clear-link-check': { req: Record<string, never>; res: { ok: boolean } };
+  'show-comment': { req: { id: string }; res: { ok: boolean } };
+  'review-status': { req: Record<string, never>; res: { missing: string[] } };
 }
 export type TabMessage = { [K in keyof TabApi]: { type: K } & TabApi[K]['req'] }[keyof TabApi];
 

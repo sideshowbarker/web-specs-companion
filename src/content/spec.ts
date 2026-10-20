@@ -1,18 +1,21 @@
 // Runs on spec pages at document_idle in the isolated world, as declared by the manifest's run_at and world keys:
 // https://w3c.github.io/webextensions/specification/#key-run_at
 import '../shared/browser.ts';
+import { isReview } from '../logic/review.ts';
 import { send } from '../shared/messages.ts';
 import { getSettings, onSettingsChanged } from '../shared/settings.ts';
 import { extractSpecFacts, whenSpecReady } from './extract.ts';
 import { clearProblems, collectOutboundLinks, markProblems, revealLink } from './links.ts';
+import { ReviewLayer } from './review.ts';
 import { copySteps } from './steps.ts';
 import { UsedByLayer } from './usedby.ts';
 
 let layer: UsedByLayer | undefined;
+let review: ReviewLayer | undefined;
 let currentShortname: string | undefined;
 let linkElements: HTMLAnchorElement[] = [];
 
-browser.runtime.onMessage.addListener((msg: { type?: string; i?: number }, _sender, sendResponse) => {
+browser.runtime.onMessage.addListener((msg: { type?: string; i?: number; id?: string }, _sender, sendResponse) => {
   if (msg.type === 'run-link-check') {
     if (!currentShortname) {
       sendResponse({ error: 'This page isn\u2019t a spec the extension knows.' });
@@ -39,6 +42,14 @@ browser.runtime.onMessage.addListener((msg: { type?: string; i?: number }, _send
     sendResponse({ ok: true });
     return false;
   }
+  if (msg.type === 'show-comment' && typeof msg.id === 'string') {
+    sendResponse({ ok: review?.show(msg.id) ?? false });
+    return false;
+  }
+  if (msg.type === 'review-status') {
+    sendResponse({ missing: review?.missing() ?? [] });
+    return false;
+  }
   return false;
 });
 
@@ -52,6 +63,18 @@ async function showUsedBy(shortname: string) {
   await layer.render();
 }
 
+// The spec's review: Its comments' highlights, following the review as it changes in storage.
+function startReview(shortname: string) {
+  review = new ReviewLayer(document, { shortname });
+  review.start().catch((err) => console.debug('web-specs-companion:', err));
+  const key = `review:${shortname}`;
+  browser.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'local' || !changes[key]) return;
+    const value = changes[key].newValue;
+    review?.update(isReview(value) ? value : null);
+  });
+}
+
 function hideUsedBy() {
   layer?.clear();
   layer = undefined;
@@ -63,6 +86,7 @@ async function main() {
   const { shortname } = await send('page-facts', { facts });
   currentShortname = shortname;
   if (!shortname) return;
+  startReview(shortname);
   if ((await getSettings()).usedBy) await showUsedBy(shortname);
   onSettingsChanged((s) => {
     if (s.usedBy) showUsedBy(shortname).catch(() => {});
