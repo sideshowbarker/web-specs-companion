@@ -181,8 +181,11 @@ async function launch(profile: string, clock?: number) {
         throw new Error('the footer warns that some live data couldn\u2019t be fetched');
       }
     };
+    // The popup opens in the profile's window by its ID, since with no ID it opens only in a window that has focus.
     const openPopup = async () => {
-      const opened = await evaluate(worker, 'chrome.action.openPopup().then(() => "ok", (e) => String(e))');
+      const opened = await evaluate(worker, `chrome.windows.getAll({ windowTypes: ['normal'] })
+        .then(([w]) => chrome.action.openPopup({ windowId: w.id }))
+        .then(() => "ok", (e) => String(e))`);
       if (opened !== 'ok') throw new Error(`openPopup: ${opened}`);
       const target = await findTarget(ours('/popup.html'));
       const session = await attach(target.targetId);
