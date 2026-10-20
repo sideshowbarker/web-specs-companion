@@ -3,7 +3,7 @@ import { mkdir } from 'node:fs/promises';
 
 // Renders the extension icons in static/icons/, the Firefox Add-ons listing icon, the App Store's app icons, and the
 // Chrome Web Store's small promo tile from the maintainer's GitHub avatar, whole and unaltered except for its size:
-// assets/avatar.png, and for the 1024px app icons, assets/avatar.svg, a trace of it in its own flat colors. Needs
+// assets/avatar.png, and for the 1024px icons, assets/avatar.svg, a trace of it in its own flat colors. Needs
 // ImageMagick (magick), and for the tile's text, the Arial fonts that macOS installs.
 
 const SOURCE = 'assets/avatar.png';
@@ -48,6 +48,13 @@ magick([
   '-size', '1024x1024', 'xc:white', 'png:-', '-gravity', 'center', '-composite', '-alpha', 'off', '-strip',
   'PNG24:store/app-icon-ios-1024.png',
 ], vector);
+
+// The extension's own 1024px icon is the trace filling the whole square: Safari's packager makes the Mac app's icon
+// from it, and sets it on the rounded square that macOS gives every app icon.
+magick([
+  '-background', 'none', '-density', '192', VECTOR, '-filter', 'Lanczos', '-resize', '1024x1024', '-strip',
+  'PNG32:static/icons/1024.png',
+]);
 
 // The tile puts the avatar on a white disc, since on bare W3C Blue its dark outlines and strokes all but vanish, with
 // the name and the tagline beside it.

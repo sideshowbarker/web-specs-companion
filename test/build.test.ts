@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { fillManifest } from '../scripts/build.ts';
 
 const template = {
@@ -28,5 +29,17 @@ describe('fillManifest', () => {
 
   it('throws when the template has no github.js content script', () => {
     expect(() => fillManifest({ version: '0', content_scripts: [] }, '1', ['w3c'])).toThrow(/github\.js/);
+  });
+});
+
+// Safari's packager makes the Mac app's icon from the largest icon the manifest lists, so a 1024px one keeps it sharp.
+describe('the manifest icons', () => {
+  it('include a 1024px icon, and each is a PNG of the size it is listed at', () => {
+    const icons = Object.entries(JSON.parse(readFileSync('static/manifest.json', 'utf8')).icons as Record<string, string>);
+    expect(icons.map(([size]) => size)).toContain('1024');
+    for (const [size, path] of icons) {
+      const png = readFileSync(`static/${path}`);
+      expect([path, png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([path, Number(size), Number(size)]);
+    }
   });
 });
