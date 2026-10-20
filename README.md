@@ -32,16 +32,11 @@ More: [what Safari lacks of requestIdleCallback()](screenshots/browser-support.p
 
 The [Web Specs Companion website](https://sideshowbarker.net/web-specs-companion/) has these steps too, with the steps for your browser first.
 
-Web Specs Companion isn’t in the Chrome Web Store or on Firefox Add-ons yet. Until it is, install it from the [latest release](https://github.com/sideshowbarker/web-specs-companion/releases/latest). It needs Chrome or Edge 148 or later, Firefox 128 or later, or Safari 26 or later.
+Chrome and other Chromium-based browsers install Web Specs Companion from the [Chrome Web Store](https://chromewebstore.google.com/detail/hpajpmapkffhaiggemaeajpkehfnapkm). It isn’t on Firefox Add-ons yet, so Firefox installs it from the [latest release](https://github.com/sideshowbarker/web-specs-companion/releases/latest), as Safari does. It needs Chrome or Edge 148 or later, Firefox 128 or later, or Safari 26 or later.
 
 ### Chrome, Edge, and other Chromium-based browsers
 
-1. Download `web-specs-companion-<version>.zip` from the latest release, and unzip it into a folder it can stay in — the browser loads the extension from that folder every time it starts.
-2. Open `chrome://extensions` (`edge://extensions` in Edge, `brave://extensions` in Brave).
-3. Turn on **Developer mode**.
-4. Click **Load unpacked**, and select the unzipped folder.
-
-To update it, unzip a newer release into the same folder, and click the reload button on the extension’s card.
+[Add it to Chrome](https://chromewebstore.google.com/detail/hpajpmapkffhaiggemaeajpkehfnapkm). The Chrome Web Store installs it, and keeps it up to date. Edge, Brave, and other Chromium-based browsers install it from there too — Edge first asks you to allow extensions from other stores.
 
 ### Firefox
 
@@ -52,7 +47,7 @@ The `.xpi` is the file Firefox Add-ons signed and serves for that version, so it
 
 ### Safari
 
-Safari 26 or later can run Web Specs Companion as a temporary extension, from the same zip as Chrome. Safari removes a temporary extension when it quits, and after 24 hours, so add it again whenever it’s gone. Safari has no address-bar keywords or side panels for extensions, so the `spec` keyword and **Keep this open beside the page** aren’t there.
+Safari 26 or later can run Web Specs Companion as a temporary extension, from the zip in the latest release. Safari removes a temporary extension when it quits, and after 24 hours, so add it again whenever it’s gone. Safari has no address-bar keywords or side panels for extensions, so the `spec` keyword and **Keep this open beside the page** aren’t there.
 
 Once, in Safari, choose **Safari** → **Settings…**, select **Advanced**, and turn on **Show features for web developers**. Then, each time:
 
