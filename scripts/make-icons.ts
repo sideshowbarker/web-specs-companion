@@ -1,11 +1,13 @@
 import { execFileSync } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 
-// Renders the extension icons in static/icons/, the Firefox Add-ons listing icon, and the Chrome Web Store's small
-// promo tile from assets/avatar.png, the maintainer's GitHub avatar, whole and unaltered except for its size. Needs
+// Renders the extension icons in static/icons/, the Firefox Add-ons listing icon, the App Store's app icons, and the
+// Chrome Web Store's small promo tile from the maintainer's GitHub avatar, whole and unaltered except for its size:
+// assets/avatar.png, and for the 1024px app icons, assets/avatar.svg, a trace of it in its own flat colors. Needs
 // ImageMagick (magick), and for the tile's text, the Arial fonts that macOS installs.
 
 const SOURCE = 'assets/avatar.png';
+const VECTOR = 'assets/avatar.svg';
 const BLUE = '#005a9c';
 const BOLD = '/System/Library/Fonts/Supplemental/Arial Bold.ttf';
 const REGULAR = '/System/Library/Fonts/Supplemental/Arial.ttf';
@@ -31,6 +33,21 @@ for (const [size, padding] of [[16, 0], [32, 0], [48, 0], [128, 16]]) {
 // The Firefox Add-ons listing icon fills the whole 128px square, without the padding: AMO doesn't ask for it, and it
 // would make the avatar look small beside other add-ons' icons.
 magick(['png:-', '-filter', 'Lanczos', '-resize', '128x128', '-strip', 'PNG32:store/amo-icon-128.png'], square);
+
+// The App Store's 1024px app icons come from the trace, since the 230px avatar blurs at that size. Each puts the whole
+// avatar in the middle 824px, as Apple's macOS icon grid does: the Mac one on transparency, and the iOS one on white,
+// since an iOS app icon can't have an alpha channel.
+const vector = magick([
+  '-background', 'none', '-density', '192', VECTOR, '-filter', 'Lanczos', '-resize', '824x824', 'PNG32:-',
+]);
+magick([
+  '-size', '1024x1024', 'xc:none', 'png:-', '-gravity', 'center', '-composite', '-strip',
+  'PNG32:store/app-icon-1024.png',
+], vector);
+magick([
+  '-size', '1024x1024', 'xc:white', 'png:-', '-gravity', 'center', '-composite', '-alpha', 'off', '-strip',
+  'PNG24:store/app-icon-ios-1024.png',
+], vector);
 
 // The tile puts the avatar on a white disc, since on bare W3C Blue its dark outlines and strokes all but vanish, with
 // the name and the tagline beside it.
