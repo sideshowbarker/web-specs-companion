@@ -48,6 +48,12 @@ export class SpecIndex {
         add(s.series.nightlyUrl, 'ed');
       }
       add(s.url, s.release && normalizeSpecUrl(s.release.url) === normalizeSpecUrl(s.url) ? 'tr' : 'ed');
+      // browser-specs lists the pages of a multipage spec but not its one-page version, which HTML and EcmaScript each
+      // publish in the folder above them.
+      if (s.nightly?.url.endsWith('/multipage/')) add(s.nightly.url.slice(0, -'multipage/'.length), 'ed');
+      // For an RFC, browser-specs gives rfc-editor.org's info page, and the RFC itself is beside it, as HTML or text.
+      const rfc = /^https:\/\/www\.rfc-editor\.org\/info\/(rfc\d+)\/?$/.exec(s.url)?.[1];
+      for (const ext of rfc ? ['', '.html', '.txt'] : []) add(`https://www.rfc-editor.org/rfc/${rfc}${ext}`, 'ed');
       if (s.nightly?.pages?.length) {
         this.multipageRoots.push({ prefix: normalizeSpecUrl(s.nightly.url), entry: { spec: s, kind: 'ed' } });
       }

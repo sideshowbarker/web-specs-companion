@@ -30,7 +30,20 @@ describe('SpecIndex.lookup', () => {
   it('matches every page of a multipage spec, listed or not', () => {
     expect(si.lookup('https://html.spec.whatwg.org/multipage/parsing.html#tokenization')?.spec.shortname).toBe('html');
     expect(si.lookup('https://html.spec.whatwg.org/multipage/dom.html')?.spec.shortname).toBe('html');
-    expect(si.lookup('https://html.spec.whatwg.org/')?.spec.shortname).toBe('html');
+  });
+
+  it('matches the one-page version of a multipage spec, which browser-specs leaves out', () => {
+    expect(si.lookup('https://html.spec.whatwg.org/#the-a-element')).toMatchObject({ spec: { shortname: 'html' }, pageKind: 'ed' });
+    expect(si.lookup('https://tc39.es/ecma262/')).toMatchObject({ spec: { shortname: 'ecmascript' }, pageKind: 'ed' });
+    expect(si.lookup('https://tc39.es/ecma262/multipage/scope.html')?.spec.shortname).toBe('ecmascript');
+  });
+
+  it("matches an RFC's text on rfc-editor.org, beside the info page browser-specs gives", () => {
+    expect(si.lookup('https://www.rfc-editor.org/info/rfc9110/')?.spec.shortname).toBe('rfc9110');
+    expect(si.lookup('https://www.rfc-editor.org/rfc/rfc9110')?.spec.shortname).toBe('rfc9110');
+    expect(si.lookup('https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.1')?.spec.shortname).toBe('rfc9110');
+    expect(si.lookup('https://www.rfc-editor.org/rfc/rfc9110.txt')?.spec.shortname).toBe('rfc9110');
+    expect(si.lookup('https://www.rfc-editor.org/rfc/rfc9111')).toBeUndefined();
   });
 
   it('resolves former names and returns nothing for unknown pages', () => {
