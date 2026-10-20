@@ -1,6 +1,6 @@
 # App Store listing — Web Specs Companion for Mac
 
-The Mac app that App Store Connect’s Safari Web Extension Packager makes from the release zip. It differs from the other stores’ listing (listing.md) in what Safari lacks: There’s no side panel and no address-bar keyword, so the description mentions neither.
+The Mac app that npm run mac-app builds and uploads, as the README’s Releasing section says. It differs from the other stores’ listing (listing.md) in what Safari lacks: There’s no side panel and no address-bar keyword, so the description mentions neither.
 
 App Store Connect spreads the listing over several pages. Each section below is one of them, in the order of the app’s sidebar, and has the fields in the order the page shows them.
 
@@ -47,7 +47,7 @@ Apple already indexes the words in the app’s name, so the keywords don’t rep
 
 **Copyright:** 2026 and the developer’s legal name.
 
-**Build:** The one the packager uploads. It shows up here once App Store Connect has processed it.
+**Build:** The one that npm run mac-app -- --upload sends. It shows up here once App Store Connect has processed it.
 
 **App Review Information:** Sign-in required stays unchecked, and the contact information is the developer’s name, phone number, and email. The notes: No sign-in needed. Turn the extension on in Safari’s Settings → Extensions, open https://www.w3.org/TR/css-anchor-position-1/, and click the extension’s button in the toolbar.
 
@@ -87,4 +87,4 @@ Under Monetization.
 
 ## Not on any page
 
-**App icon:** App Store Connect takes a Mac app’s icon from the build, which the packager makes from the manifest’s largest icon, static/icons/1024.png. store/app-icon-1024.png is the avatar on Apple’s macOS icon grid, for an app built in Xcode instead.
+**App icon:** App Store Connect takes a Mac app’s icon from the build, and Safari’s packager, in npm run mac-app, makes it from the manifest’s largest icon, static/icons/1024.png. store/app-icon-1024.png is the avatar on Apple’s macOS icon grid, for an icon set made by hand instead.

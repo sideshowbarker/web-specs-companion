@@ -13,6 +13,7 @@
     "snapshot": "node scripts/snapshot.ts",
     "icons": "node scripts/make-icons.ts",
     "package": "node scripts/package.ts",
+    "mac-app": "npm run build && node scripts/mac-app.ts",
     "screenshots": "npm run build && node scripts/screenshots.ts",
     "site": "node scripts/site.ts",
     "test": "vitest run",

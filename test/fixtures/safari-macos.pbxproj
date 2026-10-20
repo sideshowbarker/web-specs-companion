@@ -1,0 +1,621 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 110;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		270139B73087337400C1D0B2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270139B63087337400C1D0B2 /* AppDelegate.swift */; };
+		270139BB3087337400C1D0B2 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 270139B93087337400C1D0B2 /* Main.html */; };
+		270139BD3087337400C1D0B2 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 270139BC3087337400C1D0B2 /* Icon.png */; };
+		270139BF3087337400C1D0B2 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 270139BE3087337400C1D0B2 /* Style.css */; };
+		270139C13087337400C1D0B2 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 270139C03087337400C1D0B2 /* Script.js */; };
+		270139C33087337400C1D0B2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270139C23087337400C1D0B2 /* ViewController.swift */; };
+		270139C63087337400C1D0B2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 270139C43087337400C1D0B2 /* Main.storyboard */; };
+		270139C83087337500C1D0B2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 270139C73087337500C1D0B2 /* Assets.xcassets */; };
+		270139CF3087337600C1D0B2 /* Web Specs Companion Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 270139CE3087337600C1D0B2 /* Web Specs Companion Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		270139D43087337600C1D0B2 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270139D33087337600C1D0B2 /* SafariWebExtensionHandler.swift */; };
+		270139EC3087337600C1D0B2 /* respec-main.js in Resources */ = {isa = PBXBuildFile; fileRef = 270139E03087337600C1D0B2 /* respec-main.js */; };
+		270139ED3087337600C1D0B2 /* spec.js in Resources */ = {isa = PBXBuildFile; fileRef = 270139E13087337600C1D0B2 /* spec.js */; };
+		270139EE3087337600C1D0B2 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 270139E23087337600C1D0B2 /* background.js */; };
+		270139EF3087337600C1D0B2 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 270139E33087337600C1D0B2 /* popup.html */; };
+		270139F03087337600C1D0B2 /* panel.js in Resources */ = {isa = PBXBuildFile; fileRef = 270139E43087337600C1D0B2 /* panel.js */; };
+		270139F13087337600C1D0B2 /* github.js in Resources */ = {isa = PBXBuildFile; fileRef = 270139E53087337600C1D0B2 /* github.js */; };
+		270139F23087337600C1D0B2 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 270139E63087337600C1D0B2 /* icons */; };
+		270139F33087337600C1D0B2 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 270139E73087337600C1D0B2 /* manifest.json */; };
+		270139F43087337600C1D0B2 /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = 270139E83087337600C1D0B2 /* _locales */; };
+		270139F53087337600C1D0B2 /* sidepanel.html in Resources */ = {isa = PBXBuildFile; fileRef = 270139E93087337600C1D0B2 /* sidepanel.html */; };
+		270139F63087337600C1D0B2 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 270139EA3087337600C1D0B2 /* data */; };
+		270139F73087337600C1D0B2 /* panel.css in Resources */ = {isa = PBXBuildFile; fileRef = 270139EB3087337600C1D0B2 /* panel.css */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		270139D03087337600C1D0B2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 270139AB3087337400C1D0B2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 270139CD3087337600C1D0B2;
+			remoteInfo = "Web Specs Companion Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		270139DB3087337600C1D0B2 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				270139CF3087337600C1D0B2 /* Web Specs Companion Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		270139B33087337400C1D0B2 /* Web Specs Companion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Web Specs Companion.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		270139B63087337400C1D0B2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		270139BA3087337400C1D0B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		270139BC3087337400C1D0B2 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		270139BE3087337400C1D0B2 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		270139C03087337400C1D0B2 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		270139C23087337400C1D0B2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		270139C53087337400C1D0B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		270139C73087337500C1D0B2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		270139C93087337500C1D0B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		270139CE3087337600C1D0B2 /* Web Specs Companion Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Web Specs Companion Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		270139D33087337600C1D0B2 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		270139D53087337600C1D0B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		270139E03087337600C1D0B2 /* respec-main.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "respec-main.js"; path = "Resources/respec-main.js"; sourceTree = "<group>"; };
+		270139E13087337600C1D0B2 /* spec.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = spec.js; path = Resources/spec.js; sourceTree = "<group>"; };
+		270139E23087337600C1D0B2 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = Resources/background.js; sourceTree = "<group>"; };
+		270139E33087337600C1D0B2 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
+		270139E43087337600C1D0B2 /* panel.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = panel.js; path = Resources/panel.js; sourceTree = "<group>"; };
+		270139E53087337600C1D0B2 /* github.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = github.js; path = Resources/github.js; sourceTree = "<group>"; };
+		270139E63087337600C1D0B2 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = Resources/icons; sourceTree = "<group>"; };
+		270139E73087337600C1D0B2 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+		270139E83087337600C1D0B2 /* _locales */ = {isa = PBXFileReference; lastKnownFileType = folder; name = _locales; path = Resources/_locales; sourceTree = "<group>"; };
+		270139E93087337600C1D0B2 /* sidepanel.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = sidepanel.html; path = Resources/sidepanel.html; sourceTree = "<group>"; };
+		270139EA3087337600C1D0B2 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = Resources/data; sourceTree = "<group>"; };
+		270139EB3087337600C1D0B2 /* panel.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = panel.css; path = Resources/panel.css; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		270139B03087337400C1D0B2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		270139CB3087337600C1D0B2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		270139AA3087337400C1D0B2 = {
+			isa = PBXGroup;
+			children = (
+				270139B53087337400C1D0B2 /* Web Specs Companion */,
+				270139D23087337600C1D0B2 /* Web Specs Companion Extension */,
+				270139B43087337400C1D0B2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		270139B43087337400C1D0B2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				270139B33087337400C1D0B2 /* Web Specs Companion.app */,
+				270139CE3087337600C1D0B2 /* Web Specs Companion Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		270139B53087337400C1D0B2 /* Web Specs Companion */ = {
+			isa = PBXGroup;
+			children = (
+				270139B63087337400C1D0B2 /* AppDelegate.swift */,
+				270139C23087337400C1D0B2 /* ViewController.swift */,
+				270139C43087337400C1D0B2 /* Main.storyboard */,
+				270139C73087337500C1D0B2 /* Assets.xcassets */,
+				270139C93087337500C1D0B2 /* Info.plist */,
+				270139B83087337400C1D0B2 /* Resources */,
+			);
+			path = "Web Specs Companion";
+			sourceTree = "<group>";
+		};
+		270139B83087337400C1D0B2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				270139B93087337400C1D0B2 /* Main.html */,
+				270139BC3087337400C1D0B2 /* Icon.png */,
+				270139BE3087337400C1D0B2 /* Style.css */,
+				270139C03087337400C1D0B2 /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		270139D23087337600C1D0B2 /* Web Specs Companion Extension */ = {
+			isa = PBXGroup;
+			children = (
+				270139DF3087337600C1D0B2 /* Resources */,
+				270139D33087337600C1D0B2 /* SafariWebExtensionHandler.swift */,
+				270139D53087337600C1D0B2 /* Info.plist */,
+			);
+			path = "Web Specs Companion Extension";
+			sourceTree = "<group>";
+		};
+		270139DF3087337600C1D0B2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				270139E03087337600C1D0B2 /* respec-main.js */,
+				270139E13087337600C1D0B2 /* spec.js */,
+				270139E23087337600C1D0B2 /* background.js */,
+				270139E33087337600C1D0B2 /* popup.html */,
+				270139E43087337600C1D0B2 /* panel.js */,
+				270139E53087337600C1D0B2 /* github.js */,
+				270139E63087337600C1D0B2 /* icons */,
+				270139E73087337600C1D0B2 /* manifest.json */,
+				270139E83087337600C1D0B2 /* _locales */,
+				270139E93087337600C1D0B2 /* sidepanel.html */,
+				270139EA3087337600C1D0B2 /* data */,
+				270139EB3087337600C1D0B2 /* panel.css */,
+			);
+			name = Resources;
+			path = "Web Specs Companion Extension";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		270139B23087337400C1D0B2 /* Web Specs Companion */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 270139DC3087337600C1D0B2 /* Build configuration list for PBXNativeTarget "Web Specs Companion" */;
+			buildPhases = (
+				270139AF3087337400C1D0B2 /* Sources */,
+				270139B03087337400C1D0B2 /* Frameworks */,
+				270139B13087337400C1D0B2 /* Resources */,
+				270139DB3087337600C1D0B2 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				270139D13087337600C1D0B2 /* PBXTargetDependency */,
+			);
+			name = "Web Specs Companion";
+			productName = "Web Specs Companion";
+			productReference = 270139B33087337400C1D0B2 /* Web Specs Companion.app */;
+			productType = "com.apple.product-type.application";
+		};
+		270139CD3087337600C1D0B2 /* Web Specs Companion Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 270139D83087337600C1D0B2 /* Build configuration list for PBXNativeTarget "Web Specs Companion Extension" */;
+			buildPhases = (
+				270139CA3087337600C1D0B2 /* Sources */,
+				270139CB3087337600C1D0B2 /* Frameworks */,
+				270139CC3087337600C1D0B2 /* Resources */,
+			);
+			buildRules = (
+			);
+			name = "Web Specs Companion Extension";
+			productName = "Web Specs Companion Extension";
+			productReference = 270139CE3087337600C1D0B2 /* Web Specs Companion Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		270139AB3087337400C1D0B2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2710;
+				LastUpgradeCheck = 2710;
+				TargetAttributes = {
+					270139B23087337400C1D0B2 = {
+						CreatedOnToolsVersion = 27.1;
+					};
+					270139CD3087337600C1D0B2 = {
+						CreatedOnToolsVersion = 27.1;
+					};
+				};
+			};
+			buildConfigurationList = 270139AE3087337400C1D0B2 /* Build configuration list for PBXProject "Web Specs Companion" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 270139AA3087337400C1D0B2;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 270139B43087337400C1D0B2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				270139B23087337400C1D0B2 /* Web Specs Companion */,
+				270139CD3087337600C1D0B2 /* Web Specs Companion Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		270139B13087337400C1D0B2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+				270139BD3087337400C1D0B2 /* Icon.png in Resources */,
+				270139C63087337400C1D0B2 /* Main.storyboard in Resources */,
+				270139C13087337400C1D0B2 /* Script.js in Resources */,
+				270139BB3087337400C1D0B2 /* Main.html in Resources */,
+				270139C83087337500C1D0B2 /* Assets.xcassets in Resources */,
+				270139BF3087337400C1D0B2 /* Style.css in Resources */,
+			);
+		};
+		270139CC3087337600C1D0B2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+				270139F43087337600C1D0B2 /* _locales in Resources */,
+				270139EC3087337600C1D0B2 /* respec-main.js in Resources */,
+				270139F13087337600C1D0B2 /* github.js in Resources */,
+				270139F63087337600C1D0B2 /* data in Resources */,
+				270139EF3087337600C1D0B2 /* popup.html in Resources */,
+				270139EE3087337600C1D0B2 /* background.js in Resources */,
+				270139F33087337600C1D0B2 /* manifest.json in Resources */,
+				270139F03087337600C1D0B2 /* panel.js in Resources */,
+				270139F73087337600C1D0B2 /* panel.css in Resources */,
+				270139F23087337600C1D0B2 /* icons in Resources */,
+				270139F53087337600C1D0B2 /* sidepanel.html in Resources */,
+				270139ED3087337600C1D0B2 /* spec.js in Resources */,
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		270139AF3087337400C1D0B2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				270139C33087337400C1D0B2 /* ViewController.swift in Sources */,
+				270139B73087337400C1D0B2 /* AppDelegate.swift in Sources */,
+			);
+		};
+		270139CA3087337600C1D0B2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				270139D43087337600C1D0B2 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		270139D13087337600C1D0B2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 270139CD3087337600C1D0B2 /* Web Specs Companion Extension */;
+			targetProxy = 270139D03087337600C1D0B2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		270139B93087337400C1D0B2 /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				270139BA3087337400C1D0B2 /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		270139C43087337400C1D0B2 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				270139C53087337400C1D0B2 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		270139D63087337600C1D0B2 /* Debug configuration for PBXProject "Web Specs Companion" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		270139D73087337600C1D0B2 /* Release configuration for PBXProject "Web Specs Companion" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		270139D93087337600C1D0B2 /* Debug configuration for PBXNativeTarget "Web Specs Companion Extension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Web Specs Companion Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Web Specs Companion Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = net.sideshowbarker.WebSpecsCompanion.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		270139DA3087337600C1D0B2 /* Release configuration for PBXNativeTarget "Web Specs Companion Extension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Web Specs Companion Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Web Specs Companion Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = net.sideshowbarker.WebSpecsCompanion.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		270139DD3087337600C1D0B2 /* Debug configuration for PBXNativeTarget "Web Specs Companion" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Web Specs Companion/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Web Specs Companion";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				INFOPLIST_KEY_NSViewGestureRecognizerIsExclusive = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "net.sideshowbarker.Web-Specs-Companion";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		270139DE3087337600C1D0B2 /* Release configuration for PBXNativeTarget "Web Specs Companion" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Web Specs Companion/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Web Specs Companion";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				INFOPLIST_KEY_NSViewGestureRecognizerIsExclusive = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "net.sideshowbarker.Web-Specs-Companion";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		270139AE3087337400C1D0B2 /* Build configuration list for PBXProject "Web Specs Companion" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				270139D63087337600C1D0B2 /* Debug configuration for PBXProject "Web Specs Companion" */,
+				270139D73087337600C1D0B2 /* Release configuration for PBXProject "Web Specs Companion" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		270139D83087337600C1D0B2 /* Build configuration list for PBXNativeTarget "Web Specs Companion Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				270139D93087337600C1D0B2 /* Debug configuration for PBXNativeTarget "Web Specs Companion Extension" */,
+				270139DA3087337600C1D0B2 /* Release configuration for PBXNativeTarget "Web Specs Companion Extension" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		270139DC3087337600C1D0B2 /* Build configuration list for PBXNativeTarget "Web Specs Companion" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				270139DD3087337600C1D0B2 /* Debug configuration for PBXNativeTarget "Web Specs Companion" */,
+				270139DE3087337600C1D0B2 /* Release configuration for PBXNativeTarget "Web Specs Companion" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 270139AB3087337400C1D0B2 /* Project object */;
+	validationLevel = 1;
+}
