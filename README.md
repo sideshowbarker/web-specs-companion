@@ -111,6 +111,17 @@ The extension showcases the use of particular features from the [WebExtensions s
 
 The extension collects nothing and sends nothing about you anywhere. It reads the address of the page you’re on to look it up, and fetches public data from W3C-run services and GitHub Pages. See [store/privacy.md](store/privacy.md).
 
+## Future work
+
+Some ideas for what comes next:
+
+- **Reviewing a spec:** comments on selected text in a spec, each filed as a GitHub issue against the spec’s repository, with its quote, the section and step it’s in, and a link to the quoted words — or the whole review filed as one issue, or copied as Markdown, as Martin Thomson’s [spec-comment](https://github.com/martinthomson/spec-comment) extension does.
+- **In-page features on more spec sites:** the definition counts, copying steps, and the link check run only on the W3C, WHATWG, and other spec sites the extension lists, and not yet on the IETF’s or TC39’s, though the card knows their specs.
+- **The standards body on the card:** the name and logo of the body each spec comes from, beside the group responsible for it.
+- **From MDN to the spec:** on an MDN page, the card for the spec it documents, with the spec’s group and standards body.
+- **Definition counts in the specs themselves:** Bikeshed and ReSpec could list the other specs that use each definition right in their own definition panels, from webref’s data ([speced/bikeshed#3155](https://github.com/speced/bikeshed/issues/3155), [speced/respec#5435](https://github.com/speced/respec/issues/5435)). The extension’s counts would then matter only for specs built some other way.
+- **Less to maintain:** the link check repeats one of [strudy](https://github.com/w3c/strudy)’s checks, so sharing strudy’s code would leave one copy of it to keep up.
+
 ## Contributing
 
 Contributions are welcome: Open an issue or a pull request in this repository.
