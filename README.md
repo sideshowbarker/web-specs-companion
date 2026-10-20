@@ -4,7 +4,10 @@ A browser extension for reading web specs and finding the groups and people behi
 
 - **The card:** the spec’s maturity, its editor’s draft and TR versions, its repository and issues, its tests, and the group responsible for it — with the group’s chairs, team contacts, and charter end date.
 - **The version radar:** whether you’re reading a dated snapshot, whether a newer level exists, and how far the latest TR version lags the draft.
-- **Browser support:** which browser engines implement the spec, and buttons for its [MDN](https://developer.mozilla.org/) articles, its [Can I Use](https://caniuse.com/) features, and its web-platform-tests results on [wpt.fyi](https://wpt.fyi/).
+- **Browser support:** Firefox, Safari, and Chrome logos, each in color when that browser’s engine implements the spec and gray when it doesn’t, going by MDN’s [browser-compat-data](https://github.com/mdn/browser-compat-data). For a gray one, **What’s missing?** lists the features it lacks.
+- **MDN:** a button with the number of the spec’s [MDN](https://developer.mozilla.org/) articles, which opens them, grouped by kind: interfaces, CSS properties, and more.
+- **Can I Use:** a button with the number of the spec’s [Can I Use](https://caniuse.com/) features, which opens each one’s global support, and a timeline of when Firefox, Safari, and Chrome shipped it.
+- **wpt.fyi:** a button with the interop score of the spec’s web-platform-tests on [wpt.fyi](https://wpt.fyi/), which opens their pass rates in each browser, by test directory, and the tests that fail in only one browser.
 - **Spec intelligence from [webref](https://github.com/w3c/webref):** how many other specs use each definition (what [specdex](https://dontcallmedom.github.io/specdex/) shows, in the page you’re reading), the spec’s platform footprint, and a check of its links to other specs for anchors that no longer exist (one of [strudy](https://github.com/w3c/strudy)’s checks, run live).
 - **Search:** type `spec` and a space in the address bar to search specs, groups, Web IDL names ([webidlpedia](https://dontcallmedom.github.io/webidlpedia/)), and terms (ReSpec’s xref service).
 - **TPAC 2026:** what’s in session now and next, and when each group meets.
