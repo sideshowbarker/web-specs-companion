@@ -132,6 +132,12 @@ These would each put another part of WebExtensions to work, as the features in [
 
 Contributions are welcome: Open an issue or a pull request in this repository.
 
+## Acknowledgements
+
+- The card is built mostly on [browser-specs](https://github.com/w3c/browser-specs) and [webref](https://github.com/w3c/webref), which W3C’s François Daoust and Dominique Hazaël-Massieux created and maintain.
+- The “Reviewing a spec” feature was inspired by Martin Thomson’s [Spec Comment browser extension](https://github.com/martinthomson/spec-comment). A review’s Markdown takes the shape of Mark Nottingham’s [ietf-comments format](https://github.com/mnot/ietf-comments/blob/main/format.md), as Spec Comment’s does.
+- The “Copying steps” feature was inspired by a [“spec copy button” userscript](https://bsky.app/profile/lukewarlow.dev/post/3luzxwrdaf22y) that Luke Warlow made, and by noticing how ecmarkup’s [listNumbers.js](https://github.com/tc39/ecmarkup/blob/main/js/listNumbers.js) causes step numbers to be included in text copied out from algorithms in the EcmaScript spec and in TC39 proposals.
+
 ## License
 
 [Apache-2.0](LICENSE). `npm run icons` renders the icons in `static/icons/`, and the Firefox Add-ons icon, the App Store icons, and the promo tile in `store/`, from the avatar in `assets/` (and for the App Store icons, the SVG traced from it), and needs [ImageMagick](https://imagemagick.org/). The browser logos in `static/icons/browsers/` are from [alrra/browser-logos](https://github.com/alrra/browser-logos/tree/58881b84c4d73adc03c06fa2c275a7abee02d935/src), under the MIT license in `LICENSE.txt` beside them. The logos themselves are trademarks of Mozilla, Apple, and Google. The MDN mark in `src/ui/components/Mdn.tsx` is the path from [Simple Icons](https://simpleicons.org/)’ MDN Web Docs icon, which is CC0 1.0. MDN Web Docs and its mark are Mozilla’s trademarks. The Can I Use logo in `static/icons/caniuse.png` is caniuse.com’s icon, by Alexis Deveria, used with attribution until it’s released under a free license; this repository’s license doesn’t cover it. The wpt.fyi logo in `static/icons/wpt.svg` is from [wpt.fyi](https://github.com/web-platform-tests/wpt.fyi), under the W3C 3-clause BSD license in `wpt-LICENSE.txt` beside it.
