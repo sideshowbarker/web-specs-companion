@@ -467,6 +467,20 @@ describe('Can I Use button', () => {
     expect(document.querySelector('.impl')).toBeNull();
   });
 
+  // The Mac app's build sets __CANIUSE_LOGO__ to false.
+  it('shows the words Can I Use in place of the logo in a build without it', async () => {
+    vi.stubGlobal('__CANIUSE_LOGO__', false);
+    try {
+      answerAll(answer);
+      render(<CardRow shortname="fetch" />);
+      const button = await screen.findByRole('button', { name: '2 Can I Use features' });
+      expect(button.querySelector('img')).toBeNull();
+      expect(button.textContent).toBe('Can I Use2');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("renders the list only once it's first opened, with each feature's chips, timeline, and notes", async () => {
     answerAll(answer);
     render(<CardRow shortname="fetch" />);

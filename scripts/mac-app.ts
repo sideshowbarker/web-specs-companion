@@ -1,11 +1,12 @@
-// Builds the Mac app for the App Store from dist/ with Safari's packager, then archives it, and with --upload, sends
-// it to App Store Connect. App Store Connect's web packager can't do this: For a Mac-only app, it names the app's
-// bundle ID after the app, but the extension's after the bundle ID it's given, so the extension's ID doesn't start
-// with the app's, and the export fails. Takes --build N for a version's second and later uploads. Needs Xcode, signed
-// in to the developer's Apple Account.
+// Builds the extension for the Mac app, without caniuse.com's icon, and makes the app from it with Safari's packager,
+// then archives it, and with --upload, sends it to App Store Connect. App Store Connect's web packager can't do this:
+// For a Mac-only app, it names the app's bundle ID after the app, but the extension's after the bundle ID it's given,
+// so the extension's ID doesn't start with the app's, and the export fails. Takes "--build N" for a version's second
+// and later uploads. Needs Xcode, signed in to the developer's Apple Account.
 import { execFileSync } from 'node:child_process';
 import { readFile, rm, writeFile } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
+import { buildExtension } from './build.ts';
 
 const NAME = 'Web Specs Companion';
 const BUNDLE_ID = 'net.sideshowbarker.WebSpecsCompanion';
@@ -75,10 +76,12 @@ async function main() {
   const run = (command: string, commandArgs: string[]) => execFileSync(command, commandArgs, { env, stdio: 'inherit' });
 
   await rm(OUT, { recursive: true, force: true });
+  const extension = `${OUT}/extension`;
+  await buildExtension(extension, { caniuseLogo: false });
   run('xcrun', [
     'safari-web-extension-packager', '--project-location', `${OUT}/project`, '--app-name', NAME,
     '--bundle-identifier', BUNDLE_ID, '--swift', '--macos-only', '--copy-resources', '--no-open', '--no-prompt',
-    '--force', 'dist',
+    '--force', extension,
   ]);
   const project = `${OUT}/project/${NAME}/${NAME}.xcodeproj`;
   const pbxproj = `${project}/project.pbxproj`;

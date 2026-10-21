@@ -13,12 +13,17 @@ const NOTES_SHOWN = 3;
 
 const count = (n: number) => (n === 1 ? '1 Can I Use feature' : `${n} Can I Use features`);
 
-// The logo is caniuse.com's own icon, by Alexis Deveria, used with attribution (see the README's License section).
+// The logo is caniuse.com's own icon, by Alexis Deveria, used with attribution (see the README's License section). The
+// Mac app's build sets __CANIUSE_LOGO__ to false and leaves the icon out, since App Review asks for proof of the right
+// to show it, so the button there shows the words "Can I Use" instead.
+declare const __CANIUSE_LOGO__: boolean | undefined;
+
 export function CaniuseButton({ answer, open, onToggle }: { answer: CiuAnswer; open: boolean; onToggle: () => void }) {
   const label = count(answer.features.length);
+  const logo = typeof __CANIUSE_LOGO__ === 'undefined' || __CANIUSE_LOGO__;
   return (
     <button type="button" class="linkish caniuse" aria-expanded={open} aria-controls="caniuse-list" aria-label={label} title={label} onClick={onToggle}>
-      <img src="icons/caniuse.png" width={16} height={16} alt="" />
+      {logo ? <img src="icons/caniuse.png" width={16} height={16} alt="" /> : <span>Can I Use</span>}
       {answer.features.length}
     </button>
   );

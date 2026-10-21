@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { fillManifest } from '../scripts/build.ts';
+import { existsSync, readFileSync } from 'node:fs';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { buildExtension, fillManifest } from '../scripts/build.ts';
 
 const template = {
   version: '0.0.0',
@@ -49,5 +52,21 @@ describe('the comment command', () => {
     const manifest = JSON.parse(readFileSync('static/manifest.json', 'utf8'));
     expect(manifest.commands['comment-on-selection']).toEqual({ suggested_key: { default: 'Alt+Shift+C' }, description: '__MSG_commentCommand__' });
     expect(JSON.parse(readFileSync('static/_locales/en/messages.json', 'utf8')).commentCommand).toEqual({ message: 'Comment on the selected text' });
+  });
+});
+
+describe('buildExtension', () => {
+  it("leaves caniuse.com's icon out of the Mac app's build, and keeps it in every other", async () => {
+    const out = await mkdtemp(join(tmpdir(), 'build-'));
+    try {
+      await buildExtension(join(out, 'mac'), { caniuseLogo: false });
+      await buildExtension(join(out, 'all'), { caniuseLogo: true });
+      expect(existsSync(join(out, 'mac/icons/caniuse.png'))).toBe(false);
+      expect(existsSync(join(out, 'mac/icons/wpt.svg'))).toBe(true);
+      expect(existsSync(join(out, 'all/icons/caniuse.png'))).toBe(true);
+      for (const build of ['mac', 'all']) expect(readFileSync(join(out, build, 'panel.js'), 'utf8')).not.toContain('__CANIUSE_LOGO__');
+    } finally {
+      await rm(out, { recursive: true, force: true });
+    }
   });
 });
