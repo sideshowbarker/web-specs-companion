@@ -84,7 +84,7 @@ describe('handlers', () => {
 
   it('builds the used-by map and the footprint from webref', async () => {
     const files: Record<string, unknown> = {
-      'https://w3c.github.io/webref/ed/index.json': { date: '9 October 2026', results: [{ shortname: 'fetch', date: '9 October 2026', backrefs: 'backrefs/fetch.json', refs: 'refs/fetch.json' }] },
+      'https://w3c.github.io/webref/ed/index.json': { date: '2026-10-22T18:48:27.351Z', results: [{ shortname: 'fetch', date: '31 March 2022', backrefs: 'backrefs/fetch.json', refs: 'refs/fetch.json' }] },
       'https://w3c.github.io/webref/ed/backrefs/fetch.json': { backrefs: [{ id: 'concept-fetch', href: 'https://fetch.spec.whatwg.org/#concept-fetch', linkingText: ['fetch'], type: 'dfn', for: [], access: 'public', referencedBy: [{ shortname: 'html', title: 'HTML Standard', url: 'https://html.spec.whatwg.org/multipage/' }] }] },
       'https://w3c.github.io/webref/ed/refs/fetch.json': { refs: { normative: [{ name: 'HTML', url: 'https://html.spec.whatwg.org/multipage/' }], informative: [] } },
     };
@@ -96,7 +96,8 @@ describe('handlers', () => {
     const f = (await h.handle({ type: 'get-footprint', shortname: 'fetch' }, sender(1))) as { footprint: { referencedBy: { shortname: string }[]; normativeRefs: unknown[]; crawlDate: string } };
     expect(f.footprint.referencedBy.map((s) => s.shortname)).toEqual(['html']);
     expect(f.footprint.normativeRefs).toHaveLength(1);
-    expect(f.footprint.crawlDate).toBe('9 October 2026');
+    // The crawl's own date, never the date the spec prints, which is the entry's.
+    expect(f.footprint.crawlDate).toBe('2026-10-22');
   });
 
   it('checks links against the target spec ids from webref', async () => {

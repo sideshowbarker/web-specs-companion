@@ -2,7 +2,7 @@ import { GroupIndex } from '../data/groups.ts';
 import type { Http } from '../data/http.ts';
 import type { Sources } from '../data/sources.ts';
 import { getGroupDetails, getSpecDetails } from '../data/w3capi.ts';
-import { getExtract, getWebrefIndex, isoFromSpecDate, type WebrefEntry } from '../data/webref.ts';
+import { getExtract, getWebrefIndex, isoFromSpecDate, type WebrefEntry, type WebrefIndex } from '../data/webref.ts';
 import { caniuseFeatures } from '../logic/caniuse.ts';
 import { buildUsedByMap, computeFootprint, specdexUrl } from '../logic/footprint.ts';
 import { isImplRecord } from '../logic/implementations.ts';
@@ -128,7 +128,7 @@ export function createHandlers(deps: HandlerDeps) {
       return { url: hits[0]?.url ?? webidlpediaUrl(msg.name) };
     },
     'get-footprint': async (msg) => {
-      const { entries } = await getWebrefIndex(deps.http, deps.now).catch(() => ({ entries: new Map<string, WebrefEntry>() }));
+      const { date, entries } = await getWebrefIndex(deps.http, deps.now).catch((): WebrefIndex => ({ entries: new Map<string, WebrefEntry>() }));
       const entry = entries.get(msg.shortname);
       if (!entry) return { footprint: null };
       const safe = <T>(p: Promise<T>) => p.catch(() => undefined);
@@ -142,7 +142,7 @@ export function createHandlers(deps: HandlerDeps) {
       return {
         footprint: computeFootprint(
           { backrefs: backrefs?.backrefs, links: links?.links, refs: refs?.refs, idlparsed: idlparsed?.idlparsed },
-          msg.shortname, specs, entry,
+          msg.shortname, specs, entry, date,
         ),
       };
     },

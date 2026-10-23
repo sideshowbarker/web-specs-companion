@@ -33,12 +33,16 @@ describe('computeFootprint', () => {
       },
       refs: { normative: [{ name: 'HTML', url: 'https://html.spec.whatwg.org/multipage/' }], informative: [] },
       idlparsed: { idlNames: { Request: {}, Headers: {} }, idlExtendedNames: { Request: {}, Window: {}, WindowOrWorkerGlobalScope: {} } },
-    }, 'fetch', si, { shortname: 'fetch', date: '9 October 2026', revision: 'abc' });
+    }, 'fetch', si, { shortname: 'fetch', date: '31 March 2022', revision: 'abc' }, '2026-10-22T18:48:27.351Z');
     expect(f.referencedBy.map((s) => s.shortname)).toEqual(['fetch-metadata', 'html']);
     expect(f.usesTermsFrom.map((s) => s.shortname)).toEqual(['fetch-metadata', 'html']);
     expect(f.normativeRefs).toEqual([{ name: 'HTML', url: 'https://html.spec.whatwg.org/multipage/' }]);
     expect(f.extendsInterfaces).toEqual(['Window', 'WindowOrWorkerGlobalScope']);
-    expect(f).toMatchObject({ crawlDate: '9 October 2026', revision: 'abc', specdex: 'https://dontcallmedom.github.io/specdex/fetch.html' });
+    expect(f).toMatchObject({ crawlDate: '2026-10-22', revision: 'abc', specdex: 'https://dontcallmedom.github.io/specdex/fetch.html' });
+  });
+
+  it("never takes the crawl date from the date the spec prints", () => {
+    expect(computeFootprint({}, 'fetch', si, { shortname: 'fetch', date: '31 March 2022' }).crawlDate).toBeUndefined();
   });
 
   it('copes with missing extracts', () => {

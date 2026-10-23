@@ -91,14 +91,15 @@ import { Footprint } from '../src/ui/components/Footprint.tsx';
 describe('Footprint', () => {
   it('shows the most-used definitions and says where the data comes from', async () => {
     sendMock.mockImplementation(async (type: string) => {
-      if (type === 'get-footprint') return { footprint: { referencedBy: [], usesTermsFrom: [], normativeRefs: [], extendsInterfaces: [], crawlDate: '9 October 2026', revision: 'def', specdex: 'https://dontcallmedom.github.io/specdex/fetch.html' } };
+      if (type === 'get-footprint') return { footprint: { referencedBy: [], usesTermsFrom: [], normativeRefs: [], extendsInterfaces: [], crawlDate: '2026-10-22', revision: 'def', specdex: 'https://dontcallmedom.github.io/specdex/fetch.html' } };
       if (type === 'get-used-by') return { map: { a: { count: 3, access: 'public', term: 'fetch', type: 'dfn', specs: [], href: 'https://fetch.spec.whatwg.org/#a' } }, specdex: '' };
       return {};
     });
     render(<Footprint shortname="fetch" pageKind="tr" pageRevision="abc" />);
     await waitFor(() => expect(screen.getByRole('link', { name: 'fetch' }).getAttribute('href')).toBe('https://fetch.spec.whatwg.org/#a'));
     expect(screen.getByText(/comes from the editor/)).toBeTruthy();
-    expect(screen.getByText(/different revision/)).toBeTruthy();
+    expect(screen.getByText(/different revision/).textContent).toContain('(on 22 October 2026)');
+    expect(screen.getByText(/From webref/).textContent).toContain('crawled 22 October 2026.');
   });
 });
 

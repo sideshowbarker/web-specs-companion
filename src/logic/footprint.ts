@@ -7,7 +7,7 @@ export interface Footprint {
   usesTermsFrom: SpecRef[];
   normativeRefs: { name: string; url: string }[];
   extendsInterfaces: string[];
-  crawlDate?: string;
+  crawlDate?: string; // the day webref crawled, YYYY-MM-DD
   revision?: string;
   specdex: string;
 }
@@ -38,6 +38,7 @@ export function computeFootprint(
   self: string,
   specs: SpecIndex,
   entry?: WebrefEntry,
+  crawled?: string,
 ): Footprint {
   const referencing = new Map<string, SpecRef>();
   for (const b of input.backrefs ?? []) {
@@ -54,7 +55,8 @@ export function computeFootprint(
     usesTermsFrom: [...used.values()].sort(byTitle),
     normativeRefs: input.refs?.normative ?? [],
     extendsInterfaces: idl ? Object.keys(idl.idlExtendedNames).filter((n) => !(n in idl.idlNames)).sort() : [],
-    crawlDate: entry?.date,
+    // The date of webref's whole crawl, from its index. The entry's own date is the one the spec prints.
+    crawlDate: /^\d{4}-\d{2}-\d{2}/.exec(crawled ?? '')?.[0],
     revision: entry?.revision,
     specdex: specdexUrl(self),
   };

@@ -2,6 +2,7 @@ import { mostUsed, webrefBehind } from '../../logic/footprint.ts';
 import { webidlpediaUrl } from '../../logic/search.ts';
 import type { PageKind, SpecRef } from '../../shared/types.ts';
 import { send } from '../api.ts';
+import { formatDate } from '../format.ts';
 import { useAsync } from '../hooks.ts';
 import { A } from './A.tsx';
 
@@ -29,7 +30,7 @@ export function Footprint({ shortname, pageKind, pageRevision }: { shortname: st
         <p class="note">{'This data comes from the editor\u2019s draft, which can differ from this TR version.'}</p>
       )}
       {webrefBehind(pageRevision, f.revision) && (
-        <p class="note">Webref crawled a different revision of this draft{f.crawlDate ? ` (on ${f.crawlDate})` : ''}, so recent changes may be missing.</p>
+        <p class="note">Webref crawled a different revision of this draft{f.crawlDate ? ` (on ${formatDate(f.crawlDate)})` : ''}, so recent changes may be missing.</p>
       )}
       <ul>
         <SpecList summary={`Referenced by ${f.referencedBy.length} other specs`} specs={f.referencedBy} />
@@ -62,7 +63,7 @@ export function Footprint({ shortname, pageKind, pageRevision }: { shortname: st
         </>
       )}
       <p class="muted">
-        From webref{f.crawlDate ? `, crawled ${f.crawlDate}` : ''}. <A href={f.specdex}>Every definition on specdex</A>
+        From webref{f.crawlDate ? `, crawled ${formatDate(f.crawlDate)}` : ''}. <A href={f.specdex}>Every definition on specdex</A>
       </p>
     </section>
   );
