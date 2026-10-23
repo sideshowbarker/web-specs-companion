@@ -5,7 +5,8 @@ name: Pages
 # pages once Firefox Add-ons and the Chrome Web Store list the extension. And it serves the browser-support, MDN, Can I
 # Use, and test-results files the extension fetches, built from the latest BCD, mdn/content, caniuse-db, web-features,
 # and wpt.fyi runs. So, the workflow also runs after each release and every hour, and an hourly run deploys only when
-# the page or one of those files has changed.
+# the page or one of those files has changed. html-now.github.io is built from those files too, so each run then asks
+# that site's Pages workflow to build.
 
 on:
   push:
@@ -86,3 +87,17 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  # Runs after this run's deploy, or after it finds nothing to deploy, so html-now.github.io's build reads the files
+  # this run published. It needs a token that can start workflows in html-now/html-now.github.io, in the
+  # HTML_NOW_DISPATCH_TOKEN secret; without one, the job does nothing.
+  notify:
+    needs: [build, deploy]
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.deploy.result != 'failure' }}
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.HTML_NOW_DISPATCH_TOKEN }}
+    steps:
+      - name: Ask html-now.github.io to build
+        if: env.GH_TOKEN != ''
+        run: gh workflow run pages.yml --repo html-now/html-now.github.io -f trigger=wsc
