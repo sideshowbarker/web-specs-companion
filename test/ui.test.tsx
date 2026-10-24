@@ -828,6 +828,14 @@ describe('Review', () => {
     await waitFor(() => expect(sendMock).toHaveBeenCalledWith('delete-review', { shortname: 'fetch' }));
   });
 
+  it('says how to copy steps with their numbers, after the review', async () => {
+    answer([c('a')]);
+    render(<SpecTools tabId={1} shortname="fetch" url={FETCH} />);
+    await screen.findByRole('heading', { name: 'Your review: 1 comment' });
+    expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Your review: 1 comment', 'Copying steps']);
+    expect(screen.getByText('Copy an algorithm\u2019s steps from the spec, and the copy keeps their step numbers.')).toBeTruthy();
+  });
+
   it('turns the Comment button off', async () => {
     answer([]);
     render(<SpecTools tabId={1} shortname="fetch" url={FETCH} />);

@@ -157,10 +157,10 @@ button.linkish { border: 0; padding: 0; text-decoration: underline; }
 .events { list-style: none; padding: 0; display: grid; gap: 4px; }
 .empty { color: var(--muted); }
 footer { border-top: 1px solid var(--line); padding-top: 8px; display: grid; gap: 6px; }
-.review { margin-top: 12px; display: grid; gap: 6px; }
+.review, .copy-steps { margin-top: 12px; display: grid; gap: 6px; }
 .review ol.comments { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .review ol.comments > li { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; }
-.review p { margin: 0 0 2px; }
+.review p, .copy-steps p { margin: 0 0 2px; }
 .review .kind { display: inline-block; color: var(--review-chip-fg); font: 700 11px/1 system-ui, sans-serif; padding: 3px 6px; border-radius: 3px; }
 .review .kind-major { background: var(--review-major); }
 .review .kind-minor { background: var(--review-minor); }

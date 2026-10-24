@@ -29,6 +29,11 @@ export function SpecTools({ tabId, shortname, url }: { tabId: number; shortname:
       {toggle('reviewButton', 'Show a Comment button beside text you select')}
       <LinkCheck tabId={tabId} />
       <ReviewBlock tabId={tabId} shortname={shortname} url={url} />
+      {/* A copy of a spec's steps gets their numbers with no control on the page to show it, so this says so. */}
+      <div class="copy-steps">
+        <h3>Copying steps</h3>
+        <p class="muted">{'Copy an algorithm\u2019s steps from the spec, and the copy keeps their step numbers.'}</p>
+      </div>
     </section>
   );
 }
