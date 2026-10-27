@@ -8,7 +8,7 @@ import { readFile, rm, writeFile } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
 import { buildExtension } from './build.ts';
 
-const NAME = 'Web Specs Companion';
+const NAME = 'Browser specs companion';
 const BUNDLE_ID = 'net.sideshowbarker.WebSpecsCompanion';
 const TEAM = 'C3DGD38MM6';
 const CATEGORY = 'public.app-category.developer-tools';

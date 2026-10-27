@@ -1,4 +1,4 @@
-# App Store listing — Web Specs Companion for Mac
+# App Store listing — Browser specs companion for Mac
 
 The Mac app that npm run mac-app builds and uploads, as the README’s Releasing section says. It differs from the other stores’ listing (listing.md) in what Safari lacks: There’s no side panel and no address-bar keyword, so the description mentions neither.
 
@@ -18,7 +18,7 @@ During TPAC 2026 (Dublin, 26–30 October), it shows what’s in session now and
 App Store Connect lets the promotional text change at any time, while the description changes only with a new version. So TPAC goes here, and comes out once TPAC is over.
 
 **Description (4,000 characters max):**
-Web Specs Companion shows all that’s known about the page you’re on.
+Browser specs companion shows all that’s known about the page you’re on.
 
 On any web spec, it shows what’s known of the spec’s maturity, versions, repository and issue tracker, tests, and the group responsible for it. For a W3C spec, that includes the editor’s draft and TR versions, and the group’s chairs, team contacts, and charter end date.
 
@@ -32,7 +32,7 @@ After you install it, turn it on in Safari’s Settings, under Extensions, and a
 
 Data comes from public sources, including browser-specs, webref, MDN, Can I Use, and wpt.fyi.
 
-Web Specs Companion is a personal project. It isn’t affiliated with or endorsed by W3C.
+Browser specs companion is a personal project. It isn’t affiliated with or endorsed by W3C.
 
 **Keywords (100 characters max):**
 specification,standards,web platform,Web IDL,browser support,developer,reference,interop,tests,spec
@@ -59,7 +59,7 @@ Apple already indexes the words in the app’s name, so the keywords don’t rep
 
 Under General.
 
-**Name (30 characters max):** Web Specs Companion
+**Name (30 characters max):** Browser specs companion
 
 **Subtitle (30 characters max):** For reading web specs
 

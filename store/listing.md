@@ -1,12 +1,12 @@
-# Store listing — Web Specs Companion 1.1.0
+# Store listing — Browser specs companion 1.1.0
 
-**Name:** Web Specs Companion
+**Name:** Browser specs companion
 
 **Summary (132 characters max):**
 A companion for reading web specs and finding the groups and people behind them.
 
 **Description:**
-Web Specs Companion shows all that’s known about the page you’re on.
+Browser specs companion shows all that’s known about the page you’re on.
 
 On any web spec, it shows what’s known of the spec’s maturity, versions, repository and issue tracker, tests, and the group responsible for it. For a W3C spec, that includes the editor’s draft and TR versions, and the group’s chairs, team contacts, and charter end date.
 
@@ -22,7 +22,7 @@ During TPAC 2026 (Dublin, 26–30 October), it shows what’s in session now and
 
 Data comes from public sources, including browser-specs, webref, MDN, Can I Use, and wpt.fyi.
 
-Web Specs Companion is a personal project. It isn’t affiliated with or endorsed by W3C.
+Browser specs companion is a personal project. It isn’t affiliated with or endorsed by W3C.
 
 **Screenshots (1280×800):** These ten in screenshots/ go to Firefox Add-ons: card-editors-draft.png, used-by-counts.png, version-radar.png, mdn-articles.png, caniuse-features.png, wpt-results.png, github-repo.png, group-page.png, side-panel.png, tpac-now-and-next.png.
 

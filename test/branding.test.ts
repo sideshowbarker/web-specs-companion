@@ -22,12 +22,12 @@ describe('the rebrand', () => {
     expect(hits).toEqual([]);
   });
 
-  it('names the extension Web Specs Companion, with its own Firefox ID and keyword', () => {
+  it('names the extension Browser specs companion, with its own Firefox ID and keyword', () => {
     const manifest = json('static/manifest.json');
     expect(manifest.browser_specific_settings.gecko.id).toBe('web-specs-companion@sideshowbarker.net');
     expect(manifest.omnibox.keyword).toBe('spec');
     const m = json('static/_locales/en/messages.json');
-    expect([m.extName.message, m.extShortName.message, m.actionTitle.message]).toEqual(['Web Specs Companion', 'Web Specs', 'Web Specs Companion']);
+    expect([m.extName.message, m.extShortName.message, m.actionTitle.message]).toEqual(['Browser specs companion', 'Browser specs', 'Browser specs companion']);
     expect(m.extDescription.message).toBe('A companion for reading web specs and finding the groups and people behind them.');
     expect(m.extDescription.message.length).toBeLessThanOrEqual(132);
   });

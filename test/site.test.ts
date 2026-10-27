@@ -49,6 +49,8 @@ describe('probeStores', () => {
 
   it('counts the Chrome Web Store as listing the extension once its item page has its name', async () => {
     const amo = { status: 401, body: {} };
+    expect((await probeStores(fake(amo, { status: 200, title: 'Browser specs companion - Chrome Web Store' }))).cws).toBe(true);
+    // And by the name it had before, which the store shows until it publishes a version with this one.
     expect((await probeStores(fake(amo, { status: 200, title: 'Web Specs Companion - Chrome Web Store' }))).cws).toBe(true);
     expect((await probeStores(fake(amo, { status: 200, title: 'Chrome Web Store' }))).cws).toBe(false);
     expect((await probeStores(fake(amo, { status: 404 }))).cws).toBe(false);
@@ -126,7 +128,7 @@ describe('the site', () => {
   it('disclaims any formal affiliation, and claims no W3C copyright or trademark', async () => {
     const page = fillTemplate(await read('site/index.html'), values, every[0]);
     expect(page).toContain(
-      '<p class="disclaimer">Web Specs Companion isn\u2019t formally affiliated with or endorsed by W3C, WHATWG, or any ' +
+      '<p class="disclaimer">Browser specs companion isn\u2019t formally affiliated with or endorsed by W3C, WHATWG, or any ' +
         'other standards body.</p>',
     );
     expect(page).not.toMatch(/World Wide Web Consortium|trademark/);

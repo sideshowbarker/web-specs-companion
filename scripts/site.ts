@@ -74,7 +74,8 @@ export async function probeStores(fetchUrl: Fetch = fetch): Promise<Stores> {
   if (!cws.ok && cws.status !== 404) throw new Error(`Chrome Web Store answered HTTP ${cws.status} for ${CWS_PAGE}`);
   return {
     amo: amo.ok && ((await amo.json()) as { status?: string }).status === 'public',
-    cws: cws.ok && /<title>Web Specs Companion\b/.test(await cws.text()),
+    // Either name: the store shows the extension's earlier one until it publishes a version with this one.
+    cws: cws.ok && /<title>(?:Browser specs companion|Web Specs Companion)\b/.test(await cws.text()),
   };
 }
 

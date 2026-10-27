@@ -59,9 +59,9 @@ jobs:
           name: packages
       - name: Publish the GitHub release
         run: |
-          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "Web Specs Companion $VERSION" --generate-notes \
-            "artifacts/web-specs-companion-$VERSION.zip#Web Specs Companion $VERSION for Chrome, Edge, other Chromium-based browsers, and Safari" \
-            "artifacts/web-specs-companion-$VERSION-source.zip#Web Specs Companion $VERSION source code"
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "Browser specs companion $VERSION" --generate-notes \
+            "artifacts/web-specs-companion-$VERSION.zip#Browser specs companion $VERSION for Chrome, Edge, other Chromium-based browsers, and Safari" \
+            "artifacts/web-specs-companion-$VERSION-source.zip#Browser specs companion $VERSION source code"
       - name: Point the website at the release
         run: gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main
 

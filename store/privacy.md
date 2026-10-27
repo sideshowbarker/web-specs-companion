@@ -1,6 +1,6 @@
 # Privacy
 
-Web Specs Companion doesn’t collect, store, or transmit any personal data.
+Browser specs companion doesn’t collect, store, or transmit any personal data.
 
 - It reads the address and content of the page in the current tab, in the browser, to recognize specs, W3C repositories,
   and w3.org group pages. That information stays in the browser.

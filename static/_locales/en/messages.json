@@ -1,15 +1,15 @@
 {
   "extName": {
-    "message": "Web Specs Companion"
+    "message": "Browser specs companion"
   },
   "extShortName": {
-    "message": "Web Specs"
+    "message": "Browser specs"
   },
   "extDescription": {
     "message": "A companion for reading web specs and finding the groups and people behind them."
   },
   "actionTitle": {
-    "message": "Web Specs Companion"
+    "message": "Browser specs companion"
   },
   "commentCommand": {
     "message": "Comment on the selected text"

@@ -50,10 +50,10 @@ magick(['png:-', '-filter', 'Lanczos', '-resize', '1024x1024', '-strip', 'PNG32:
 // The tile puts the globe on W3C Blue, with the name and the tagline beside it.
 magick([
   '-size', '440x280', `xc:${BLUE}`,
-  '(', 'png:-', '-filter', 'Lanczos', '-resize', '160x160', ')', '-geometry', '+36+60', '-composite',
-  '-fill', 'white', '-font', BOLD, '-pointsize', '30',
-  '-annotate', '+222+124', 'Web Specs', '-annotate', '+222+160', 'Companion',
+  '(', 'png:-', '-filter', 'Lanczos', '-resize', '150x150', ')', '-geometry', '+30+65', '-composite',
+  '-fill', 'white', '-font', BOLD, '-pointsize', '28',
+  '-annotate', '+204+124', 'Browser specs', '-annotate', '+204+158', 'companion',
   '-font', REGULAR, '-pointsize', '14.5',
-  '-annotate', '+223+194', 'Specs, groups, and TPAC,', '-annotate', '+223+213', 'wherever you are',
+  '-annotate', '+205+192', 'Specs, groups, and TPAC,', '-annotate', '+205+211', 'wherever you are',
   '-strip', 'PNG24:store/promo-tile-440x280.png',
 ], square);

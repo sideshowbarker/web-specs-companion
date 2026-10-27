@@ -1,4 +1,4 @@
-# Web Specs Companion
+# Browser specs companion
 
 A browser extension for reading web specs. On any spec — from W3C, WHATWG, or another standards body — it shows a detailed “cheatsheet” of all that’s known about it:
 
@@ -16,7 +16,7 @@ A browser extension for reading web specs. On any spec — from W3C, WHATWG, or
 - **On W3C repos and group pages:** for a W3C repo on GitHub, the group behind it and the specs it hosts; for a w3.org group page, the group’s specs.
 - **TPAC 2026:** what’s in session now and next, and when each group meets.
 
-Web Specs Companion isn’t formally affiliated with or endorsed by W3C, WHATWG, or any other standards body.
+Browser specs companion isn’t formally affiliated with or endorsed by W3C, WHATWG, or any other standards body.
 
 ## Screenshots
 
@@ -30,9 +30,9 @@ More: [what Safari lacks of requestIdleCallback()](screenshots/browser-support.p
 
 ## Install
 
-The [Web Specs Companion website](https://sideshowbarker.net/web-specs-companion/) has these steps too, with the steps for your browser first.
+The [Browser specs companion website](https://sideshowbarker.net/web-specs-companion/) has these steps too, with the steps for your browser first.
 
-Chrome and other Chromium-based browsers install Web Specs Companion from the [Chrome Web Store](https://chromewebstore.google.com/detail/hpajpmapkffhaiggemaeajpkehfnapkm). It isn’t on Firefox Add-ons yet, so Firefox installs it from the [latest release](https://github.com/sideshowbarker/web-specs-companion/releases/latest), as Safari does. It needs Chrome or Edge 148 or later, Firefox 128 or later, or Safari 26 or later.
+Chrome and other Chromium-based browsers install Browser specs companion from the [Chrome Web Store](https://chromewebstore.google.com/detail/hpajpmapkffhaiggemaeajpkehfnapkm). It isn’t on Firefox Add-ons yet, so Firefox installs it from the [latest release](https://github.com/sideshowbarker/web-specs-companion/releases/latest), as Safari does. It needs Chrome or Edge 148 or later, Firefox 128 or later, or Safari 26 or later.
 
 ### Chrome, Edge, and other Chromium-based browsers
 
@@ -47,7 +47,7 @@ The `.xpi` is the file Firefox Add-ons signed and serves for that version, so it
 
 ### Safari
 
-Safari 26 or later can run Web Specs Companion as a temporary extension, from the zip in the latest release. Safari removes a temporary extension when it quits, and after 24 hours, so add it again whenever it’s gone. Safari has no address-bar keywords or side panels for extensions, so the `spec` keyword and **Keep this open beside the page** aren’t there.
+Safari 26 or later can run Browser specs companion as a temporary extension, from the zip in the latest release. Safari removes a temporary extension when it quits, and after 24 hours, so add it again whenever it’s gone. Safari has no address-bar keywords or side panels for extensions, so the `spec` keyword and **Keep this open beside the page** aren’t there.
 
 Once, in Safari, choose **Safari** → **Settings…**, select **Advanced**, and turn on **Show features for web developers**. Then, each time:
 

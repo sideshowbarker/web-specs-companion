@@ -24,4 +24,4 @@ for ((waited = 0; ; waited++)); do
 done
 curl -sfL -o "web-specs-companion-$version.xpi" "$url"
 gh release upload "$tag" ${GITHUB_REPOSITORY:+--repo "$GITHUB_REPOSITORY"} --clobber \
-  "web-specs-companion-$version.xpi#Web Specs Companion $version for Firefox"
+  "web-specs-companion-$version.xpi#Browser specs companion $version for Firefox"
