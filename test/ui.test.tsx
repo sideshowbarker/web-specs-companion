@@ -38,7 +38,9 @@ describe('SpecCard', () => {
     render(<SpecCard ctx={{ kind: 'spec', url: 'https://w3c.github.io/webappsec-fetch-metadata/', pageKind: 'ed', spec: specs[0], groups: [groups[0]] }} tabId={1} slots={{}} />);
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Fetch Metadata Request Headers');
     expect(screen.getByText('ED')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Latest TR version' }).getAttribute('href')).toBe('https://www.w3.org/TR/fetch-metadata/');
+    expect(screen.getByRole('link', { name: 'Fetch Metadata Request Headers' }).getAttribute('href')).toBe('https://www.w3.org/TR/fetch-metadata/');
+    expect(screen.queryByRole('link', { name: 'Latest TR version' })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Editor\u2019s Draft' }).getAttribute('href')).toBe('https://w3c.github.io/webappsec-fetch-metadata/');
     await waitFor(() => expect(screen.getByText('Chairs: Daniel Veditz, Mike West')).toBeTruthy());
     await waitFor(() => expect(screen.getByText('Editor\u2019s Draft', { selector: '.radar-label' })).toBeTruthy());
   });

@@ -1,6 +1,6 @@
 import { badgeColor, maturityFor } from '../../logic/maturity.ts';
 import type { Context, TpacEvent } from '../../shared/types.ts';
-import { specLinks } from '../format.ts';
+import { specLinks, titleHref } from '../format.ts';
 import { A } from './A.tsx';
 import { CardRow } from './CardRow.tsx';
 import { Footprint } from './Footprint.tsx';
@@ -15,7 +15,7 @@ export function SpecCard({ ctx, tabId, slots }: { ctx: Context; tabId: number; s
     <section class="card" aria-labelledby="card-title">
       <header class="card-head">
         {code && <span class="chip" style={{ background: badgeColor(code) }}>{code}</span>}
-        <h1 id="card-title"><A href={ctx.spec?.url ?? ctx.url}>{title}</A></h1>
+        <h1 id="card-title"><A href={titleHref(ctx)}>{title}</A></h1>
         {ctx.spec && <p class="muted">{ctx.spec.shortname}</p>}
       </header>
       {ctx.spec && <CardRow key={ctx.spec.shortname} shortname={ctx.spec.shortname} />}

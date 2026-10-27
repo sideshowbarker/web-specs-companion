@@ -33,14 +33,20 @@ export function charterWarning(endDate: string | undefined, now: number): string
   return undefined;
 }
 
+export function titleHref(ctx: Context): string {
+  return ctx.spec?.url ?? ctx.url;
+}
+
+// The card's links, without the draft or the TR its title already links to.
 export function specLinks(ctx: Context): { label: string; href: string }[] {
   const s = ctx.spec;
   const f = ctx.facts;
   const out: { label: string; href: string }[] = [];
+  const title = titleHref(ctx);
   const ed = s?.nightly?.url ?? f?.edUrl;
-  if (ed) out.push({ label: 'Editor\u2019s Draft', href: ed });
+  if (ed && ed !== title) out.push({ label: 'Editor\u2019s Draft', href: ed });
   const tr = s?.release?.url ?? f?.latestUrl;
-  if (tr) out.push({ label: 'Latest TR version', href: tr });
+  if (tr && tr !== title) out.push({ label: 'Latest TR version', href: tr });
   if (s?.release && s.organization.startsWith('W3C')) {
     out.push({ label: 'Publication history', href: `https://www.w3.org/standards/history/${s.shortname}/` });
   }

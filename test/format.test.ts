@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { charterWarning, formatDate, formatTpacTime, relativeAge, specLinks } from '../src/ui/format.ts';
+import { charterWarning, formatDate, formatTpacTime, relativeAge, specLinks, titleHref } from '../src/ui/format.ts';
 import { specs } from './fixtures/catalog.ts';
 
 const at = (iso: string) => Date.parse(iso);
@@ -37,11 +37,23 @@ describe('charterWarning', () => {
 });
 
 describe('specLinks', () => {
-  it('lists the draft, the TR, history, the repo and its issues, and tests', () => {
+  it('lists the draft, history, the repo and its issues, and tests, but not the TR the title links', () => {
     const links = specLinks({ kind: 'spec', url: 'x', groups: [], spec: { ...specs[0], tests: { repository: 'https://github.com/web-platform-tests/wpt', testPaths: ['fetch/metadata'] } } });
     expect(links.map((l) => l.label)).toEqual([
-      'Editor\u2019s Draft', 'Latest TR version', 'Publication history', 'Repository', 'Open issues', 'File an issue', 'Tests',
+      'Editor\u2019s Draft', 'Publication history', 'Repository', 'Open issues', 'File an issue', 'Tests',
     ]);
     expect(links.find((l) => l.label === 'Tests')?.href).toBe('https://wpt.fyi/results/fetch/metadata');
+  });
+
+  it("lists the TR but not the draft when the title links the draft", () => {
+    const links = specLinks({ kind: 'spec', url: 'x', groups: [], spec: { ...specs[0], url: specs[0].nightly!.url } });
+    expect(links.map((l) => l.label).slice(0, 2)).toEqual(['Latest TR version', 'Publication history']);
+  });
+
+  it("lists no draft for a page that is its own draft, which the title links when there's no spec", () => {
+    const url = 'https://example.test/draft/';
+    const links = specLinks({ kind: 'spec', url, groups: [], facts: { kind: 'spec', url, edUrl: url, latestUrl: 'https://example.test/tr/' } });
+    expect(titleHref({ kind: 'spec', url, groups: [] })).toBe(url);
+    expect(links.map((l) => l.label)).toEqual(['Latest TR version']);
   });
 });
