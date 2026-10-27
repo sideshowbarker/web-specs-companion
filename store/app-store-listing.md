@@ -69,7 +69,7 @@ Under General.
 
 **Content Rights:** Yes, it shows third-party content, and yes, it has the rights to it: All that it shows comes from public sources that publish their data for reuse.
 
-**Age Rating:** None for every question in the questionnaire, for 4+. Guideline 2.3.8 also asks that the icon and screenshots suit 4+, and the avatar in the icon has a cigarette, so App Review may ask for another icon.
+**Age Rating:** None for every question in the questionnaire, for 4+. Guideline 2.3.8 also asks that the icon and screenshots suit 4+, which a grinning globe does.
 
 ## App Privacy
 
@@ -87,4 +87,4 @@ Under Monetization.
 
 ## Not on any page
 
-**App icon:** App Store Connect takes a Mac app’s icon from the build, and Safari’s packager, in npm run mac-app, makes it from the manifest’s largest icon, static/icons/1024.png. store/app-icon-1024.png is the avatar on Apple’s macOS icon grid, for an icon set made by hand instead.
+**App icon:** App Store Connect takes a Mac app’s icon from the build, and Safari’s packager, in npm run mac-app, makes it from the manifest’s largest icon, static/icons/1024.png. store/app-icon-1024.png is the globe on Apple’s macOS icon grid, for an icon set made by hand instead.
