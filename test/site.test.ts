@@ -156,6 +156,15 @@ describe('the site', () => {
     expect(section(after, 'safari')).toContain(values.zip);
   });
 
+  it('sends Safari to the Mac App Store, and keeps the zip for a Mac too old for the app', async () => {
+    const page = await read('site/index.html');
+    for (const stores of every) {
+      const safari = section(fillTemplate(page, values, stores), 'safari');
+      expect(safari).toContain('<a class="button store" href="https://apps.apple.com/app/id6824749953">');
+      expect(safari).toContain(values.zip);
+    }
+  });
+
   it('shows every screenshot, and only screenshots that exist', async () => {
     const page = await read('site/index.html');
     const shown = [...page.matchAll(/src="screenshots\/([^"]+)"/g)].map((m) => m[1]).sort();
