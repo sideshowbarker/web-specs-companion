@@ -2,7 +2,7 @@
 // WebDriver section mirrors), then loads a Bikeshed spec and a live ReSpec draft, and waits for the in-page "used by"
 // counts on each, which exercises the manifest, both content scripts, the background, and the live webref fetches. Back
 // on Fetch, it then comments on one of the spec's steps, through the page's own Comment button and editor, and waits
-// for that comment's highlight.
+// for that comment's highlight. It also checks the group subtitle and abstract placement on Bikeshed and ReSpec pages.
 import { spawn } from 'node:child_process';
 import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -80,6 +80,23 @@ try {
     }
     throw new Error(failure);
   };
+  for (const url of ['https://w3c.github.io/element-timing/', 'https://w3c.github.io/aria/']) {
+    await cmd('browsingContext.navigate', { context, url, wait: 'complete' });
+    await until(`(() => {
+      const head = document.querySelector('.head');
+      const group = head?.querySelector('[data-wsc-group]');
+      const abstract = head?.querySelector('[data-wsc-abstract]');
+      const details = head?.querySelector('details');
+      if (!group || !abstract || !details) return false;
+      const heading = abstract.querySelector('h2');
+      return group.textContent.includes('Working Group') &&
+        group.nextElementSibling === abstract && abstract.nextElementSibling === details &&
+        heading && getComputedStyle(heading).display === 'none' &&
+        group.getBoundingClientRect().bottom <= abstract.getBoundingClientRect().top &&
+        abstract.getBoundingClientRect().bottom <= details.getBoundingClientRect().top;
+    })()`, `no enhanced spec header appeared on ${url}`);
+    console.log(`ok: group subtitle and abstract above metadata on ${url}`);
+  }
   const fetchUrl = 'https://fetch.spec.whatwg.org/';
   await cmd('browsingContext.navigate', { context, url: fetchUrl, wait: 'complete' });
   await until("document.querySelectorAll('[data-wsc-usedby]').length > 0", `no used-by counts appeared on ${fetchUrl}`);

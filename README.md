@@ -3,6 +3,7 @@
 A browser extension for reading web specs. On any spec — from W3C, WHATWG, or another standards body — it shows a detailed “cheatsheet” of all that’s known about it:
 
 - **The card:** the spec’s type (Living Standard, Editor’s Draft, Working Draft, Candidate Recommendation, etc.), related drafts, its repository and issues, its tests, and the group responsible for it.
+- **Spec headers:** on W3C specs, the responsible group appears below the date, and the abstract text appears above the document details, without its heading.
 - **Browser support:** Firefox, Safari, and Chrome logos, each in color when that browser’s engine implements the spec and gray when it doesn’t, going by MDN’s [browser-compat-data](https://github.com/mdn/browser-compat-data). For a gray one, **What’s missing?** lists the features it lacks.
 - **MDN:** a button with the number of the spec’s [MDN](https://developer.mozilla.org/) articles, which opens them, grouped by kind: interfaces, CSS properties, and more.
 - **Can I Use:** a button with the number of the spec’s [Can I Use](https://caniuse.com/) features, which opens each one’s global support, and a timeline of when Firefox, Safari, and Chrome shipped it.

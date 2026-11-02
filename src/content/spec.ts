@@ -5,6 +5,7 @@ import { isReview } from '../logic/review.ts';
 import { send } from '../shared/messages.ts';
 import { getSettings, onSettingsChanged } from '../shared/settings.ts';
 import { extractSpecFacts, whenSpecReady } from './extract.ts';
+import { enhanceHeader } from './header.ts';
 import { clearProblems, collectOutboundLinks, markProblems, revealLink } from './links.ts';
 import { ReviewLayer } from './review.ts';
 import { copySteps } from './steps.ts';
@@ -91,7 +92,8 @@ function hideUsedBy() {
 async function main() {
   await whenSpecReady(document, window);
   const facts = extractSpecFacts(document, location.href);
-  const { shortname } = await send('page-facts', { facts });
+  const { shortname, header } = await send('page-facts', { facts });
+  if (header) enhanceHeader(document, header.groupNames);
   currentShortname = shortname;
   if (!shortname) return;
   const settings = await getSettings();

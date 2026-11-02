@@ -13,7 +13,7 @@ import type { WptAnswer } from '../logic/wpt.ts';
 import type { Context, Loaded, PageFacts } from './types.ts';
 
 export interface Api {
-  'page-facts': { req: { facts: PageFacts }; res: { shortname?: string } };
+  'page-facts': { req: { facts: PageFacts }; res: { shortname?: string; header?: { groupNames: string[] } } };
   'get-context': { req: { tabId: number; url?: string }; res: { context: Context | null } };
   'get-spec-details': { req: { shortname: string }; res: { details: SpecDetails | null } };
   'get-group-details': { req: { identifier: string }; res: { details: GroupDetails | null } };

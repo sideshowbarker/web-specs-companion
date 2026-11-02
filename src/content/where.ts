@@ -22,7 +22,7 @@ function sectionOf(heading: Element): NonNullable<Where['section']> {
   const copy = heading.cloneNode(true) as Element;
   for (const el of Array.from(copy.querySelectorAll('.secno, .self-link, [data-wsc-usedby]'))) el.remove();
   const title = (copy.textContent ?? '').replace(/\s+/g, ' ').trim();
-  const section = heading.closest('section');
+  const section = heading.closest('section, [data-wsc-abstract]');
   const id = (section?.id && section.querySelector(HEADINGS) === heading ? section.id : '') || heading.id;
   return { ...(id ? { id } : {}), ...(number ? { number } : {}), title };
 }

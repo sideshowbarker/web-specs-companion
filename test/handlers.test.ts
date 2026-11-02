@@ -16,8 +16,33 @@ describe('handlers', () => {
     const h = createHandlers(d);
     const url = 'https://w3c.github.io/webappsec-fetch-metadata/';
     const reply = await h.handle({ type: 'page-facts', facts: { kind: 'spec', url, status: 'ED' } }, sender(7));
-    expect(reply).toEqual({ shortname: 'fetch-metadata' });
+    expect(reply).toEqual({ shortname: 'fetch-metadata', header: { groupNames: ['Web Application Security Working Group'] } });
     expect(d.setBadge).toHaveBeenCalledWith(7, expect.objectContaining({ kind: 'spec' }));
+  });
+
+  it('leaves non-W3C specs and unrelated pages without a header change', async () => {
+    const h = createHandlers(deps());
+    for (const url of ['https://fetch.spec.whatwg.org/', 'https://example.org/']) {
+      const reply = await h.handle({ type: 'page-facts', facts: { kind: 'spec', url } }, sender(7));
+      expect(reply).not.toHaveProperty('header');
+    }
+  });
+
+  it('uses the catalog group name when the group directory has no matching entry', async () => {
+    const h = createHandlers(deps({ sources: fakeSources({ groups: [] }) }));
+    const reply = await h.handle({ type: 'page-facts', facts: {
+      kind: 'spec', url: 'https://w3c.github.io/webappsec-fetch-metadata/',
+    } }, sender(7));
+    expect(reply).toMatchObject({ header: { groupNames: ['Web Application Security Working Group'] } });
+  });
+
+  it('can show the group from page facts when the spec is absent from the catalog', async () => {
+    const h = createHandlers(deps());
+    const reply = await h.handle({ type: 'page-facts', facts: {
+      kind: 'spec', url: 'https://w3c.github.io/uncataloged/',
+      groupUrls: ['https://www.w3.org/groups/wg/webappsec/'],
+    } }, sender(7));
+    expect(reply).toMatchObject({ header: { groupNames: ['Web Application Security Working Group'] } });
   });
 
   it('answers get-context after the worker restarts, from session storage', async () => {
