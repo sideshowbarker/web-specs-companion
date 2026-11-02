@@ -44,12 +44,20 @@ it('enhances an uncataloged spec whose group is known', async () => {
   expect(start).not.toHaveBeenCalled();
 });
 
-it('leaves a non-W3C header unchanged', async () => {
-  send.mockResolvedValue({ shortname: 'fetch' });
+it('leaves a page unchanged when no header data is returned', async () => {
+  send.mockResolvedValue({ shortname: 'example' });
   const html = document.body.innerHTML;
   await import('../src/content/spec.ts');
   await vi.waitFor(() => expect(start).toHaveBeenCalled());
   expect(document.body.innerHTML).toBe(html);
+});
+
+it('enhances a WHATWG header using its workstream name', async () => {
+  send.mockResolvedValue({ shortname: 'fetch', header: { groupNames: ['Fetch Workstream'] } });
+  await import('../src/content/spec.ts');
+  await vi.waitFor(() => expect(start).toHaveBeenCalled());
+  expect(document.querySelector('[data-wsc-group]')?.textContent).toBe('Fetch Workstream');
+  expect(document.querySelector('.head #abstract')).not.toBeNull();
 });
 
 it('waits for a live ReSpec draft to finish rendering', async () => {

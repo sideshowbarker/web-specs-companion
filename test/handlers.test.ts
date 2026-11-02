@@ -20,12 +20,23 @@ describe('handlers', () => {
     expect(d.setBadge).toHaveBeenCalledWith(7, expect.objectContaining({ kind: 'spec' }));
   });
 
-  it('leaves non-W3C specs and unrelated pages without a header change', async () => {
+  it('leaves unrelated pages without a header change', async () => {
     const h = createHandlers(deps());
-    for (const url of ['https://fetch.spec.whatwg.org/', 'https://example.org/']) {
+    for (const url of ['https://example.org/', 'https://www.w3.org/groups/wg/css/']) {
       const reply = await h.handle({ type: 'page-facts', facts: { kind: 'spec', url } }, sender(7));
       expect(reply).not.toHaveProperty('header');
     }
+  });
+
+  it.each([
+    ['https://fetch.spec.whatwg.org/', 'Fetch Workstream'],
+    ['https://html.spec.whatwg.org/multipage/', 'HTML Workstream'],
+    ['https://tc39.es/ecma262/multipage/', 'TC39'],
+    ['https://httpwg.org/specs/rfc9110.html', 'HTTP Working Group'],
+  ])('offers the header for %s regardless of its standards organization', async (url, group) => {
+    const h = createHandlers(deps());
+    const reply = await h.handle({ type: 'page-facts', facts: { kind: 'spec', url } }, sender(7));
+    expect(reply).toMatchObject({ header: { groupNames: [group] } });
   });
 
   it('uses the catalog group name when the group directory has no matching entry', async () => {

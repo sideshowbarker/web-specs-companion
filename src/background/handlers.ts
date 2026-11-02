@@ -93,10 +93,10 @@ export function createHandlers(deps: HandlerDeps) {
       const ctx = await contextFor(tabId, msg.facts.url);
       if (ctx) await deps.setBadge(tabId, ctx);
       deps.notify?.(tabId);
-      const w3c = ctx?.kind === 'spec' && (ctx.spec ? ctx.spec.organization.startsWith('W3C') : ctx.groups.length > 0);
+      const recognized = ctx?.kind === 'spec' && (ctx.spec || ctx.groups.length > 0);
       return {
         shortname: ctx?.spec?.shortname,
-        ...(w3c ? { header: { groupNames: (ctx.groups.length ? ctx.groups : ctx.spec?.groups ?? []).map((g) => g.name) } } : {}),
+        ...(recognized ? { header: { groupNames: (ctx.groups.length ? ctx.groups : ctx.spec?.groups ?? []).map((g) => g.name) } } : {}),
       };
     },
     'get-context': async (msg) => ({ context: await contextFor(msg.tabId, msg.url) }),

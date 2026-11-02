@@ -80,22 +80,31 @@ try {
     }
     throw new Error(failure);
   };
-  for (const url of ['https://w3c.github.io/element-timing/', 'https://w3c.github.io/aria/']) {
+  for (const url of ['https://w3c.github.io/element-timing/', 'https://w3c.github.io/aria/', 'https://fetch.spec.whatwg.org/']) {
     await cmd('browsingContext.navigate', { context, url, wait: 'complete' });
     await until(`(() => {
       const head = document.querySelector('.head');
       const group = head?.querySelector('[data-wsc-group]');
       const abstract = head?.querySelector('[data-wsc-abstract]');
-      const details = head?.querySelector('details');
+      const details = head?.querySelector('details, [data-fill-with="spec-metadata"]');
       if (!group || !abstract || !details) return false;
       const heading = abstract.querySelector('h2');
-      return group.textContent.includes('Working Group') &&
+      return group.textContent.length > 0 &&
         group.nextElementSibling === abstract && abstract.nextElementSibling === details &&
         heading && getComputedStyle(heading).display === 'none' &&
         group.getBoundingClientRect().bottom <= abstract.getBoundingClientRect().top &&
         abstract.getBoundingClientRect().bottom <= details.getBoundingClientRect().top;
     })()`, `no enhanced spec header appeared on ${url}`);
     console.log(`ok: group subtitle and abstract above metadata on ${url}`);
+  }
+  for (const [url, groupName] of [
+    ['https://tc39.es/ecma262/multipage/', 'TC39'],
+    ['https://www.rfc-editor.org/rfc/rfc9110.html', 'HTTP Working Group'],
+  ]) {
+    await cmd('browsingContext.navigate', { context, url, wait: 'complete' });
+    await until(`document.querySelector('[data-wsc-group]')?.textContent === ${JSON.stringify(groupName)}`,
+      `no group badge appeared on ${url}`);
+    console.log(`ok: ${groupName} badge on ${url}`);
   }
   const fetchUrl = 'https://fetch.spec.whatwg.org/';
   await cmd('browsingContext.navigate', { context, url: fetchUrl, wait: 'complete' });

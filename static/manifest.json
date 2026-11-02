@@ -54,12 +54,25 @@
     "https://gpuweb.github.io/*",
     "https://patcg-individual-drafts.github.io/*",
     "https://w3c-cg.github.io/*",
-    "https://svgwg.org/*"
+    "https://svgwg.org/*",
+    "https://aomediacodec.github.io/*",
+    "https://tc39.es/*",
+    "https://httpwg.org/*",
+    "https://datatracker.ietf.org/doc/*",
+    "https://www.ietf.org/archive/id/*",
+    "https://tools.ietf.org/html/*",
+    "https://www.rfc-editor.org/rfc/*",
+    "https://www.rfc-editor.org/info/*",
+    "https://registry.khronos.org/*",
+    "https://fidoalliance.org/specs/*",
+    "https://www.iso.org/standard/*"
   ],
   "content_scripts": [
     {
       "matches": [
         "https://www.w3.org/TR/*",
+        "https://www.w3.org/2001/tag/doc/*",
+        "https://www.w3.org/policies/*",
         "https://w3c.github.io/*",
         "https://wicg.github.io/*",
         "https://drafts.csswg.org/*",
@@ -77,7 +90,18 @@
         "https://gpuweb.github.io/*",
         "https://patcg-individual-drafts.github.io/*",
         "https://w3c-cg.github.io/*",
-        "https://svgwg.org/*"
+        "https://svgwg.org/*",
+        "https://aomediacodec.github.io/*",
+        "https://tc39.es/*",
+        "https://httpwg.org/*",
+        "https://datatracker.ietf.org/doc/*",
+        "https://www.ietf.org/archive/id/*",
+        "https://tools.ietf.org/html/*",
+        "https://www.rfc-editor.org/rfc/*",
+        "https://www.rfc-editor.org/info/*",
+        "https://registry.khronos.org/*",
+        "https://fidoalliance.org/specs/*",
+        "https://www.iso.org/standard/*"
       ],
       "js": [
         "respec-main.js"
@@ -88,6 +112,8 @@
     {
       "matches": [
         "https://www.w3.org/TR/*",
+        "https://www.w3.org/2001/tag/doc/*",
+        "https://www.w3.org/policies/*",
         "https://w3c.github.io/*",
         "https://wicg.github.io/*",
         "https://drafts.csswg.org/*",
@@ -105,7 +131,18 @@
         "https://gpuweb.github.io/*",
         "https://patcg-individual-drafts.github.io/*",
         "https://w3c-cg.github.io/*",
-        "https://svgwg.org/*"
+        "https://svgwg.org/*",
+        "https://aomediacodec.github.io/*",
+        "https://tc39.es/*",
+        "https://httpwg.org/*",
+        "https://datatracker.ietf.org/doc/*",
+        "https://www.ietf.org/archive/id/*",
+        "https://tools.ietf.org/html/*",
+        "https://www.rfc-editor.org/rfc/*",
+        "https://www.rfc-editor.org/info/*",
+        "https://registry.khronos.org/*",
+        "https://fidoalliance.org/specs/*",
+        "https://www.iso.org/standard/*"
       ],
       "js": [
         "spec.js"

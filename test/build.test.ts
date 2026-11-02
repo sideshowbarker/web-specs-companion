@@ -4,6 +4,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { buildExtension, fillManifest } from '../scripts/build.ts';
+import type { SlimSpec } from '../src/shared/types.ts';
 
 const template = {
   version: '0.0.0',
@@ -69,4 +70,28 @@ describe('buildExtension', () => {
       await rm(out, { recursive: true, force: true });
     }
   });
+});
+
+// The popup and the page scripts must cover the same catalog, including its alternate publication URLs.
+it('injects both spec scripts on every HTML catalog URL', () => {
+  const manifest = JSON.parse(readFileSync('static/manifest.json', 'utf8')) as {
+    host_permissions: string[]; content_scripts: { js: string[]; matches: string[] }[];
+  };
+  const specs = JSON.parse(readFileSync('data/specs.json', 'utf8')) as SlimSpec[];
+  const matches = (pattern: string, url: string) =>
+    new RegExp('^' + pattern.split('*').map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*') + '$').test(url);
+  const urls = new Set(specs.flatMap((s) => [s.url, s.series.releaseUrl, s.series.nightlyUrl,
+    s.nightly?.url, s.release?.url, ...(s.nightly?.alternateUrls ?? []), ...(s.nightly?.pages ?? []), ...(s.release?.pages ?? [])]));
+  urls.add('https://www.rfc-editor.org/rfc/rfc9110.html');
+  urls.add('https://html.spec.whatwg.org/');
+  urls.add('https://tc39.es/ecma262/');
+  for (const url of urls) {
+    if (!url || /\.(pdf|txt)(?:$|[?#])/.test(url)) continue;
+    for (const script of ['spec.js', 'respec-main.js']) {
+      const entry = manifest.content_scripts.find((cs) => cs.js.includes(script));
+      expect(entry!.matches.some((pattern: string) => matches(pattern, url)), `${script}: ${url}`).toBe(true);
+    }
+    expect(manifest.host_permissions.some((pattern: string) => matches(pattern, url)), url).toBe(true);
+  }
+  expect(manifest.host_permissions).not.toContain('<all_urls>');
 });
