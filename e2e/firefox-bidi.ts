@@ -80,19 +80,22 @@ try {
     }
     throw new Error(failure);
   };
-  for (const url of ['https://w3c.github.io/element-timing/', 'https://w3c.github.io/aria/', 'https://fetch.spec.whatwg.org/']) {
+  for (const url of ['https://w3c.github.io/element-timing/', 'https://w3c.github.io/aria/', 'https://fetch.spec.whatwg.org/', 'https://privacycg.github.io/storage-access/']) {
     await cmd('browsingContext.navigate', { context, url, wait: 'complete' });
     await until(`(() => {
-      const head = document.querySelector('.head');
+      const head = document.querySelector('.head') ?? document.querySelector('header');
+      const subtitle = head?.querySelector(':scope > #w3c-state, :scope > #subtitle, :scope > #profile-and-date, :scope > hgroup');
       const group = head?.querySelector('[data-wsc-group]');
       const abstract = head?.querySelector('[data-wsc-abstract]');
       const details = head?.querySelector('details, [data-fill-with="spec-metadata"]');
-      if (!group || !abstract || !details) return false;
+      if (!subtitle || !group || !abstract || !details) return false;
       const heading = abstract.querySelector('h2');
       return group.textContent.length > 0 &&
         !head.querySelector('img[alt="W3C"]') &&
+        subtitle.nextElementSibling === group &&
         group.nextElementSibling === abstract && abstract.nextElementSibling === details &&
         heading && getComputedStyle(heading).display === 'none' &&
+        subtitle.getBoundingClientRect().bottom <= group.getBoundingClientRect().top &&
         group.getBoundingClientRect().bottom <= abstract.getBoundingClientRect().top &&
         abstract.getBoundingClientRect().bottom <= details.getBoundingClientRect().top;
     })()`, `no enhanced spec header appeared on ${url}`);

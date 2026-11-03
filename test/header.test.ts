@@ -15,6 +15,28 @@ function docFrom(abstract: string, head = header): Document {
 }
 
 describe('enhanceHeader', () => {
+  it.each(['header', 'div class="head"'])('keeps a report type and date below its title in %s', (tag) => {
+    const doc = docFrom(`<div data-fill-with="abstract"><h2 id="abstract">Abstract</h2>${content}</div>`,
+      `<${tag}><h1 id="title">The Storage Access API</h1>
+      <h2 id="subtitle"><span class="content">Draft Community Group Report,
+      <time datetime="2026-10-26">26 October 2026</time></span></h2>
+      <div data-fill-with="spec-metadata"><dl><dt>This version:</dt><dd>Spec URL</dd></dl></div></${tag.split(' ')[0]}>`);
+    const title = doc.querySelector('#title')!;
+    const subtitle = doc.querySelector('#subtitle')!;
+    const date = subtitle.querySelector('time');
+    enhanceHeader(doc, ['Privacy Community Group']);
+    const badge = doc.querySelector('[data-wsc-group]')!;
+    const abstract = doc.querySelector('[data-wsc-abstract]')!;
+    expect(title.nextElementSibling).toBe(subtitle);
+    expect(subtitle.nextElementSibling).toBe(badge);
+    expect(badge.nextElementSibling).toBe(abstract);
+    expect(abstract.nextElementSibling).toBe(doc.querySelector('[data-fill-with="spec-metadata"]'));
+    expect(subtitle.querySelector('time')).toBe(date);
+    const html = doc.body.innerHTML;
+    enhanceHeader(doc, ['Privacy Community Group']);
+    expect(doc.body.innerHTML).toBe(html);
+  });
+
   it.each([
     '<p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"><img alt="W3C" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C"></a></p>',
     '<p class="logos"><a class="logo" href="https://www.w3.org/"><img alt="W3C" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C"></a></p>',

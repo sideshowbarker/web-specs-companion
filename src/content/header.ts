@@ -25,14 +25,11 @@ function removeW3cLogos(doc: Document): void {
   }
 }
 
-// Locate the title block without separating its version or publication date from the title.
+// Locate the title block ahead of the document metadata.
 function titleBlock(doc: Document): Element | null {
   const head = doc.querySelector('.head');
   let title = head?.querySelector(':scope > hgroup, :scope > h1');
-  if (title) {
-    while (title.nextElementSibling?.matches('#w3c-state, #subtitle, #profile-and-date')) title = title.nextElementSibling;
-    return title;
-  }
+  if (title) return title;
   const rfcTitle = doc.getElementById('rfc.title');
   if (rfcTitle?.parentElement?.tagName === 'HEADER') {
     const header = rfcTitle.parentElement;
@@ -102,6 +99,7 @@ export function enhanceHeader(doc: Document, groupNames: string[]): void {
   removeW3cLogos(doc);
   let after = titleBlock(doc);
   if (!after) return;
+  while (after.nextElementSibling?.matches('#w3c-state, #subtitle, #profile-and-date')) after = after.nextElementSibling;
   const head = after.parentElement!;
   const state = head.querySelector<HTMLElement>(':scope > #w3c-state');
 
