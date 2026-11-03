@@ -1,3 +1,30 @@
+function isW3cLogo(img: HTMLImageElement): boolean {
+  if (/^W3C(?:\s+logo)?$/i.test(img.alt.trim())) return true;
+  try {
+    const src = new URL(img.getAttribute('src') ?? '', img.ownerDocument.baseURI);
+    return /^(?:www\.)?w3\.org$/i.test(src.hostname)
+      && /^\/(?:Icons\/w3c(?:[_-](?:home|main))?|StyleSheets\/TR\/[^/]+\/logos\/W3C)(?:[.-][^/]*)?$/i.test(src.pathname);
+  } catch {
+    return false;
+  }
+}
+
+function removeW3cLogos(doc: Document): void {
+  for (const img of doc.querySelectorAll<HTMLImageElement>('.head img, header img, #header img')) {
+    if (!isW3cLogo(img)) continue;
+    const head = img.closest('.head, header, #header');
+    const logo = img.closest('picture') ?? img;
+    let wrapper = logo.parentElement;
+    logo.remove();
+    while (wrapper && wrapper !== head && wrapper.matches('a, p, div, span')
+      && !wrapper.children.length && !wrapper.textContent?.trim()) {
+      const parent = wrapper.parentElement;
+      wrapper.remove();
+      wrapper = parent;
+    }
+  }
+}
+
 // Locate the title block without separating its version or publication date from the title.
 function titleBlock(doc: Document): Element | null {
   const head = doc.querySelector('.head');
@@ -72,6 +99,7 @@ function abstractBlock(doc: Document): { abstract: HTMLElement; heading: HTMLEle
 
 // The background's catalog or group lookup establishes that this document is a spec before this runs.
 export function enhanceHeader(doc: Document, groupNames: string[]): void {
+  removeW3cLogos(doc);
   let after = titleBlock(doc);
   if (!after) return;
   const head = after.parentElement!;

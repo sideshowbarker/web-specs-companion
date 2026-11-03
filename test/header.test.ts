@@ -15,6 +15,36 @@ function docFrom(abstract: string, head = header): Document {
 }
 
 describe('enhanceHeader', () => {
+  it.each([
+    '<p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"><img alt="W3C" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C"></a></p>',
+    '<p class="logos"><a class="logo" href="https://www.w3.org/"><img alt="W3C" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C"></a></p>',
+    '<p><a href="https://www.w3.org/"><img src="https://www.w3.org/Icons/w3c_home.png"></a></p>',
+    '<a class="logo" href="https://www.w3.org/"><picture><source srcset="w3c-dark.svg"><img alt="W3C" src="w3c.svg"></picture></a>',
+  ])('removes the W3C header logo and its empty wrappers', (logo) => {
+    const doc = docFrom('', `<div class="head">${logo}<h1>Spec title</h1></div>`);
+    enhanceHeader(doc, group);
+    expect(doc.querySelector('.head')!.firstElementChild?.tagName).toBe('H1');
+    expect(doc.querySelector('.head img, .head picture, .head a')).toBeNull();
+    const html = doc.body.innerHTML;
+    enhanceHeader(doc, group);
+    expect(doc.body.innerHTML).toBe(html);
+  });
+
+  it('preserves partner logos, meaningful text, and illustrations outside the header', () => {
+    const doc = docFrom('<img id="illustration" alt="W3C" src="diagram.svg">',
+      `<div class="head"><p class="logos"><a href="https://www.w3.org/"><img alt="W3C" src="w3c.svg"></a>
+      <a id="partner" href="https://example.org/"><img alt="Partner" src="partner.svg"></a></p>
+      <p id="credit"><a href="https://www.w3.org/"><img alt="W3C" src="w3c.svg">Copyright W3C</a></p>
+      <h1>Spec title</h1></div>`);
+    const partner = doc.querySelector('#partner');
+    enhanceHeader(doc, group);
+    expect(doc.querySelector('.head img[alt="W3C"]')).toBeNull();
+    expect(doc.querySelector('#partner')).toBe(partner);
+    expect(doc.querySelector('#partner img')).not.toBeNull();
+    expect(doc.querySelector('#credit')?.textContent).toBe('Copyright W3C');
+    expect(doc.querySelector('#illustration')).not.toBeNull();
+  });
+
   it('keeps a WHATWG title and date together, above its workstream and abstract', () => {
     const doc = docFrom(`<div data-fill-with="abstract"><h2 id="abstract">Abstract</h2>${content}</div>`,
       `<div class="head"><hgroup><h1>Fetch</h1><p id="subtitle">Living Standard <time>Today</time></p></hgroup>

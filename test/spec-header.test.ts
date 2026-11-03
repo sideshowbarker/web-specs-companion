@@ -68,8 +68,11 @@ it('waits for a live ReSpec draft to finish rendering', async () => {
   expect(send).not.toHaveBeenCalled();
   expect(document.querySelector('.head #abstract')).toBeNull();
   const generator = document.createElement('meta');
+  document.querySelector('.head')!.insertAdjacentHTML('afterbegin',
+    '<p class="logos"><a class="logo" href="https://www.w3.org/"><img alt="W3C" src="w3c.svg"></a></p>');
   generator.name = 'generator';
   generator.content = 'ReSpec';
   document.head.append(generator);
   await vi.waitFor(() => expect(document.querySelector('.head #abstract')).not.toBeNull());
+  expect(document.querySelector('.head .logos')).toBeNull();
 });

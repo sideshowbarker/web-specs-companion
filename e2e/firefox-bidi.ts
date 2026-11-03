@@ -90,6 +90,7 @@ try {
       if (!group || !abstract || !details) return false;
       const heading = abstract.querySelector('h2');
       return group.textContent.length > 0 &&
+        !head.querySelector('img[alt="W3C"]') &&
         group.nextElementSibling === abstract && abstract.nextElementSibling === details &&
         heading && getComputedStyle(heading).display === 'none' &&
         group.getBoundingClientRect().bottom <= abstract.getBoundingClientRect().top &&
