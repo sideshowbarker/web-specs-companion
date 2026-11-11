@@ -37,17 +37,21 @@ export function titleHref(ctx: Context): string {
   return ctx.spec?.url ?? ctx.url;
 }
 
-// The card's links, without the draft or the TR its title already links to.
+// The card's links, without one to the page itself. On the draft or the TR, the link to the other one stays even when
+// the title goes there too, since the title doesn't say which version it is. On any other page, the card leaves out
+// the draft or the TR its title already links to.
 export function specLinks(ctx: Context): { label: string; href: string }[] {
   const s = ctx.spec;
   const f = ctx.facts;
   const out: { label: string; href: string }[] = [];
   const title = titleHref(ctx);
+  const here = ctx.pageKind;
+  const onVersion = here === 'ed' || here === 'tr';
   const ed = s?.nightly?.url ?? f?.edUrl;
-  if (ed && ed !== title) out.push({ label: 'Editor\u2019s Draft', href: ed });
+  if (ed && here !== 'ed' && (onVersion || ed !== title)) out.push({ label: 'Editor\u2019s Draft', href: ed });
   const tr = s?.release?.url ?? f?.latestUrl;
-  if (tr && tr !== title) out.push({ label: 'Latest TR version', href: tr });
-  if (s?.release && s.organization.startsWith('W3C')) {
+  if (tr && here !== 'tr' && (onVersion || tr !== title)) out.push({ label: 'Latest TR version', href: tr });
+  if (s?.release && s.organization.startsWith('W3C') && here !== 'history') {
     out.push({ label: 'Publication history', href: `https://www.w3.org/standards/history/${s.shortname}/` });
   }
   const repo = (s?.nightly?.repository ?? f?.repoUrl)?.replace(/\/$/, '');

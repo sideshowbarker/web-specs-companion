@@ -56,4 +56,23 @@ describe('specLinks', () => {
     expect(titleHref({ kind: 'spec', url, groups: [] })).toBe(url);
     expect(links.map((l) => l.label)).toEqual(['Latest TR version']);
   });
+
+  it('lists the TR but not the draft on the draft, even when the title links the TR', () => {
+    const s = specs[0];
+    const links = specLinks({ kind: 'spec', url: s.nightly!.url, pageKind: 'ed', groups: [], spec: s });
+    expect(titleHref({ kind: 'spec', url: s.nightly!.url, groups: [], spec: s })).toBe(s.release!.url);
+    expect(links.map((l) => l.label).slice(0, 2)).toEqual(['Latest TR version', 'Publication history']);
+  });
+
+  it('lists the draft but not the TR on the TR, even when the title links the draft', () => {
+    const s = { ...specs[0], url: specs[0].nightly!.url };
+    const links = specLinks({ kind: 'spec', url: s.release!.url, pageKind: 'tr', groups: [], spec: s });
+    expect(links.map((l) => l.label).slice(0, 2)).toEqual(['Editor\u2019s Draft', 'Publication history']);
+  });
+
+  it('lists no publication history on the publication history', () => {
+    const s = specs[0];
+    const links = specLinks({ kind: 'spec', url: 'x', pageKind: 'history', groups: [], spec: s });
+    expect(links.map((l) => l.label)).not.toContain('Publication history');
+  });
 });
