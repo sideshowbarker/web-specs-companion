@@ -199,7 +199,7 @@ export function enhanceHeader(doc: Document, groupNames: string[]): void {
 
 // The blocks that an element's content starts (or ends) with, outermost first, down to the first one that starts (or
 // ends) with text or an inline element rather than another block. Their margins would otherwise add to the padding.
-function edgeBlocks(root: Element, end: 'first' | 'last'): HTMLElement[] {
+export function edgeBlocks(root: Element, end: 'first' | 'last'): HTMLElement[] {
   const view = root.ownerDocument.defaultView;
   const chain: HTMLElement[] = [];
   for (let parent = root; ;) {

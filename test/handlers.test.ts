@@ -16,7 +16,7 @@ describe('handlers', () => {
     const h = createHandlers(d);
     const url = 'https://w3c.github.io/webappsec-fetch-metadata/';
     const reply = await h.handle({ type: 'page-facts', facts: { kind: 'spec', url, status: 'ED' } }, sender(7));
-    expect(reply).toEqual({ shortname: 'fetch-metadata', header: { groupNames: ['Web Application Security Working Group'] } });
+    expect(reply).toEqual({ shortname: 'fetch-metadata', header: { groupNames: ['Web Application Security Working Group'], w3c: true } });
     expect(d.setBadge).toHaveBeenCalledWith(7, expect.objectContaining({ kind: 'spec' }));
   });
 
@@ -36,7 +36,7 @@ describe('handlers', () => {
   ])('offers the header for %s regardless of its standards organization', async (url, group) => {
     const h = createHandlers(deps());
     const reply = await h.handle({ type: 'page-facts', facts: { kind: 'spec', url } }, sender(7));
-    expect(reply).toMatchObject({ header: { groupNames: [group] } });
+    expect(reply).toMatchObject({ header: { groupNames: [group], w3c: false } });
   });
 
   it('uses the catalog group name when the group directory has no matching entry', async () => {
@@ -53,7 +53,7 @@ describe('handlers', () => {
       kind: 'spec', url: 'https://w3c.github.io/uncataloged/',
       groupUrls: ['https://www.w3.org/groups/wg/webappsec/'],
     } }, sender(7));
-    expect(reply).toMatchObject({ header: { groupNames: ['Web Application Security Working Group'] } });
+    expect(reply).toMatchObject({ header: { groupNames: ['Web Application Security Working Group'], w3c: true } });
   });
 
   it('answers get-context after the worker restarts, from session storage', async () => {

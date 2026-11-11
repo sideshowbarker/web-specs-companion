@@ -96,7 +96,11 @@ export function createHandlers(deps: HandlerDeps) {
       const recognized = ctx?.kind === 'spec' && (ctx.spec || ctx.groups.length > 0);
       return {
         shortname: ctx?.spec?.shortname,
-        ...(recognized ? { header: { groupNames: (ctx.groups.length ? ctx.groups : ctx.spec?.groups ?? []).map((g) => g.name) } } : {}),
+        ...(recognized ? { header: {
+          groupNames: (ctx.groups.length ? ctx.groups : ctx.spec?.groups ?? []).map((g) => g.name),
+          // A spec missing from the catalog is recognized only by its W3C group.
+          w3c: ctx.spec ? ctx.spec.organization.startsWith('W3C') : true,
+        } } : {}),
       };
     },
     'get-context': async (msg) => ({ context: await contextFor(msg.tabId, msg.url) }),

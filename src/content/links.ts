@@ -1,4 +1,5 @@
 import type { LinkProblem } from '../logic/linkcheck.ts';
+import { revealInDetails } from './status.ts';
 
 export interface OutLink {
   i: number;
@@ -54,6 +55,7 @@ export function clearProblems(doc: Document) {
 export function revealLink(elements: HTMLAnchorElement[], i: number): boolean {
   const el = elements[i];
   if (!el) return false;
+  revealInDetails(el);
   el.scrollIntoView({ block: 'center' });
   el.focus();
   return true;

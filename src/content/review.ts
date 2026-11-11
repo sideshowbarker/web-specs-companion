@@ -9,6 +9,7 @@ import {
 import { send } from '../shared/messages.ts';
 import { findQuote, PageText, quoteOf } from './quote.ts';
 import { CommentEditor, EDITOR_WIDTH, type EditorValues } from './review-editor.ts';
+import { revealInDetails } from './status.ts';
 import { stepsText } from './steps.ts';
 import { whereOf } from './where.ts';
 
@@ -208,6 +209,7 @@ export class ReviewLayer {
     if (!range) return false;
     const node = range.startContainer;
     const element = node.nodeType === Node.ELEMENT_NODE ? (node as Element) : node.parentElement;
+    if (element) revealInDetails(element);
     element?.scrollIntoView({ block: 'center', behavior: 'smooth' });
     const api = this.api();
     if (api) {

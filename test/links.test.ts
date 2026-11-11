@@ -36,4 +36,11 @@ describe('markProblems / clearProblems / revealLink', () => {
     expect(document.querySelectorAll('[data-wsc-problem]')).toHaveLength(0);
     expect(document.getElementById('wsc-linkcheck-style')).toBeNull();
   });
+
+  it('opens a collapsed section to reveal a link inside it', () => {
+    document.body.innerHTML = '<details><summary>Status</summary><a href="https://dom.spec.whatwg.org/#x">x</a></details>';
+    const { elements } = collectOutboundLinks(document, 'https://w3c.github.io/spec/');
+    expect(revealLink(elements, 0)).toBe(true);
+    expect(document.querySelector('details')!.open).toBe(true);
+  });
 });

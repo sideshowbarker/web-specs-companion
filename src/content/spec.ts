@@ -8,6 +8,7 @@ import { extractSpecFacts, whenSpecReady } from './extract.ts';
 import { enhanceHeader } from './header.ts';
 import { clearProblems, collectOutboundLinks, markProblems, revealLink } from './links.ts';
 import { ReviewLayer } from './review.ts';
+import { collapseStatus } from './status.ts';
 import { copySteps } from './steps.ts';
 import { UsedByLayer } from './usedby.ts';
 
@@ -94,6 +95,7 @@ async function main() {
   const facts = extractSpecFacts(document, location.href);
   const { shortname, header } = await send('page-facts', { facts });
   if (header) enhanceHeader(document, header.groupNames);
+  if (header?.w3c) collapseStatus(document);
   currentShortname = shortname;
   if (!shortname) return;
   const settings = await getSettings();
