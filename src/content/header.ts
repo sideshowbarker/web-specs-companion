@@ -142,6 +142,16 @@ function dateLine(title: Element, last: Element): HTMLElement | undefined {
     && (el.matches('#w3c-state, #profile-and-date, #living-standard') || !!el.querySelector('time')));
 }
 
+// Shortens the maturity level in the date line, e.g. "W3C Candidate Recommendation Draft" to "W3C CR Draft".
+function abbreviateMaturity(line: HTMLElement): void {
+  const walker = line.ownerDocument.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+  for (let text = walker.nextNode(); text; text = walker.nextNode()) {
+    if (text.parentElement?.closest('[data-wsc-group]')) continue;
+    const shortened = text.textContent!.replace(/\bCandidate Recommendation\b/g, 'CR');
+    if (shortened !== text.textContent) text.textContent = shortened;
+  }
+}
+
 // The background's catalog or group lookup establishes that this document is a spec before this runs.
 export function enhanceHeader(doc: Document, groupNames: string[]): void {
   removeW3cLogos(doc);
@@ -149,6 +159,8 @@ export function enhanceHeader(doc: Document, groupNames: string[]): void {
   if (!title) return;
   let after = title;
   while (after.nextElementSibling?.matches('#w3c-state, #subtitle, #profile-and-date')) after = after.nextElementSibling;
+  const line = dateLine(title, after);
+  if (line) abbreviateMaturity(line);
 
   if (groupNames.length) {
     let badge = doc.querySelector<HTMLElement>('[data-wsc-group]');
@@ -170,7 +182,6 @@ export function enhanceHeader(doc: Document, groupNames: string[]): void {
     }
     const names = groupNames.join(' and ');
     if (badge.textContent !== names) badge.textContent = names;
-    const line = dateLine(title, after);
     if (line) {
       // Sized from the header's text rather than the date line's, which may be a heading. And raised by half the
       // difference between the two cap heights, so its text is centered on the date's rather than sharing its baseline.

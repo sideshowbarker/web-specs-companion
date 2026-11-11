@@ -308,6 +308,18 @@ describe('enhanceHeader', () => {
     expect(head.style.marginBottom).toBe('-64px');
   });
 
+  it.each([[['GPU for the Web Working Group']], [[]]])('shortens Candidate Recommendation to CR in the date line, with groups %j', (groups) => {
+    const doc = docFrom('', `<div class="head"><h1 id="title">WebGPU Shading Language</h1>
+<p id="w3c-state"><a href="https://www.w3.org/standards/types/#CRD">W3C Candidate Recommendation Draft</a>, <time>6 November 2026</time></p>
+<details open><summary>More details about this document</summary><dl><dt>Latest published version:</dt><dd>Candidate Recommendation Snapshot</dd></dl></details></div>`);
+    enhanceHeader(doc, groups);
+    enhanceHeader(doc, groups);
+    const line = doc.getElementById('w3c-state')!;
+    expect(line.querySelector('a')!.textContent).toBe('W3C CR Draft');
+    expect(line.textContent).toBe(['W3C CR Draft, 6 November 2026', ...groups].join(''));
+    expect(doc.querySelector('dd')!.textContent).toBe('Candidate Recommendation Snapshot');
+  });
+
   it('does not duplicate the subtitle or abstract when called again', () => {
     const doc = docFrom(`<section id="abstract"><h2>Abstract</h2>${content}</section>`);
     enhanceHeader(doc, group);
