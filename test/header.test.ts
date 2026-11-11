@@ -267,6 +267,35 @@ describe('enhanceHeader', () => {
     expect(doc.querySelector('[data-wsc-editors]')).toBeNull();
   });
 
+  it('evens out the space inside the abstract box, down through wrappers', () => {
+    const doc = docFrom('<section id="abstract"><h2>Abstract</h2><p id="a1">One.</p><div id="w"><p id="a2">Two.</p></div></section>');
+    enhanceHeader(doc, group);
+    const abstract = doc.querySelector<HTMLElement>('[data-wsc-abstract]')!;
+    expect(abstract.style.padding).toBe('0.75em 1em');
+    const style = (id: string) => doc.getElementById(id)!.style;
+    expect(style('a1').marginTop).toBe('0px');
+    expect(style('a1').marginBottom).toBe('');
+    expect(style('w').marginBottom).toBe('0px');
+    expect(style('a2').marginBottom).toBe('0px');
+    expect(style('w').marginTop).toBe('');
+  });
+
+  it('keeps the margin of a block that text follows at the end of the abstract', () => {
+    const doc = docFrom('<h2 id="abstract">Abstract</h2><div><p id="a1">One.</p><p id="a2">Two.</p> And trailing text.</div><h2>Next</h2>');
+    enhanceHeader(doc, group);
+    expect(doc.getElementById('a1')!.style.marginTop).toBe('0px');
+    expect(doc.getElementById('a2')!.style.marginBottom).toBe('');
+  });
+
+  it('leaves the same space above the abstract as below it', () => {
+    const doc = docFrom(`<section id="abstract"><h2>Abstract</h2>${content}</section>`);
+    enhanceHeader(doc, group);
+    const abstract = doc.querySelector<HTMLElement>('[data-wsc-abstract]')!;
+    expect(abstract.previousElementSibling).toBe(doc.getElementById('w3c-state'));
+    expect(doc.getElementById('w3c-state')!.style.marginBottom).toBe('0px');
+    expect(abstract.style.marginBlock).toBe('1.25em');
+  });
+
   it('does not duplicate the subtitle or abstract when called again', () => {
     const doc = docFrom(`<section id="abstract"><h2>Abstract</h2>${content}</section>`);
     enhanceHeader(doc, group);

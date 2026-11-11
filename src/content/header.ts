@@ -197,6 +197,27 @@ export function enhanceHeader(doc: Document, groupNames: string[]): void {
   placeEditors(doc, after);
 }
 
+// The blocks that an element's content starts (or ends) with, outermost first, down to the first one that starts (or
+// ends) with text or an inline element rather than another block. Their margins would otherwise add to the padding.
+function edgeBlocks(root: Element, end: 'first' | 'last'): HTMLElement[] {
+  const view = root.ownerDocument.defaultView;
+  const chain: HTMLElement[] = [];
+  for (let parent = root; ;) {
+    const nodes = Array.from(parent.childNodes);
+    if (end === 'last') nodes.reverse();
+    const edge = nodes.find((node) => node.nodeType === Node.TEXT_NODE
+      ? !!node.textContent?.trim()
+      : node.nodeType === Node.ELEMENT_NODE && view?.getComputedStyle(node as Element).display !== 'none'
+        // An empty fragment anchor takes no space.
+        && !(!node.hasChildNodes() && (node as Element).matches('a, span')));
+    if (edge?.nodeType !== Node.ELEMENT_NODE) return chain;
+    const el = edge as HTMLElement;
+    if (!/^(?:block|flow-root|flex|grid|list-item|table)$/.test(view?.getComputedStyle(el).display ?? '')) return chain;
+    chain.push(el);
+    parent = el;
+  }
+}
+
 function placeAbstract(after: Element, { abstract, heading }: { abstract: HTMLElement; heading: HTMLElement }): Element {
   const doc = after.ownerDocument;
 
@@ -223,10 +244,16 @@ function placeAbstract(after: Element, { abstract, heading }: { abstract: HTMLEl
   if (heading.parentElement?.classList.contains('header-wrapper')) heading.parentElement.hidden = true;
   abstract.setAttribute('data-wsc-abstract', '');
   abstract.style.marginBlock = '1.25em';
-  abstract.style.padding = '0.25em 1em';
+  // The box's padding alone sets the space inside it, rather than the margins of whatever the abstract starts and ends
+  // with. And the line above drops its bottom margin, so the box has the same space above it as below it.
+  abstract.style.padding = '0.75em 1em';
+  (after as HTMLElement).style.marginBottom = '0';
   abstract.style.borderInlineStart = '3px solid color-mix(in srgb, var(--heading-text, currentColor) 55%, transparent)';
   abstract.style.backgroundColor = 'color-mix(in srgb, var(--heading-text, currentColor) 7%, transparent)';
   abstract.style.borderRadius = '0 0.25em 0.25em 0';
   if (after.nextElementSibling !== abstract) after.after(abstract);
+  // Only once it's in the document does the abstract's content have the computed display that tells blocks apart.
+  for (const el of edgeBlocks(abstract, 'first')) el.style.marginTop = '0';
+  for (const el of edgeBlocks(abstract, 'last')) el.style.marginBottom = '0';
   return abstract;
 }
