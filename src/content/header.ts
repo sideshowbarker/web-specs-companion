@@ -132,25 +132,33 @@ function placeEditors(doc: Document, after: Element): void {
   if (after.nextElementSibling !== line) after.after(line);
 }
 
+// The line in the title block with the document's status and date, which the group's name joins.
+function dateLine(title: Element, last: Element): HTMLElement | undefined {
+  const chain: Element[] = [];
+  for (let el: Element | null = title; el; el = el === last ? null : el.nextElementSibling) {
+    chain.push(...(el.tagName === 'HGROUP' ? Array.from(el.children) : [el]));
+  }
+  return chain.reverse().find((el): el is HTMLElement => el.tagName !== 'H1'
+    && (el.matches('#w3c-state, #profile-and-date, #living-standard') || !!el.querySelector('time')));
+}
+
 // The background's catalog or group lookup establishes that this document is a spec before this runs.
 export function enhanceHeader(doc: Document, groupNames: string[]): void {
   removeW3cLogos(doc);
-  let after = titleBlock(doc);
-  if (!after) return;
+  const title = titleBlock(doc);
+  if (!title) return;
+  let after = title;
   while (after.nextElementSibling?.matches('#w3c-state, #subtitle, #profile-and-date')) after = after.nextElementSibling;
-  const head = after.parentElement!;
-  const state = head.querySelector<HTMLElement>(':scope > #w3c-state');
 
   if (groupNames.length) {
-    let subtitle = head.querySelector<HTMLElement>(':scope > [data-wsc-group]');
-    if (!subtitle) {
-      subtitle = doc.createElement('p');
-      subtitle.setAttribute('data-wsc-group', '');
-      subtitle.style.cssText = `
-        display: table;
+    let badge = doc.querySelector<HTMLElement>('[data-wsc-group]');
+    if (!badge) {
+      badge = doc.createElement('span');
+      badge.setAttribute('data-wsc-group', '');
+      badge.style.cssText = `
         box-sizing: border-box;
         max-width: 100%;
-        font-size: .9em;
+        font-style: normal;
         font-weight: 600;
         line-height: 1.4;
         color: var(--heading-text, currentColor);
@@ -158,14 +166,30 @@ export function enhanceHeader(doc: Document, groupNames: string[]): void {
         border: 1px solid color-mix(in srgb, var(--heading-text, currentColor) 30%, transparent);
         background: color-mix(in srgb, var(--heading-text, currentColor) 6%, transparent);
         border-radius: .35em;
-        margin: .6em 0 1em;
       `;
-      after.after(subtitle);
     }
     const names = groupNames.join(' and ');
-    if (subtitle.textContent !== names) subtitle.textContent = names;
-    if (state) state.style.marginBottom = '0.35em';
-    after = subtitle;
+    if (badge.textContent !== names) badge.textContent = names;
+    const line = dateLine(title, after);
+    if (line) {
+      // Sized from the header's text rather than the date line's, which may be a heading. And raised by half the
+      // difference between the two cap heights, so its text is centered on the date's rather than sharing its baseline.
+      const view = doc.defaultView;
+      const size = .9 * (parseFloat(view?.getComputedStyle(after.parentElement!).fontSize ?? '') || 16);
+      const lineSize = parseFloat(view?.getComputedStyle(line).fontSize ?? '') || size;
+      badge.style.display = 'inline-block';
+      badge.style.fontSize = `${size}px`;
+      badge.style.verticalAlign = `calc(0.5cap * ${Math.max(0, lineSize / size - 1).toFixed(3)})`;
+      badge.style.margin = '0 0 0 .6em';
+      if (line.lastElementChild !== badge) line.append(badge);
+    } else {
+      badge.style.display = 'table';
+      badge.style.verticalAlign = '';
+      badge.style.fontSize = '.9em';
+      badge.style.margin = '.6em 0 1em';
+      if (after.nextElementSibling !== badge) after.after(badge);
+      after = badge;
+    }
   }
 
   const block = abstractBlock(doc);

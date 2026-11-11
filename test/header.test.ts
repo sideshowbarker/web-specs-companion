@@ -28,8 +28,8 @@ describe('enhanceHeader', () => {
     const badge = doc.querySelector('[data-wsc-group]')!;
     const abstract = doc.querySelector('[data-wsc-abstract]')!;
     expect(title.nextElementSibling).toBe(subtitle);
-    expect(subtitle.nextElementSibling).toBe(badge);
-    expect(badge.nextElementSibling).toBe(abstract);
+    expect(subtitle.lastElementChild).toBe(badge);
+    expect(subtitle.nextElementSibling).toBe(abstract);
     expect(abstract.nextElementSibling).toBe(doc.querySelector('[data-fill-with="spec-metadata"]'));
     expect(subtitle.querySelector('time')).toBe(date);
     const html = doc.body.innerHTML;
@@ -75,9 +75,9 @@ describe('enhanceHeader', () => {
     enhanceHeader(doc, ['Fetch Workstream']);
     const group = doc.querySelector('[data-wsc-group]')!;
     expect(group?.textContent).toBe('Fetch Workstream');
-    expect(titleBlock.nextElementSibling).toBe(group);
+    expect(doc.querySelector('#subtitle')!.lastElementChild).toBe(group);
     expect(doc.querySelector('#subtitle')!.parentElement).toBe(titleBlock);
-    expect(group.nextElementSibling).toBe(doc.querySelector('#abstract'));
+    expect(titleBlock.nextElementSibling).toBe(doc.querySelector('#abstract'));
     expect(doc.querySelector('#abstract')!.nextElementSibling).toBe(doc.querySelector('[data-fill-with="spec-metadata"]'));
   });
 
@@ -85,8 +85,25 @@ describe('enhanceHeader', () => {
     const doc = docFrom('<h3 id="abstract">Where does this specification fit?</h3><p>Introduction.</p>',
       '<header class="head"><hgroup><h1>HTML</h1><p id="living-standard">Living Standard</p></hgroup><nav>Versions</nav></header>');
     enhanceHeader(doc, ['HTML Workstream']);
-    expect(doc.querySelector('hgroup')!.nextElementSibling?.textContent).toBe('HTML Workstream');
+    expect(doc.querySelector('#living-standard')!.lastElementChild?.textContent).toBe('HTML Workstream');
     expect(doc.querySelector('#abstract')!.parentElement).toBe(doc.body);
+  });
+
+  it('keeps a subtitle without a date on its own line, above the date line the group joins', () => {
+    const doc = docFrom(`<section id="abstract"><h2>Abstract</h2>${content}</section>`,
+      `<div class="head"><h1 id="title">VCALM v1.0</h1> <h2 id="subtitle">A Verifiable Credential API</h2>
+      <p id="w3c-state"><a href="https://www.w3.org/standards/types#WD">W3C Working Draft</a> <time>10 November 2026</time></p></div>`);
+    enhanceHeader(doc, ['Verifiable Credentials Working Group']);
+    const state = doc.querySelector('#w3c-state')!;
+    expect(doc.querySelector('#subtitle [data-wsc-group]')).toBeNull();
+    expect(state.textContent!.replace(/\s+/g, ' ')).toBe('W3C Working Draft 10 November 2026Verifiable Credentials Working Group');
+    expect(state.lastElementChild!.tagName).toBe('SPAN');
+    expect((state.lastElementChild as HTMLElement).style.display).toBe('inline-block');
+    // Raised by half the difference between the date's cap height and its own, so the two texts share a center.
+    expect((state.lastElementChild as HTMLElement).style.verticalAlign).toMatch(/^calc\(0\.5cap \* \d+(\.\d+)?\)$/);
+    const html = doc.body.innerHTML;
+    enhanceHeader(doc, ['Verifiable Credentials Working Group']);
+    expect(doc.body.innerHTML).toBe(html);
   });
 
   it.each([
@@ -108,7 +125,7 @@ describe('enhanceHeader', () => {
     const doc = docFrom(`<div data-fill-with="abstract"><h2>Abstract</h2>${content}</div>`,
       '<div class="head"><h1>AVIF</h1><h2 id="subtitle">v1.2</h2><h3 id="profile-and-date">Final Deliverable, Today</h3><dl><dt>Editors</dt></dl></div>');
     enhanceHeader(doc, ['AOM']);
-    expect(doc.querySelector('#profile-and-date')!.nextElementSibling?.textContent).toBe('AOM');
+    expect(doc.querySelector('#profile-and-date')!.lastElementChild?.textContent).toBe('AOM');
     expect(doc.querySelector('[data-wsc-abstract]')!.nextElementSibling?.tagName).toBe('DL');
   });
 
@@ -180,9 +197,9 @@ describe('enhanceHeader', () => {
     enhanceHeader(doc, group);
     const subtitle = doc.querySelector('[data-wsc-group]')!;
     const abstract = doc.querySelector('[data-wsc-abstract]')!;
-    expect(doc.querySelector('#w3c-state')!.nextElementSibling).toBe(subtitle);
+    expect(doc.querySelector('#w3c-state')!.lastElementChild).toBe(subtitle);
     expect(subtitle.textContent).toBe(group[0]);
-    expect(subtitle.nextElementSibling).toBe(abstract);
+    expect(doc.querySelector('#w3c-state')!.nextElementSibling).toBe(abstract);
     expect(abstract.nextElementSibling).toBe(doc.querySelector('[data-wsc-editors]'));
     expect(abstract.nextElementSibling!.nextElementSibling).toBe(details);
     expect(abstract.querySelector('#summary-text')).toBe(paragraph);
