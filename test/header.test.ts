@@ -296,6 +296,18 @@ describe('enhanceHeader', () => {
     expect(abstract.style.marginBlock).toBe('1.25em');
   });
 
+  it('leaves 1em between the header and the first heading after it, past a table of contents out of the flow', () => {
+    const doc = docFrom('<nav id="toc" style="position: fixed"><h2>Table of Contents</h2></nav>'
+      + '<section id="intro"><div class="header-wrapper" style="display: flex"><h2 id="intro-h">1. Introduction</h2></div></section>');
+    doc.querySelector('#sotd')!.remove();
+    const head = doc.querySelector<HTMLElement>('.head')!;
+    head.getBoundingClientRect = () => ({ bottom: 100 }) as DOMRect;
+    doc.getElementById('intro')!.getBoundingClientRect = () => ({ top: 100 }) as DOMRect;
+    doc.getElementById('intro-h')!.getBoundingClientRect = () => ({ top: head.style.marginBottom === '0px' ? 180 : 999 }) as DOMRect;
+    enhanceHeader(doc, group);
+    expect(head.style.marginBottom).toBe('-64px');
+  });
+
   it('does not duplicate the subtitle or abstract when called again', () => {
     const doc = docFrom(`<section id="abstract"><h2>Abstract</h2>${content}</section>`);
     enhanceHeader(doc, group);

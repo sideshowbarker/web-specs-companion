@@ -86,7 +86,7 @@ describe('collapseStatus', () => {
     expect(document.querySelector<HTMLElement>('details[data-wsc-status]')!.style.margin).toBe('1em 0px 0px');
   });
 
-  it('leaves the space below alone when the next block is already close', () => {
+  it('tops the space below up to 1em when the next block is closer than that', () => {
     document.body.innerHTML = bikeshed;
     document.getElementById('contents')!.getBoundingClientRect = () => ({ top: 110 }) as DOMRect;
     HTMLDetailsElement.prototype.getBoundingClientRect = () => ({ bottom: 100 }) as DOMRect;
@@ -95,7 +95,7 @@ describe('collapseStatus', () => {
     } finally {
       delete (HTMLDetailsElement.prototype as { getBoundingClientRect?: unknown }).getBoundingClientRect;
     }
-    expect(document.querySelector<HTMLElement>('details[data-wsc-status]')!.style.marginBottom).toBe('0px');
+    expect(document.querySelector<HTMLElement>('details[data-wsc-status]')!.style.marginBottom).toBe('6px');
   });
 
   it('styles the heading like any other summary, rather than as a section heading', () => {

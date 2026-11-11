@@ -1,4 +1,4 @@
-import { edgeBlocks } from './header.ts';
+import { closeGapBelow, edgeBlocks } from './header.ts';
 
 const collapse = (text: string | null | undefined) => (text ?? '').replace(/\s+/g, ' ').trim();
 
@@ -83,29 +83,6 @@ function moveIntoHeader(doc: Document, container: Element): boolean {
   const copyright = head?.querySelector('.copyright');
   copyright?.before(container);
   return !!copyright;
-}
-
-// The next block's top margin (a section heading's, usually) would leave a gap below the closed section several lines
-// tall. So a negative bottom margin cancels all but 1em of it. With the section's own bottom margin at 0, the gap is
-// just what the next block brings, whether or not its margin collapses with the section's.
-function closeGapBelow(container: HTMLElement): void {
-  const view = container.ownerDocument.defaultView;
-  if (!view) return;
-  container.style.marginBottom = '0';
-  let next = container.nextElementSibling;
-  while (next) {
-    const style = view.getComputedStyle(next);
-    if (style.display !== 'none' && style.position !== 'fixed' && style.position !== 'absolute'
-      && !next.matches('script, style, template')) break;
-    next = next.nextElementSibling;
-  }
-  if (!next) return;
-  // Measured to the block's first content, since a heading's margin inside a flex wrapper doesn't collapse through it.
-  let first = next;
-  while (first.firstElementChild && !view.getComputedStyle(first).display.startsWith('inline')) first = first.firstElementChild;
-  const em = parseFloat(view.getComputedStyle(container).fontSize) || 16;
-  const gap = first.getBoundingClientRect().top - container.getBoundingClientRect().bottom;
-  if (gap > em) container.style.marginBottom = `${-Math.round(gap - em)}px`;
 }
 
 function fragmentTarget(doc: Document): Element | null {

@@ -195,6 +195,32 @@ export function enhanceHeader(doc: Document, groupNames: string[]): void {
   const block = abstractBlock(doc);
   if (block) after = placeAbstract(after, block);
   placeEditors(doc, after);
+  const head = doc.querySelector<HTMLElement>('.head');
+  if (head) closeGapBelow(head);
+}
+
+// The next block's top margin (a section heading's, usually) can leave a gap several lines tall below an element. So a
+// negative bottom margin cancels all but 1em of it, or a positive one tops a narrower gap up to 1em. With the element's
+// own bottom margin at 0, the gap is just what the next block brings, whether or not its margin collapses with the
+// element's.
+export function closeGapBelow(container: HTMLElement): void {
+  const view = container.ownerDocument.defaultView;
+  if (!view) return;
+  container.style.marginBottom = '0';
+  let next = container.nextElementSibling;
+  while (next) {
+    const style = view.getComputedStyle(next);
+    if (style.display !== 'none' && style.position !== 'fixed' && style.position !== 'absolute'
+      && !next.matches('script, style, template')) break;
+    next = next.nextElementSibling;
+  }
+  if (!next) return;
+  // Measured to the block's first content, since a heading's margin inside a flex wrapper doesn't collapse through it.
+  let first = next;
+  while (first.firstElementChild && !view.getComputedStyle(first).display.startsWith('inline')) first = first.firstElementChild;
+  const em = parseFloat(view.getComputedStyle(container).fontSize) || 16;
+  const gap = first.getBoundingClientRect().top - container.getBoundingClientRect().bottom;
+  container.style.marginBottom = `${Math.round(em - gap)}px`;
 }
 
 // The blocks that an element's content starts (or ends) with, outermost first, down to the first one that starts (or

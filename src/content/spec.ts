@@ -94,8 +94,9 @@ async function main() {
   await whenSpecReady(document, window);
   const facts = extractSpecFacts(document, location.href);
   const { shortname, header } = await send('page-facts', { facts });
-  if (header) enhanceHeader(document, header.groupNames);
+  // The status section moves into the header first, so that the header's gap below is measured to what then follows it.
   if (header?.w3c) collapseStatus(document);
+  if (header) enhanceHeader(document, header.groupNames);
   currentShortname = shortname;
   if (!shortname) return;
   const settings = await getSettings();
