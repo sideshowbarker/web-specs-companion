@@ -94,6 +94,44 @@ function abstractBlock(doc: Document): { abstract: HTMLElement; heading: HTMLEle
   return { abstract: wrapper, heading: standalone };
 }
 
+const collapse = (text: string | null | undefined) => (text ?? '').replace(/\s+/g, ' ').trim();
+
+// Each current editor in the header's metadata list, with their affiliation when the hCard markup gives one.
+function editorNames(doc: Document): string[] {
+  const label = Array.from(doc.querySelectorAll('.head dt, header dt, #header dt'))
+    .find((dt) => /^Editors?:$/i.test(collapse(dt.textContent)));
+  const names: string[] = [];
+  for (let dd = label?.nextElementSibling; dd?.tagName === 'DD'; dd = dd.nextElementSibling) {
+    const name = collapse(dd.querySelector('.p-name, .fn')?.textContent);
+    const org = collapse(dd.querySelector('.p-org, .org')?.textContent);
+    const entry = name ? (org ? `${name} (${org})` : name) : collapse(dd.textContent);
+    if (entry && !names.includes(entry)) names.push(entry);
+  }
+  return names;
+}
+
+function placeEditors(doc: Document, after: Element): void {
+  const names = editorNames(doc);
+  let line = doc.querySelector<HTMLElement>('[data-wsc-editors]');
+  if (!names.length) {
+    line?.remove();
+    return;
+  }
+  const label = names.length > 1 ? 'Editors:' : 'Editor:';
+  const list = ` ${names.join(', ')}`;
+  if (!line) {
+    line = doc.createElement('p');
+    line.setAttribute('data-wsc-editors', '');
+    line.style.margin = '0 0 1.25em';
+  }
+  if (line.textContent !== label + list) {
+    const strong = doc.createElement('strong');
+    strong.textContent = label;
+    line.replaceChildren(strong, list);
+  }
+  if (after.nextElementSibling !== line) after.after(line);
+}
+
 // The background's catalog or group lookup establishes that this document is a spec before this runs.
 export function enhanceHeader(doc: Document, groupNames: string[]): void {
   removeW3cLogos(doc);
@@ -131,8 +169,12 @@ export function enhanceHeader(doc: Document, groupNames: string[]): void {
   }
 
   const block = abstractBlock(doc);
-  if (!block) return;
-  const { abstract, heading } = block;
+  if (block) after = placeAbstract(after, block);
+  placeEditors(doc, after);
+}
+
+function placeAbstract(after: Element, { abstract, heading }: { abstract: HTMLElement; heading: HTMLElement }): Element {
+  const doc = after.ownerDocument;
 
   // Keep the heading for review-location lookup, and put its fragment target on a visible element.
   if (heading.id) {
@@ -162,4 +204,5 @@ export function enhanceHeader(doc: Document, groupNames: string[]): void {
   abstract.style.backgroundColor = 'color-mix(in srgb, var(--heading-text, currentColor) 7%, transparent)';
   abstract.style.borderRadius = '0 0.25em 0.25em 0';
   if (after.nextElementSibling !== abstract) after.after(abstract);
+  return abstract;
 }

@@ -183,7 +183,8 @@ describe('enhanceHeader', () => {
     expect(doc.querySelector('#w3c-state')!.nextElementSibling).toBe(subtitle);
     expect(subtitle.textContent).toBe(group[0]);
     expect(subtitle.nextElementSibling).toBe(abstract);
-    expect(abstract.nextElementSibling).toBe(details);
+    expect(abstract.nextElementSibling).toBe(doc.querySelector('[data-wsc-editors]'));
+    expect(abstract.nextElementSibling!.nextElementSibling).toBe(details);
     expect(abstract.querySelector('#summary-text')).toBe(paragraph);
     expect(paragraph.querySelector('a')).toBe(link);
     expect(abstract.querySelectorAll('p')).toHaveLength(2);
@@ -194,6 +195,59 @@ describe('enhanceHeader', () => {
     const range = doc.createRange();
     range.selectNodeContents(paragraph);
     expect(whereOf(range).section).toMatchObject({ title: 'Abstract', id: 'abstract' });
+  });
+
+  it('lists the editors and their affiliations below the abstract, leaving out the authors', () => {
+    const doc = docFrom(`<section id="abstract"><h2>Abstract</h2>${content}</section>`,
+      `<div class="head"><h1 id="title">VCALM v1.0</h1><p id="w3c-state">W3C Working Draft</p>
+      <details open><summary>More details about this document</summary><dl>
+      <dt>Latest editor's draft:</dt><dd><a href="https://w3c.github.io/vcalm/">https://w3c.github.io/vcalm/</a></dd>
+      <dt>
+        Editors:
+      </dt><dd class="editor p-author h-card vcard">
+        <a class="u-url url p-name fn" href="https://example.org/psl">Patrick St. Louis</a> (<a class="p-org org h-org" href="https://opsecid.ca/">Open Security and Identity</a>)
+      </dd><dd class="editor p-author h-card vcard">
+        <a class="u-url url p-name fn" href="https://example.org/ke">Kayode Ezike</a> (<a class="p-org org h-org" href="https://gobekli.io/">Gobekli</a>)
+      </dd>
+      <dt>Authors:</dt><dd class="editor p-author h-card vcard">
+        <span class="p-name fn">Nate Otto</span> (<a class="p-org org h-org" href="https://skybridgeskills.com/">Skybridge Skills</a>)
+      </dd>
+      <dt>Feedback:</dt><dd>GitHub</dd>
+      </dl></details></div>`);
+    enhanceHeader(doc, ['Verifiable Credentials Working Group']);
+    const editors = doc.querySelector('[data-wsc-editors]')!;
+    expect(doc.querySelector('[data-wsc-abstract]')!.nextElementSibling).toBe(editors);
+    expect(editors.textContent).toBe('Editors: Patrick St. Louis (Open Security and Identity), Kayode Ezike (Gobekli)');
+    expect(editors.querySelector('a')).toBeNull();
+    const html = doc.body.innerHTML;
+    enhanceHeader(doc, ['Verifiable Credentials Working Group']);
+    expect(doc.body.innerHTML).toBe(html);
+  });
+
+  it('lists a Bikeshed editor without email links, and leaves out former editors', () => {
+    const doc = docFrom(`<div data-fill-with="abstract"><h2 id="abstract">Abstract</h2>${content}</div>`,
+      `<div class="head"><h1 id="title">CSS Anchor Positioning</h1><div data-fill-with="spec-metadata"><dl>
+      <dt class="editor">Editor:<dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:a@example.org">Tab Atkins Jr.</a> (<a class="p-org org" href="https://www.google.com/">Google</a>)
+      <dt class="editor">Former Editors:<dd class="editor p-author h-card vcard"><a class="p-name fn u-url url" href="https://example.org/">Someone Else</a> (<span class="p-org org">Example</span>)
+      </dl></div></div>`);
+    enhanceHeader(doc, ['CSS Working Group']);
+    expect(doc.querySelector('[data-wsc-editors]')!.textContent).toBe('Editor: Tab Atkins Jr. (Google)');
+  });
+
+  it('lists editors from plain metadata, and puts them below the group when there is no abstract', () => {
+    const doc = docFrom('', `<div class="head"><h1>Title</h1><dl><dt>Editors:</dt>
+      <dd>Jane Doe, Example Corp</dd><dd><span class="p-name fn">Ann Example</span></dd><dd>Jane Doe, Example Corp</dd></dl></div>`);
+    enhanceHeader(doc, group);
+    const editors = doc.querySelector('[data-wsc-editors]')!;
+    expect(doc.querySelector('[data-wsc-group]')!.nextElementSibling).toBe(editors);
+    expect(editors.textContent).toBe('Editors: Jane Doe, Example Corp, Ann Example');
+  });
+
+  it('adds no editors line when the metadata names no editors', () => {
+    const doc = docFrom(`<section id="abstract"><h2>Abstract</h2>${content}</section>`,
+      '<div class="head"><h1>Title</h1><dl><dt>Editors</dt><dt>Authors:</dt><dd>Someone</dd></dl></div>');
+    enhanceHeader(doc, group);
+    expect(doc.querySelector('[data-wsc-editors]')).toBeNull();
   });
 
   it('does not duplicate the subtitle or abstract when called again', () => {
