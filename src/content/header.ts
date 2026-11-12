@@ -218,17 +218,24 @@ export function closeGapBelow(container: HTMLElement): void {
   const view = container.ownerDocument.defaultView;
   if (!view) return;
   container.style.marginBottom = '0';
-  let next = container.nextElementSibling;
-  while (next) {
-    const style = view.getComputedStyle(next);
-    if (style.display !== 'none' && style.position !== 'fixed' && style.position !== 'absolute'
-      && !next.matches('script, style, template')) break;
-    next = next.nextElementSibling;
-  }
+  // The first element from el on that's in the flow: A script, or a sidebar table of contents, has no place in it.
+  const inFlow = (el: Element | null) => {
+    for (; el; el = el.nextElementSibling) {
+      const style = view.getComputedStyle(el);
+      if (style.display !== 'none' && style.position !== 'fixed' && style.position !== 'absolute'
+        && !el.matches('script, style, template')) return el;
+    }
+    return null;
+  };
+  const next = inFlow(container.nextElementSibling);
   if (!next) return;
   // Measured to the block's first content, since a heading's margin inside a flex wrapper doesn't collapse through it.
   let first = next;
-  while (first.firstElementChild && !view.getComputedStyle(first).display.startsWith('inline')) first = first.firstElementChild;
+  while (!view.getComputedStyle(first).display.startsWith('inline')) {
+    const child = inFlow(first.firstElementChild);
+    if (!child) break;
+    first = child;
+  }
   const em = parseFloat(view.getComputedStyle(container).fontSize) || 16;
   const gap = first.getBoundingClientRect().top - container.getBoundingClientRect().bottom;
   container.style.marginBottom = `${Math.round(em - gap)}px`;

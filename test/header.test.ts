@@ -308,6 +308,19 @@ describe('enhanceHeader', () => {
     expect(head.style.marginBottom).toBe('-64px');
   });
 
+  it('measures the space to the first heading past a script at the start of the block after the header', () => {
+    const doc = docFrom('<nav id="toc" style="position: fixed"><h2>Table of Contents</h2></nav>'
+      + '<main id="main"><script id="s">1</script><h2 id="intro-h">1. Introduction</h2></main>');
+    doc.querySelector('#sotd')!.remove();
+    const head = doc.querySelector<HTMLElement>('.head')!;
+    head.getBoundingClientRect = () => ({ bottom: 100 }) as DOMRect;
+    doc.getElementById('main')!.getBoundingClientRect = () => ({ top: 100 }) as DOMRect;
+    doc.getElementById('s')!.getBoundingClientRect = () => ({ top: 0 }) as DOMRect;
+    doc.getElementById('intro-h')!.getBoundingClientRect = () => ({ top: head.style.marginBottom === '0px' ? 180 : 999 }) as DOMRect;
+    enhanceHeader(doc, group);
+    expect(head.style.marginBottom).toBe('-64px');
+  });
+
   it.each([[['GPU for the Web Working Group']], [[]]])('shortens Candidate Recommendation to CR in the date line, with groups %j', (groups) => {
     const doc = docFrom('', `<div class="head"><h1 id="title">WebGPU Shading Language</h1>
 <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CRD">W3C Candidate Recommendation Draft</a>, <time>6 November 2026</time></p>
